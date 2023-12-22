@@ -1,4 +1,4 @@
-const { Driver } = require('../lib/driver/driver.js');
+const { Driver } = require('../src/driver.js');
 const axios = require('axios');
 const fs = require('fs');
 
@@ -26,26 +26,12 @@ class ScrapperCollector extends AbstractCollector {
         super(name);
 
         this.entry_url = entry_url;
-        this.driver = new Driver({
-            launch: {
-                headless:false,
-                args:[
-                    '--start-maximized' // you can also use '--start-fullscreen'
-                 ]
-            },
-            view_port: {
-                width: 1920,
-                height: 1080,
-            }
-        });
     }
 
     async collect(context) {
-        await this.driver.launch();
-        await this.driver.goto(this.entry_url);
-        const invoices = await this.run(context)
+        await context.driver.goto(this.entry_url);
+        const invoices = await this.run(context.driver, context.config)
         await this.download(invoices);
-        await this.driver.close();
         return invoices;
     }
 }

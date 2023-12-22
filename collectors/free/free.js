@@ -1,4 +1,32 @@
 const { ScrapperCollector } = require('../base_collector.js');
+const selectors = require('./selectors.js');
+
+class FreeCollectorData {
+    
+    //LOGIN PAGE
+
+    FIELD_LOGIN = {
+        selector: "input[name='login']",
+        info: "login input field"
+    }
+    FIELD_PASSWORD = {
+        selector: "input[name='pass']",
+        info: "password input field"
+    }
+    BUTTON_SUBMIT = {
+        selector: "#ok",
+        info: "submit form button"
+    }
+    
+    //INDEX PAGE
+
+    BUTTON_INVOICES = {
+        selector: "a[title='Mes Factures']",
+        info: "submit form button"
+    }
+    
+    //INVOICES PAGE
+}
 
 class FreeCollector extends ScrapperCollector {
 
@@ -9,17 +37,17 @@ class FreeCollector extends ScrapperCollector {
         super(FreeCollector.NAME, FreeCollector.ENTRY_URL);
     }
 
-    async run(config) {
+    async run(driver, config) {
         //Authentication
-        await this.driver.input_text("input[name='login']", config.login, {selector_info: "login input field"});
-        await this.driver.input_text("input[name='pass']", config.password, {selector_info: "password input field"});
-        await this.driver.left_click('#ok', {selector_info: "submit form button"});
+        await driver.input_text(selectors.FIELD_LOGIN, config.login);
+        await driver.input_text(selectors.FIELD_PASSWORD, config.password);
+        await driver.left_click(selectors.BUTTON_SUBMIT);
 
         //Go to invoices
-        await this.driver.left_click("a[title='Mes Factures']", {selector_info: "my invoices button"});
+        await driver.left_click(selectors.BUTTON_INVOICES);
 
         //Get invoices
-        const links = await this.driver.get_all_attributes("a[class='btn_download']", "href", {selector_info: "download invoice button"});
+        const links = await driver.get_all_attributes(selectors.BUTTON_DOWNLOAD, "href");
 
         //Build return array
         return links.map(link => {
