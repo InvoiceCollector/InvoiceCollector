@@ -1,7 +1,7 @@
 module.exports = {
     //LOGIN PAGE
 
-    FIELD_LOGIN: {
+    FIELD_USERNAME: {
         selector: "input[name='login']",
         info: "login input field"
     },

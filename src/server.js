@@ -1,63 +1,49 @@
-const { Cluster } = require('puppeteer-cluster');
-const { Driver } = require('../src/driver.js');
+const puppeteer = require('puppeteer');
 const collectors = require('../collectors/collectors.js')
 
 class Server {
+
+    PUPPETEER_CONFIG = {
+        headless:false,
+        args:[
+            '--start-maximized' // you can also use '--start-fullscreen'
+        ]
+    };
+
     constructor() {
-        this.driver = new Driver({
-            launch: {
-                headless:false,
-                args:[
-                    '--start-maximized' // you can also use '--start-fullscreen'
-                 ]
-            },
-            view_port: {
-                width: 1920,
-                height: 1080,
-            }
-        });
+        this.browser = null;
 	}
 
     async start() {
-        await this.driver.start();
-
-        await this.cluster.task(async ({ page, data: context}) => {
-            console.log(`Collecting invoice on "${context.collector.NAME}"`);
-
-            //Instanciate collector
-            const collector = new context.collector();
-
-            context.driver = new Driver(page);
-            const invoices = await collector.collect(context);
-            console.log(invoices);
-        });
+        this.browser = await puppeteer.launch(this.PUPPETEER_CONFIG);
     }
 
     async stop() {
-        if (this.cluster) {
-            await this.driver.close();
+        if(this.browser) {
+            await this.browser.close();
         }
     }
 
     collectors() {
+        console.log(`Listing all collectors`);
         return collectors.map((collector) => collector.NAME);
     }
 
-    collect(name, body = {}) {
-        if (this.cluster == null) {
-            throw new Error('Cluster not initialized. Start the server first.');
+    async collect(name, body = {}) {
+        if(!this.browser) {
+            throw new Error(`Browser not started.`);
         }
 
         //Get collector from name
         const matching_collector = collectors.filter((collector) => collector.NAME == name)
         if(matching_collector.length == 0) {
-            throw new Error(`No collectors with the name "${name}".`);
+            throw new Error(`No collector named "${name}" found.`);
         }
         if(matching_collector.length > 1) {
-            throw new Error(`Found ${matching_collector.length} collectors with the name "${name}".`);
+            throw new Error(`Found ${matching_collector.length} collectors named "${name}".`);
         }
 
-        console.log(`Adding collector "${name}" on queue`);
+        console.log(`Collecting invoice on "${name}"`);
 
         //Generate unique token
         //TODO
@@ -66,7 +52,11 @@ class Server {
             collector: matching_collector[0],
             config: body,
         }
-        this.cluster.queue(context);
+
+        //Instanciate collector
+        const collector = new context.collector(this.browser);
+        const invoices = await collector.collect(context);
+        console.log(invoices);
 
         //Return token
         return "my_token" //TODO

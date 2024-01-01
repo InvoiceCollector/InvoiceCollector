@@ -1,24 +1,12 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { ElementNotFoundError } = require('./error.js')
 
 class Driver {
     constructor(page) {
-        this.config = config;
-        this.browser = null;
+        this.page = page;
     }
 
     // ACTIONS
-
-    async launch() {
-        this.browser = await puppeteer.launch(this.config.launch);
-        this.page = await this.browser.newPage();
-        await this.page.setViewport(this.config.view_port);
-    }
-
-    async close() {
-        await this.browser.close();
-    }
 
     async goto(url) {
         await this.page.goto(url);

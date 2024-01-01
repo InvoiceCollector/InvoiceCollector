@@ -7,7 +7,7 @@ class AbstractCollector {
         this.name = name;
     }
 
-    collect() {
+    async collect() {
         throw new Error('`collect` is not implemented.');
     }
 
@@ -22,13 +22,31 @@ class AbstractCollector {
 }
 
 class ScrapperCollector extends AbstractCollector {
-    constructor(name, entry_url) {
-        super(name);
+    
+    PAGE_CONFIG = {
+        width: 1920,
+        height: 1080,
+    };
 
+    constructor(name, entry_url, browser) {
+        super(name);
         this.entry_url = entry_url;
+        this.browser = browser;
     }
 
     async collect(context) {
+        if(!context.config.username) {
+            throw new Error('Field "username" is missing.');
+        }
+        if(!context.config.password) {
+            throw new Error('Field "password" is missing.');
+        }
+
+        let page = await this.browser.newPage();
+        await page.setViewport(this.PAGE_CONFIG);
+
+        context.driver = new Driver(page); //TODO get page from newPage
+
         await context.driver.goto(this.entry_url);
         const invoices = await this.run(context.driver, context.config)
         await this.download(invoices);

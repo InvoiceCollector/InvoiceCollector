@@ -1,8 +1,9 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const { Server } = require('./src/server.js');
-const fs = require('fs');
 
 const app = express()
+app.use(bodyParser);
 const server = new Server();
 
 //TODO REMOVE
@@ -12,24 +13,30 @@ ENV_VARIABLES = [
     "PORT",
 ]
 
-app.get('/collectors', (req, res) => {
+app.get('/api/v1/collectors', (req, res) => {
+    console.log(`GET collectors`);
+
     const response = server.collectors()
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(response));
 });
 
-app.post('/collect/:collector', (req, res) => {
+app.post('/api/v1/collect/:collector', async (req, res) => {
+    console.log(`POST collect ${req.params.collector}`);
+
     try {
-        const response = server.collect(req.params.collector, req.body);
+        const response = await server.collect(req.params.collector, req.body);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
+        console.error(e);
         res.status(400).send(e);
     }
 });
 
-app.get('/collect/:token', async (req, res) => {
+app.get('/api/v1/collect/:token', async (req, res) => {
+    console.log(`GET collect ${req.params.collector}`);
 	//TODO const response = await server.getStatus(req.params.token);
 
     res.setHeader('Content-Type', 'application/json');
