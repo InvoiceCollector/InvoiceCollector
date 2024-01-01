@@ -4,6 +4,20 @@ class ElementNotFoundError extends Error {
     }
 }
 
+class NotAuthenticatedError extends Error {
+    constructor(opts) {
+        super(`Could not authenticate. Please verify your username and password.`, opts);
+    }
+}
+
+class InMaintenanceError extends Error {
+    constructor(opts) {
+        super(`The website is in maintenance. Wait a moment and try again.`, opts);
+    }
+}
+
 module.exports = {
 	ElementNotFoundError,
+	NotAuthenticatedError,
+	InMaintenanceError
 }

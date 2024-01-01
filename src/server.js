@@ -29,7 +29,7 @@ class Server {
         return collectors.map((collector) => collector.NAME);
     }
 
-    async collect(name, body = {}) {
+    async post_collect(name, body = {}) {
         if(!this.browser) {
             throw new Error(`Browser not started.`);
         }
@@ -43,23 +43,30 @@ class Server {
             throw new Error(`Found ${matching_collector.length} collectors named "${name}".`);
         }
 
+        //Create request record in database as pending
+        //TODO
+
         console.log(`Collecting invoice on "${name}"`);
+
+        //Instanciate collector
+        const collector = new matching_collector[0](this.browser);
+        const invoices = await collector.collect(body);
 
         //Generate unique token
         //TODO
-        
-        var context = {
-            collector: matching_collector[0],
-            config: body,
-        }
 
-        //Instanciate collector
-        const collector = new context.collector(this.browser);
-        const invoices = await collector.collect(context);
-        console.log(invoices);
+        //Download invoices to token folder
+        await collector.download(invoices); //TODO
 
-        //Return token
-        return "my_token" //TODO
+        //Update request record in database
+        //TODO
+
+        return {type: "success", token: "my_token", invoices}
+    }
+
+    async get_collect(token) {
+        //Return request record in database
+        //TODO
     }
 }
 

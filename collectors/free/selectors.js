@@ -13,6 +13,10 @@ module.exports = {
         selector: "#ok",
         info: "submit form button"
     },
+    CONTAINER_LOGIN_ALERT: {
+        selector: "div[class='loginalert']",
+        info: "login alert container"
+    },
     
     //INDEX PAGE
 

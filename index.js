@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { Server } = require('./src/server.js');
 
 const app = express()
-app.use(bodyParser);
+app.use(bodyParser.json());
 const server = new Server();
 
 //TODO REMOVE
@@ -26,18 +26,18 @@ app.post('/api/v1/collect/:collector', async (req, res) => {
     console.log(`POST collect ${req.params.collector}`);
 
     try {
-        const response = await server.collect(req.params.collector, req.body);
+        const response = await server.post_collect(req.params.collector, req.body);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
         console.error(e);
-        res.status(400).send(e);
+        res.status(400).end(JSON.stringify({type: "error", reason: e.message}));
     }
 });
 
 app.get('/api/v1/collect/:token', async (req, res) => {
     console.log(`GET collect ${req.params.collector}`);
-	//TODO const response = await server.getStatus(req.params.token);
+	//TODO const response = await server.get_collect(req.params.token);
 
     res.setHeader('Content-Type', 'application/json');
     //res.end(JSON.stringify(response));

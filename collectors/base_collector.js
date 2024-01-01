@@ -1,14 +1,11 @@
-const { Driver } = require('../src/driver.js');
 const axios = require('axios');
 const fs = require('fs');
+const { Driver } = require('../src/driver.js');
+const { NotAuthenticatedError, InMaintenanceError } = require('../src/error.js')
 
 class AbstractCollector {
     constructor(name) {
         this.name = name;
-    }
-
-    async collect() {
-        throw new Error('`collect` is not implemented.');
     }
 
     async download(invoices) {
@@ -18,6 +15,12 @@ class AbstractCollector {
             });
             fs.writeFileSync(`media/${this.name}_${invoice.id}.${invoice.format}`, response.data);
         }
+    }
+
+    //NOT IMPLEMENTED
+
+    async collect() {
+        throw new Error('`collect` is not implemented.');
     }
 }
 
@@ -34,23 +37,49 @@ class ScrapperCollector extends AbstractCollector {
         this.browser = browser;
     }
 
-    async collect(context) {
-        if(!context.config.username) {
+    async collect(config) {
+        if(!config.username) {
             throw new Error('Field "username" is missing.');
         }
-        if(!context.config.password) {
+        if(!config.password) {
             throw new Error('Field "password" is missing.');
         }
 
+        //Open new page
         let page = await this.browser.newPage();
         await page.setViewport(this.PAGE_CONFIG);
+        await page.goto(this.entry_url);
 
-        context.driver = new Driver(page); //TODO get page from newPage
+        const driver = new Driver(page);
+        try {
+            const invoices = await this.run(driver, config)
+            await page.close();
+            return invoices;
+        }
+        catch (err) {
+            if(!(await this.is_authenticated(driver))) {
+                await page.close();
+                throw new NotAuthenticatedError({cause: err});
+            }
+            if(await this.is_in_maintenance(driver)) {
+                await page.close();
+                throw new InMaintenanceError({cause: err});
+            }
+            await page.close();
+            throw err;
+        }
+    }
 
-        await context.driver.goto(this.entry_url);
-        const invoices = await this.run(context.driver, context.config)
-        await this.download(invoices);
-        return invoices;
+    //NOT IMPLEMENTED
+
+    async is_authenticated(driver){
+        //Assume the password is correct
+        return true;
+    }
+
+    async is_in_maintenance(driver){
+        //Assume the website is not in maintenance
+        return false;
     }
 }
 

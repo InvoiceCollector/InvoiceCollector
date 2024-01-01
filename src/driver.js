@@ -2,21 +2,18 @@ const fs = require('fs');
 const { ElementNotFoundError } = require('./error.js')
 
 class Driver {
+
+    DEFAULT_TIMEOUT = 10000;
+
     constructor(page) {
         this.page = page;
-    }
-
-    // ACTIONS
-
-    async goto(url) {
-        await this.page.goto(url);
     }
 
     // WAIT
 
     async wait_for_element(selector) {
         try {
-            await this.page.waitForSelector(selector.selector);
+            await this.page.waitForSelector(selector.selector, {timeout: this.DEFAULT_TIMEOUT});
         }
         catch (err) {
             //Get time as string
@@ -56,6 +53,12 @@ class Driver {
     async select_dropdown_menu_option(selector, option) {
         await this.wait_for_element(selector);
         //TODO
+    }
+
+    //CHECK
+
+    async check_element_exist(selector) {
+        return this.page.$$(selector.selector).length > 0;
     }
 }
 

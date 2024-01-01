@@ -10,6 +10,10 @@ class FreeCollector extends ScrapperCollector {
         super(FreeCollector.NAME, FreeCollector.ENTRY_URL, browser);
     }
 
+    async is_authenticated(driver){
+        return await driver.check_element_exist(FreeSelectors.CONTAINER_LOGIN_ALERT);
+    }
+
     async run(driver, config) {
         //Authentication
         await driver.input_text(FreeSelectors.FIELD_USERNAME, config.username);
