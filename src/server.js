@@ -1,11 +1,13 @@
 const collectors = require('../collectors/collectors.js')
 const { Queue, Worker } = require('bullmq');
-const IORedis = require('ioredis');
 
 class Server {
 
     constructor() {
-        const connection = new IORedis({maxRetriesPerRequest: null});
+        const connection = {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT
+        };
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });
         this.collect_invoice_worker = new Worker(
             'collect_invoice',
