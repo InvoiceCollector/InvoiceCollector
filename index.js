@@ -6,9 +6,6 @@ const app = express()
 app.use(bodyParser.json());
 const server = new Server();
 
-//TODO REMOVE
-process.env["PORT"] = 3000;
-
 ENV_VARIABLES = [
     "PORT",
 ]
