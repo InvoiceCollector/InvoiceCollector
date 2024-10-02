@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Server } = require('./src/server.js');
+const { Server } = require('./server.js');
 
 const app = express()
 app.use(bodyParser.json());
 const server = new Server();
+
+process.env.PORT = 8080
 
 ENV_VARIABLES = [
     "PORT",
