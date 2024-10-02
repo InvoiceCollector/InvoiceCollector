@@ -22,11 +22,17 @@ app.get('/api/v1/collectors', (req, res) => {
     res.end(JSON.stringify(response));
 });
 
-app.post('/api/v1/collect/:collector', async (req, res) => {
-    console.log(`POST collect ${req.params.collector}`);
+app.post('/api/v1/collect', async (req, res) => {
+    //Check if webhook field is missing
+    //TODO
+
+    //Check if collector field is missing
+    //TODO
+
+    console.log(`POST collect ${req.body.collector}`);
 
     try {
-        const response = await server.post_collect(req.params.collector, req.body);
+        const response = await server.post_collect(req.body.collector, req.body.params);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
@@ -53,15 +59,11 @@ function has_env_variables(){
 }
 
 //Start
-
-(async () => {
-    if(has_env_variables()){
-        await server.start();
-        app.listen(process.env.PORT, () => {
-            console.log(`App listening on port ${process.env.PORT}`)
-        });
-    }
-    else {
-        console.log(`In order to start the server, you must set following env variables: ${ENV_VARIABLES.join(', ')}`)
-    }
-})();
+if(has_env_variables()){
+    app.listen(process.env.PORT, () => {
+        console.log(`App listening on port ${process.env.PORT}`)
+    });
+}
+else {
+    console.log(`In order to start the server, you must set following env variables: ${ENV_VARIABLES.join(', ')}`)
+}

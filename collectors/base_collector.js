@@ -1,5 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
+const puppeteer = require('puppeteer');
 const { Driver } = require('../src/driver.js');
 const { NotAuthenticatedError, InMaintenanceError } = require('../src/error.js')
 
@@ -26,15 +27,21 @@ class AbstractCollector {
 
 class ScrapperCollector extends AbstractCollector {
     
+    PUPPETEER_CONFIG = {
+        headless:false,
+        args:[
+            '--start-maximized' // you can also use '--start-fullscreen'
+        ]
+    };
+
     PAGE_CONFIG = {
         width: 1920,
         height: 1080,
     };
 
-    constructor(name, entry_url, browser) {
+    constructor(name, entry_url) {
         super(name);
         this.entry_url = entry_url;
-        this.browser = browser;
     }
 
     async collect(config) {
@@ -45,8 +52,11 @@ class ScrapperCollector extends AbstractCollector {
             throw new Error('Field "password" is missing.');
         }
 
+        //Start browser
+        let browser = await puppeteer.launch(this.PUPPETEER_CONFIG);
+
         //Open new page
-        let page = await this.browser.newPage();
+        let page = await browser.newPage();
         await page.setViewport(this.PAGE_CONFIG);
         await page.goto(this.entry_url);
 
@@ -58,14 +68,14 @@ class ScrapperCollector extends AbstractCollector {
         }
         catch (err) {
             if(!(await this.is_authenticated(driver))) {
-                await page.close();
+                await browser.close();
                 throw new NotAuthenticatedError({cause: err});
             }
             if(await this.is_in_maintenance(driver)) {
-                await page.close();
+                await browser.close();
                 throw new InMaintenanceError({cause: err});
             }
-            await page.close();
+            await browser.close();
             throw err;
         }
     }

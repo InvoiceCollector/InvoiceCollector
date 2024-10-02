@@ -6,8 +6,8 @@ class FreeCollector extends ScrapperCollector {
     static NAME = "Free"
     static ENTRY_URL = "https://subscribe.free.fr/login/"
 
-    constructor(browser) {
-        super(FreeCollector.NAME, FreeCollector.ENTRY_URL, browser);
+    constructor() {
+        super(FreeCollector.NAME, FreeCollector.ENTRY_URL);
     }
 
     async is_authenticated(driver){
