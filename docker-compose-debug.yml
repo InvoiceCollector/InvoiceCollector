@@ -1,0 +1,23 @@
+services:
+  invoice-collector:
+    image: invoice-collector-debug:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-debug
+    ports:
+      - 8080:8080
+      - 9229:9229
+    volumes:
+      - ./src:/usr/app/src
+    depends_on:
+      - redis
+    environment:
+      - PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: npm run dev
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

@@ -1,0 +1,28 @@
+services:
+  invoice-collector:
+    image: invoice-collector:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+    environment:
+      - PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /usr/app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
