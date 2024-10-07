@@ -12,10 +12,9 @@ class Server {
         this.collect_invoice_worker = new Worker(
             'collect_invoice',
             async job => {
-                return await collect(
+                return await this.collect(
                     job.name,
-                    new job.data.collector_pointer(),
-                    job.data.body
+                    job.data
                 );
             },
             {
@@ -23,6 +22,17 @@ class Server {
                 concurrency: 1
             }
         );
+        
+        this.collect_invoice_worker.on("completed", (job) => {
+            console.log(`${job.id} has completed!`);
+        });
+        
+        this.collect_invoice_worker.on("failed", (job, err) => {
+            console.error(`${job.id} has failed:`);
+            console.error(err);
+        });
+        
+        console.log("Worker started!");
 	}
 
     collectors() {
@@ -30,8 +40,7 @@ class Server {
         return collectors.map((collector) => collector.NAME);
     }
 
-    async post_collect(name, body = {}) {
-        //Get collector from name
+    get_collector(name) {
         const collector_pointers = collectors.filter((collector) => collector.NAME == name)
         if(collector_pointers.length == 0) {
             throw new Error(`No collector named "${name}" found.`);
@@ -39,23 +48,31 @@ class Server {
         if(collector_pointers.length > 1) {
             throw new Error(`Found ${collector_pointers.length} collectors named "${name}".`);
         }
+        return collector_pointers[0]
+    }
+
+    async post_collect(name, body = {}) {
+        console.log(`Adding job to the queue "${name}"`);
+
+        //Get collector from name
+        const collector = this.get_collector(name);
 
         //Check mandatory parameters
         //TODO
 
         //Add job in queue
-        await this.collect_invoice_queue.add(collector_pointers[0].NAME, {
-            collector_pointer: collector_pointers[0],
-            body
-        })
+        let job = await this.collect_invoice_queue.add(collector.NAME, body);
     }
 
-    async collect(name, collector, body = {}) {
-
+    async collect(name, config = {}) {
         console.log(`Collecting invoices on "${name}"`);
 
+        //Get collector from name
+        const collector_pointer = this.get_collector(name);
+        const collector = new collector_pointer();
+
         //Collect invoices
-        const invoices = await collector.collect(body);
+        const invoices = await collector.collect(config);
 
         //Download invoices to token folder
         await collector.download(invoices); //TODO

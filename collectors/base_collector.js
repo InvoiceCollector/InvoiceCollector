@@ -20,7 +20,7 @@ class AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async collect() {
+    async collect(config) {
         throw new Error('`collect` is not implemented.');
     }
 }
@@ -60,7 +60,7 @@ class ScrapperCollector extends AbstractCollector {
         await page.setViewport(this.PAGE_CONFIG);
         await page.goto(this.entry_url);
 
-        const driver = new Driver(page);
+        let driver = new Driver(page);
         try {
             const invoices = await this.run(driver, config)
             await page.close();
