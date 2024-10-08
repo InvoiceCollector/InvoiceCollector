@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "test": "node test/test.js",
     "dev": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.js"
   },
   "dependencies": {
@@ -15,7 +16,8 @@
     "puppeteer": "^21.6.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "prompt-sync": "^4.2.0"
   },
   "nodemonConfig": {
     "watch": [
