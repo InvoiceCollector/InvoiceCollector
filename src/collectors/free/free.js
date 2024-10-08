@@ -14,10 +14,10 @@ class FreeCollector extends ScrapperCollector {
         return await driver.check_element_exist(FreeSelectors.CONTAINER_LOGIN_ALERT);
     }
 
-    async run(driver, config) {
+    async run(driver, params) {
         //Authentication
-        await driver.input_text(FreeSelectors.FIELD_USERNAME, config.username);
-        await driver.input_text(FreeSelectors.FIELD_PASSWORD, config.password);
+        await driver.input_text(FreeSelectors.FIELD_USERNAME, params.username);
+        await driver.input_text(FreeSelectors.FIELD_PASSWORD, params.password);
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
 
         //Go to invoices
@@ -28,9 +28,9 @@ class FreeCollector extends ScrapperCollector {
 
         //Build return array
         return links.map(link => {
-            let params = new URLSearchParams(link);
+            let search_params = new URLSearchParams(link);
             return {
-                id: params.get("no_facture"),
+                id: search_params.get("no_facture"),
                 type: "link",
                 mime: 'application/pdf',
                 link: link

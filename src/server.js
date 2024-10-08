@@ -52,7 +52,7 @@ class Server {
         return collector_pointers[0]
     }
 
-    async post_collect(name, body = {}) {
+    async post_collect(name, params = {}) {
         console.log(`Adding job to the queue "${name}"`);
 
         //Get collector from name
@@ -62,10 +62,10 @@ class Server {
         //TODO
 
         //Add job in queue
-        let job = await this.collect_invoice_queue.add(collector.NAME, body);
+        let job = await this.collect_invoice_queue.add(collector.NAME, params);
     }
 
-    async collect(name, config = {}) {
+    async collect(name, params = {}) {
         console.log(`Collecting invoices on "${name}"`);
 
         //Get collector from name
@@ -73,7 +73,7 @@ class Server {
         const collector = new collector_pointer();
 
         //Collect invoices
-        const invoices = await collector.collect(config);
+        const invoices = await collector.collect(params);
 
         //Download invoices to token folder
         await collector.download(invoices); //TODO

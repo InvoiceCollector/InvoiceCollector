@@ -48,11 +48,11 @@ class ScrapperCollector extends AbstractCollector {
         this.entry_url = entry_url;
     }
 
-    async collect(config) {
-        if(!config.username) {
+    async collect(params) {
+        if(!params.username) {
             throw new Error('Field "username" is missing.');
         }
-        if(!config.password) {
+        if(!params.password) {
             throw new Error('Field "password" is missing.');
         }
 
@@ -66,7 +66,7 @@ class ScrapperCollector extends AbstractCollector {
 
         let driver = new Driver(page);
         try {
-            const invoices = await this.run(driver, config)
+            const invoices = await this.run(driver, params)
             //await page.close();
             return invoices;
         }
