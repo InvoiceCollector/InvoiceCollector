@@ -67,19 +67,19 @@ class ScrapperCollector extends AbstractCollector {
         let driver = new Driver(page);
         try {
             const invoices = await this.run(driver, config)
-            await page.close();
+            //await page.close();
             return invoices;
         }
         catch (err) {
             if(!(await this.is_authenticated(driver))) {
-                await browser.close();
+                //await browser.close();
                 throw new NotAuthenticatedError({cause: err});
             }
             if(await this.is_in_maintenance(driver)) {
-                await browser.close();
+                //await browser.close();
                 throw new InMaintenanceError({cause: err});
             }
-            await browser.close();
+            //await browser.close();
             throw err;
         }
     }
