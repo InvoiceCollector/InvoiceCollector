@@ -11,10 +11,13 @@ class AbstractCollector {
 
     async download(invoices) {
         for(let invoice of invoices) {
-            const response = await axios.get(invoice.url, {
-                responseType: 'arraybuffer',
-            });
-            fs.writeFileSync(`media/${this.name}_${invoice.id}.${invoice.format}`, response.data);
+            if(invoice.type == "link") {
+                const format = invoice.mime.split('/')[1]
+                const response = await axios.get(invoice.link, {
+                    responseType: 'arraybuffer',
+                });
+                fs.writeFileSync(`media/${this.name}_${invoice.id}.${format}`, response.data);
+            }
         }
     }
 
