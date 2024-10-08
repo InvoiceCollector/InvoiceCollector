@@ -27,7 +27,6 @@ const prompt = require('prompt-sync')({sigint: true});
     // Update puppeteer config
     if (collector.PUPPETEER_CONFIG) {
       collector.PUPPETEER_CONFIG.headless = false;
-      collector.PUPPETEER_CONFIG.args = ['--start-maximized'];
     }
     
     // Loop throught each config
