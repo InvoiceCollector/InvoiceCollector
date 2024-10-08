@@ -23,7 +23,7 @@ class AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async collect(config) {
+    async collect(params) {
         throw new Error('`collect` is not implemented.');
     }
 }
@@ -71,11 +71,11 @@ class ScrapperCollector extends AbstractCollector {
             return invoices;
         }
         catch (err) {
-            if(!(await this.is_authenticated(driver))) {
+            if(!(await this.is_authenticated(driver, params))) {
                 //await browser.close();
                 throw new NotAuthenticatedError({cause: err});
             }
-            if(await this.is_in_maintenance(driver)) {
+            if(await this.is_in_maintenance(driver, params)) {
                 //await browser.close();
                 throw new InMaintenanceError({cause: err});
             }
@@ -86,12 +86,12 @@ class ScrapperCollector extends AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async is_authenticated(driver){
+    async is_authenticated(driver, params){
         //Assume the password is correct
         return true;
     }
 
-    async is_in_maintenance(driver){
+    async is_in_maintenance(driver, params){
         //Assume the website is not in maintenance
         return false;
     }
