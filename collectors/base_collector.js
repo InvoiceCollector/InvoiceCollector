@@ -28,9 +28,10 @@ class AbstractCollector {
 class ScrapperCollector extends AbstractCollector {
     
     PUPPETEER_CONFIG = {
-        headless:false,
+        headless:'new',
         args:[
-            '--start-maximized' // you can also use '--start-fullscreen'
+            '--start-maximized', // you can also use '--start-fullscreen'
+            '--no-sandbox',
         ]
     };
 
