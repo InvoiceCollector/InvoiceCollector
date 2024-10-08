@@ -1,4 +1,4 @@
-const collectors = require('../collectors/collectors.js')
+const collectors = require('./collectors/collectors.js')
 const { Queue, Worker } = require('bullmq');
 
 class Server {
@@ -77,7 +77,7 @@ class Server {
         //Download invoices to token folder
         await collector.download(invoices); //TODO
 
-        return {type: "success", token: "my_token", invoices}
+        return {type: "success", invoices}
     }
 
     async get_collect(token) {

@@ -1,8 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { Driver } = require('../src/driver.js');
-const { NotAuthenticatedError, InMaintenanceError } = require('../src/error.js')
+const { Driver } = require('../driver.js');
+const { NotAuthenticatedError, InMaintenanceError } = require('../error.js')
 
 class AbstractCollector {
     constructor(name) {

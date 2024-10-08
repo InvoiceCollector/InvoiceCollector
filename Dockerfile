@@ -7,7 +7,6 @@ WORKDIR /usr/src/app
 # Copy necessary files and folder to the working directory
 COPY package*.json .
 COPY src/ ./src/
-COPY collectors/ ./collectors/
 COPY test/ ./test/
 RUN mkdir media/ log/
 
