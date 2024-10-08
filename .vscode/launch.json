@@ -5,7 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Invoice Collector",
+            "name": "Test Simple Collector",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/test/test.js",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "${workspaceFolder}",
+            "console": "integratedTerminal",
+        },
+        {
+            "name": "Debug Container",
             "type": "node",
             "request": "attach",
             "port": 9229,
