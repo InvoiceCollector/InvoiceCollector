@@ -3,7 +3,7 @@ const FreeSelectors = require('./selectors.js');
 
 class FreeCollector extends ScrapperCollector {
 
-    static NAME = "Free"
+    static NAME = "free"
     static ENTRY_URL = "https://subscribe.free.fr/login/"
 
     constructor() {
@@ -31,8 +31,9 @@ class FreeCollector extends ScrapperCollector {
             let params = new URLSearchParams(link);
             return {
                 id: params.get("no_facture"),
-                url: link,
-                format: 'pdf'
+                type: "link",
+                mime: 'application/pdf',
+                link: link
             };
         });
     }
