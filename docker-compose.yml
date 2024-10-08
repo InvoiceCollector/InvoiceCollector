@@ -12,15 +12,7 @@ services:
       - PORT=8080
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./src
-          target: /usr/app/src
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
+    command: npm run start
 
   redis:
     image: redis:latest
