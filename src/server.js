@@ -23,8 +23,9 @@ class Server {
             }
         );
         
-        this.collect_invoice_worker.on("completed", (job) => {
+        this.collect_invoice_worker.on("completed", (job, data) => {
             console.log(`${job.id} has completed!`);
+            console.log(data);
         });
         
         this.collect_invoice_worker.on("failed", (job, err) => {
@@ -41,7 +42,7 @@ class Server {
     }
 
     get_collector(name) {
-        const collector_pointers = collectors.filter((collector) => collector.NAME == name)
+        const collector_pointers = collectors.filter((collector) => collector.NAME.toLowerCase() == name.toLowerCase())
         if(collector_pointers.length == 0) {
             throw new Error(`No collector named "${name}" found.`);
         }
