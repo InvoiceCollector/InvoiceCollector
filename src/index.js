@@ -40,14 +40,6 @@ app.post('/api/v1/collect', async (req, res) => {
     }
 });
 
-app.get('/api/v1/collect/:token', async (req, res) => {
-    console.log(`GET collect ${req.params.collector}`);
-	//TODO const response = await server.get_collect(req.params.token);
-
-    res.setHeader('Content-Type', 'application/json');
-    //res.end(JSON.stringify(response));
-});
-
 function has_env_variables(){
 	for(let env_var of ENV_VARIABLES) {
 		if(! (env_var in process.env)) {
