@@ -13,16 +13,13 @@ class Driver {
 
     async wait_for_element(selector) {
         try {
-            await this.page.waitForSelector(selector.selector, {timeout: this.DEFAULT_TIMEOUT});
+            return await this.page.waitForSelector(selector.selector, {timeout: this.DEFAULT_TIMEOUT});
         }
         catch (err) {
             //Get time as string
-            const timestamp = Date.now().toString();
-            const screenshot_path = `log/${timestamp}.png`;
-            const source_code_path = `log/${timestamp}.txt`;
-            fs.writeFileSync(source_code_path, await this.page.content());
-            await this.page.screenshot({path: screenshot_path});
-            throw new ElementNotFoundError(selector.selector, await this.page.url(), source_code_path, screenshot_path, selector.info, { cause: err }) 
+            const source_code = await page.content();
+            const screenshot = await page.screenshot({encoding: 'base64'});
+            throw new ElementNotFoundError(await this.page.url(), source_code, screenshot, selector, { cause: err }) 
         }
     }
 

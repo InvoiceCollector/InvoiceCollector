@@ -38,11 +38,11 @@ class Server {
 
     collectors() {
         console.log(`Listing all collectors`);
-        return collectors.map((collector) => collector.NAME);
+        return collectors.map((collector) => collector.CONFIG.name);
     }
 
     get_collector(name) {
-        const collector_pointers = collectors.filter((collector) => collector.NAME.toLowerCase() == name.toLowerCase())
+        const collector_pointers = collectors.filter((collector) => collector.CONFIG.name.toLowerCase() == name.toLowerCase())
         if(collector_pointers.length == 0) {
             throw new Error(`No collector named "${name}" found.`);
         }
@@ -62,7 +62,7 @@ class Server {
         //TODO
 
         //Add job in queue
-        let job = await this.collect_invoice_queue.add(collector.NAME, params);
+        let job = await this.collect_invoice_queue.add(collector.CONFIG.name, params);
     }
 
     async collect(name, params = {}) {

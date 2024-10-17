@@ -2,11 +2,11 @@ const axios = require('axios');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const { Driver } = require('../driver.js');
-const { NotAuthenticatedError, InMaintenanceError } = require('../error.js')
+const { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } = require('../error.js')
 
 class AbstractCollector {
-    constructor(name) {
-        this.name = name;
+    constructor(config) {
+        this.config = config;
     }
 
     async download(invoices) {
@@ -43,9 +43,8 @@ class ScrapperCollector extends AbstractCollector {
         height: 1080,
     };
 
-    constructor(name, entry_url) {
-        super(name);
-        this.entry_url = entry_url;
+    constructor(config) {
+        super(config);
     }
 
     async collect(params) {
@@ -62,33 +61,44 @@ class ScrapperCollector extends AbstractCollector {
         //Open new page
         let page = await browser.newPage();
         await page.setViewport(this.PAGE_CONFIG);
-        await page.goto(this.entry_url);
+        await page.goto(this.config.entry_url);
 
         let driver = new Driver(page);
-        try {
-            const invoices = await this.run(driver, params)
-            //await page.close();
-            return invoices;
+
+        //Check if website is in maintenance
+        const is_in_maintenance = await this.is_in_maintenance(driver, params)
+        if (is_in_maintenance) {
+            throw new InMaintenanceError();
         }
-        catch (err) {
-            if(!(await this.is_authenticated(driver, params))) {
-                //await browser.close();
-                throw new NotAuthenticatedError({cause: err});
-            }
-            if(await this.is_in_maintenance(driver, params)) {
-                //await browser.close();
-                throw new InMaintenanceError({cause: err});
-            }
-            //await browser.close();
-            throw err;
+
+        //Login
+        await this.login(driver, params)
+
+        //Check if authenticated
+        const { authenticated, message } = await this.is_authenticated(driver, params)
+        if (authenticated) {
+            throw new NotAuthenticatedError({cause: message});
         }
+
+        //Collect invoices
+        const invoices = await this.run(driver, params)
+        if (invoices === undefined) {
+            const source_code = await page.content();
+            const screenshot = await page.screenshot({encoding: 'base64'});
+            throw new UnfinishedCollector(await page.url(), source_code, screenshot);
+        }
+
+        return invoices;
     }
 
     //NOT IMPLEMENTED
 
     async is_authenticated(driver, params){
         //Assume the password is correct
-        return true;
+        return {
+            authenticated: true,
+            message: null
+        };
     }
 
     async is_in_maintenance(driver, params){
@@ -98,7 +108,9 @@ class ScrapperCollector extends AbstractCollector {
 }
 
 class ApiCollector extends AbstractCollector {
-    //TODO
+    constructor(config) {
+        super(config);
+    }
 }
 
 module.exports = {

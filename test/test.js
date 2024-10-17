@@ -13,7 +13,7 @@ const prompt = require('prompt-sync')({sigint: true});
     }
 
     // Get collectors
-    const collector_pointers = collectors.filter((collector) => collector.NAME.toLowerCase() == name.toLowerCase())
+    const collector_pointers = collectors.filter((collector) => collector.CONFIG.name.toLowerCase() == name.toLowerCase())
     if(collector_pointers.length == 0) {
         throw new Error(`No collector named "${name}" found.`);
     }
