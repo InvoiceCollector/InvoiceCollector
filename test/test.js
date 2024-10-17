@@ -23,36 +23,38 @@ const prompt = require('prompt-sync')({sigint: true});
 
     // Get collectors
     const collector = new collector_pointers[0]();
-  
+
     // Update puppeteer config
     if (collector.PUPPETEER_CONFIG) {
       collector.PUPPETEER_CONFIG.headless = false;
     }
-    
+
+    let params = {}
+    let argv_index = 3;
+
     // Loop throught each config
-    //TODO
-
-    // Get username
-    let username;
-    if(process.argv[3]) {
-        username = process.argv[3]
-        console.log(`Username:${username}`)
-    }
-    else {
-        username = prompt('Username:');
-    }
-
-    // Get password
-    let password;
-    if(process.argv[4]) {
-        password = process.argv[4]
-        console.log(`Password:${password}`)
-    }
-    else {
-        password = prompt.hide('Password:');
+    for(const field of collector.config.params) {
+        if(process.argv[argv_index]) {
+            params[field.name] = process.argv[argv_index]
+            if(field.name.toLowerCase().includes("password")) {
+                console.log(`${field.name}:<hidden>`)
+            }
+            else {
+                console.log(`${field.name}:${process.argv[argv_index]}`)
+            }
+        }
+        else {
+            if(field.name.toLowerCase().includes("password")) {
+                params[field.name] = prompt.hide(`${field.name}:`);
+            }
+            else {
+                params[field.name] = prompt(`${field.name}:`);
+            }
+        }
+        argv_index++;
     }
 
     // Collect invoices
-    const invoices = await collector.collect({username, password});
+    const invoices = await collector.collect(params);
     console.log(invoices);
 })();
