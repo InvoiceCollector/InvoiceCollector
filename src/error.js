@@ -1,3 +1,9 @@
+class MissingField extends Error {
+    constructor(field_name, opts) {
+        super(`The field "${field_name}" is missing.`, opts);
+    }
+}
+
 class ElementNotFoundError extends Error {
     constructor(url, source_code, screenshot, selector, opts) {
         super(`Could not find selector '${selector.selector}' corresponding to the "${selector.info}" on the page '${url}'. See the source code and the screenshot to find the issue.`, opts);
@@ -30,6 +36,7 @@ class UnfinishedCollector extends Error {
 }
 
 module.exports = {
+    MissingField,
 	ElementNotFoundError,
 	NotAuthenticatedError,
 	InMaintenanceError,

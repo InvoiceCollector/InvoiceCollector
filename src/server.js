@@ -1,5 +1,7 @@
-const collectors = require('./collectors/collectors.js')
 const { Queue, Worker } = require('bullmq');
+
+const collectors = require('./collectors/collectors.js')
+const { MissingField } = require('./error.js')
 
 class Server {
 
@@ -59,7 +61,11 @@ class Server {
         const collector = this.get_collector(name);
 
         //Check mandatory parameters
-        //TODO
+        for(const collector_param of collector.CONFIG.params) {
+            if(collector_param.mandatory && !params.hasOwnProperty(collector_param.name)) {
+                throw new MissingField(`params.${collector_param.name}`);
+            }
+        }
 
         //Add job in queue
         let job = await this.collect_invoice_queue.add(collector.CONFIG.name, params);

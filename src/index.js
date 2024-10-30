@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const { MissingField } = require('./error.js')
 const { Server } = require('./server.js');
 
 const app = express()
@@ -22,15 +24,19 @@ app.get('/api/v1/collectors', (req, res) => {
 });
 
 app.post('/api/v1/collect', async (req, res) => {
-    //Check if webhook field is missing
-    //TODO
-
-    //Check if collector field is missing
-    //TODO
-
-    console.log(`POST collect ${req.body.collector}`);
-
     try {
+        //Check if webhook field is missing
+        if(!req.body.hasOwnProperty("webhook")) {
+            throw new MissingField("webhook");
+        }
+
+        //Check if collector field is missing
+        if(!req.body.hasOwnProperty("collector")) {
+            throw new MissingField("collector");
+        }
+
+        console.log(`POST collect ${req.body.collector}`);
+
         const response = await server.post_collect(req.body.collector, req.body.params);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
