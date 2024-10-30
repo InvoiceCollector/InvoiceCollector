@@ -17,23 +17,29 @@ class ElementNotFoundError extends Error {
 }
 
 class NotAuthenticatedError extends Error {
-    constructor(opts) {
+    constructor(collector, version, opts) {
         super(`Could not authenticate. Please verify your credentials.`, opts);
         this.name = this.constructor.name;
+        this.collector = collector;
+        this.version = version;
     }
 }
 
 class InMaintenanceError extends Error {
-    constructor(opts) {
+    constructor(collector, version, opts) {
         super(`The website is in maintenance. Wait a moment and try again.`, opts);
         this.name = this.constructor.name;
+        this.collector = collector;
+        this.version = version;
     }
 }
 
 class UnfinishedCollector extends Error {
-    constructor(url, source_code, screenshot, opts) {
+    constructor(collector, version, url, source_code, screenshot, opts) {
         super(`The collector is not finished`, opts);
         this.name = this.constructor.name;
+        this.collector = collector;
+        this.version = version;
         this.url = url;
         this.source_code = source_code;
         this.screenshot = screenshot;

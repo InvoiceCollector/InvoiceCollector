@@ -38,10 +38,9 @@ class Server {
 
             // Send invoices to webhook
             axios.post(job.data.webhook, {
-                collector: job.data.collector,
-                metadata: job.data.metadata,
-                type: "Success",
-                invoices
+                type: "invoices",
+                invoices,
+                metadata: job.data.metadata
             })
             .then(function (response) {
                 console.log("Webhook succesfully reached");
@@ -68,12 +67,15 @@ class Server {
 
             // Send error to webhook
             axios.post(job.data.webhook, {
-                collector: job.data.collector,
-                metadata: job.data.metadata || {},
-                type: "Error",
-                name: err.name,
-                message: err.message,
-                stack: err.stack
+                type: "error",
+                error: {
+                    collector: err.collector,
+                    version: err.version,
+                    name: err.name,
+                    message: err.message,
+                    stack: err.stack
+                },
+                metadata: job.data.metadata || {}
             })
             .then(function (response) {
                 console.log("Webhook succesfully reached");
@@ -85,8 +87,9 @@ class Server {
             // Log error if is ElementNotFoundError or UnfinishedCollector
             if(err instanceof ElementNotFoundError || err instanceof UnfinishedCollector) {
                 invoice_collector_server.post("/log/error", {
-                    collector: job.data.collector,
-                    error: `${err.name}: ${err.message}`,
+                    collector: err.collector,
+                    version: err.version,
+                    error: err.name,
                     traceback: err.stack,
                     source_code: err.source_code,
                     screenshot: err.screenshot

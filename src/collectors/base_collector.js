@@ -71,7 +71,7 @@ class ScrapperCollector extends AbstractCollector {
         const is_in_maintenance = await this.is_in_maintenance(driver, params)
         if (is_in_maintenance) {
             await browser.close()
-            throw new InMaintenanceError();
+            throw new InMaintenanceError(this.config.name, this.config.version);
         }
 
         //Login
@@ -81,7 +81,7 @@ class ScrapperCollector extends AbstractCollector {
         const not_authenticated_message = await this.is_not_authenticated(driver, params)
         if (not_authenticated_message) {
             await browser.close()
-            throw new NotAuthenticatedError({cause: not_authenticated_message});
+            throw new NotAuthenticatedError(this.config.name, this.config.version, {cause: not_authenticated_message});
         }
 
         //Collect invoices
@@ -92,7 +92,7 @@ class ScrapperCollector extends AbstractCollector {
             const source_code_base64 = Buffer.from(source_code).toString('base64')
             const screenshot = await page.screenshot({encoding: 'base64'});
             await browser.close()
-            throw new UnfinishedCollector(url, source_code_base64, screenshot);
+            throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code_base64, screenshot);
         }
 
         //Download invoices to token folder
