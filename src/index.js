@@ -37,7 +37,7 @@ app.post('/api/v1/collect', async (req, res) => {
 
         console.log(`POST collect ${req.body.collector}`);
 
-        const response = await server.post_collect(req.body.collector, req.body.params);
+        const response = await server.post_collect(req.body);
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
