@@ -11,15 +11,20 @@ class Driver {
 
     // WAIT
 
-    async wait_for_element(selector) {
+    async wait_for_element(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
         try {
-            return await this.page.waitForSelector(selector.selector, {timeout: this.DEFAULT_TIMEOUT});
+            return await this.page.waitForSelector(selector.selector, {timeout});
         }
         catch (err) {
-            //Get time as string
-            const source_code = await page.content();
-            const screenshot = await page.screenshot({encoding: 'base64'});
-            throw new ElementNotFoundError(await this.page.url(), source_code, screenshot, selector, { cause: err }) 
+            if (raise_exception) {
+                //Get time as string
+                const url = await this.page.url();
+                const source_code = await this.page.content();
+                const source_code_base64 = Buffer.from(source_code).toString('base64')
+                const screenshot = await this.page.screenshot({encoding: 'base64'});
+                throw new ElementNotFoundError(url, source_code_base64, screenshot, selector, { cause: err })
+            }
+            return null;
         }
     }
 
