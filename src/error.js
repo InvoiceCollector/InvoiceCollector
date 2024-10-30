@@ -5,7 +5,6 @@ class ElementNotFoundError extends Error {
         this.source_code = source_code;
         this.screenshot = screenshot;
         this.selector = selector;
-        this.infos = infos;
     }
 }
 
