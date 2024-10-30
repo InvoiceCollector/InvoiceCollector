@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { ElementNotFoundError } = require('./error.js')
 
 class Driver {
