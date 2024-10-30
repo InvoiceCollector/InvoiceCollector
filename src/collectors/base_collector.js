@@ -9,14 +9,14 @@ class AbstractCollector {
         this.config = config;
     }
 
-    async download(invoices) {
+    async download(params, invoices) {
         for(let invoice of invoices) {
             if(invoice.type == "link") {
-                const format = invoice.mime.split('/')[1]
                 const response = await axios.get(invoice.link, {
                     responseType: 'arraybuffer',
                 });
-                fs.writeFileSync(`media/${this.name}_${invoice.id}.${format}`, response.data);
+                invoice.data = response.data.toString("base64");
+                invoice.type = "base64";
             }
         }
     }
@@ -68,32 +68,43 @@ class ScrapperCollector extends AbstractCollector {
         //Check if website is in maintenance
         const is_in_maintenance = await this.is_in_maintenance(driver, params)
         if (is_in_maintenance) {
+            await browser.close()
             throw new InMaintenanceError();
         }
 
         //Login
         await this.login(driver, params)
 
-        //Check if authenticated
-        const { authenticated, message } = await this.is_authenticated(driver, params)
-        if (authenticated) {
-            throw new NotAuthenticatedError({cause: message});
+        //Check if not authenticated
+        const not_authenticated_message = await this.is_not_authenticated(driver, params)
+        if (not_authenticated_message) {
+            await browser.close()
+            throw new NotAuthenticatedError({cause: not_authenticated_message});
         }
 
         //Collect invoices
         const invoices = await this.run(driver, params)
         if (invoices === undefined) {
+            const url = await page.url();
             const source_code = await page.content();
+            const source_code_base64 = Buffer.from(source_code).toString('base64')
             const screenshot = await page.screenshot({encoding: 'base64'});
-            throw new UnfinishedCollector(await page.url(), source_code, screenshot);
+            await browser.close()
+            throw new UnfinishedCollector(url, source_code_base64, screenshot);
         }
+
+        //Download invoices to token folder
+        await this.download(params, invoices);
+
+        // Close the borwser
+        await browser.close()
 
         return invoices;
     }
 
     //NOT IMPLEMENTED
 
-    async is_authenticated(driver, params){
+    async is_not_authenticated(driver, params){
         //Assume the password is correct
         return {
             authenticated: true,

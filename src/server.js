@@ -75,9 +75,6 @@ class Server {
         //Collect invoices
         const invoices = await collector.collect(params);
 
-        //Download invoices to token folder
-        await collector.download(invoices); //TODO
-
         return {type: "success", invoices}
     }
 
