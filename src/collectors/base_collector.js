@@ -10,6 +10,8 @@ class AbstractCollector {
     }
 
     async download(params, invoices) {
+        console.log(`Downloading invoices`);
+
         for(let invoice of invoices) {
             if(invoice.type == "link") {
                 const response = await axios.get(invoice.link, {
