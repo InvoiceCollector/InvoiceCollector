@@ -12,7 +12,7 @@ services:
       - PORT=8080
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - LOG_SERVER_ENDPOINT=https://n8n.bergeron.fr/webhook/invoice_collector
+      - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
     command: npm run start
 
   redis:
