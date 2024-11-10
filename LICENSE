@@ -1,0 +1,65 @@
+**All Rights Reserved**
+
+**Copyright (c) 2024 Lucas BERGERON**
+
+THE CONTENTS OF THIS PROJECT ARE PROPRIETARY AND CONFIDENTIAL.
+UNAUTHORIZED COPYING, TRANSFERRING OR REPRODUCTION OF THE CONTENTS OF THIS PROJECT, VIA ANY MEDIUM IS STRICTLY PROHIBITED.
+
+# Invoice-Collector License Agreement
+
+This license agreement ("Agreement") is a legal agreement between you (either an individual or a single entity, "Licensee") and Lucas BERGERON ("Licensor") regarding the use of Invoice-Collector (the "Software"). By downloading, forking, installing, or using the Software, you agree to be bound by the terms of this Agreement.
+
+## 1. Grant of License
+
+Licensor grants you a limited, non-exclusive, non-transferable, and revocable license to use the Software solely for your internal purposes and to contribute to the Software in the ways outlined below. This license is for the specific purpose of evaluating, testing, using, and contributing to the Software on GitHub. No other rights are granted.
+
+## 2. Permitted Contributions
+
+Licensee is permitted to:
+
+- Fork the Software repository on GitHub for the purpose of making contributions.
+- Modify the source code within the forked GitHub repository.
+
+Licensee agrees that:
+
+- Any contributions or modifications must remain within the GitHub platform.
+- Licensee will not distribute or share copies of the Software or modified versions outside of GitHub.
+- Any contributions made to the Software must be submitted as pull requests to the original repository and may be accepted, rejected, or further modified at the sole discretion of Licensor.
+
+## 3. Restrictions
+
+Licensee shall not:
+
+- Copy, modify, or distribute the Software or any portion of it, except as expressly permitted by this Agreement.
+- Distribute or share the Software, modified or otherwise, outside of GitHub.
+- Decompile, reverse engineer, disassemble, or attempt to derive the source code, except as permitted under Section 2.
+- Rent, lease, lend, sell, sublicense, or otherwise make the Software available to any third party.
+- Use the Software in a manner that is unlawful or prohibited by this Agreement.
+
+## 4. Ownership
+
+The Software is licensed, not sold. Licensor retains all rights, title, and interest in and to the Software, including all intellectual property rights therein.
+
+## 5. Contributions Ownership and License
+
+By submitting contributions to the Software, Licensee grants Licensor an irrevocable, worldwide, royalty-free, sublicensable, and transferable license to use, reproduce, distribute, prepare derivative works of, and publicly display such contributions. Licensee agrees that all contributions to the Software will be subject to the same proprietary license terms and ownership conditions as the original Software.
+
+## 6. Term and Termination
+
+This Agreement is effective until terminated. Licensor may terminate this Agreement immediately if you breach any term of this Agreement. Upon termination, you must cease all use of the Software and destroy all copies in your possession or control.
+
+## 7. Disclaimer of Warranties
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE OR THAT IT WILL OPERATE WITHOUT INTERRUPTION.
+
+## 8. Limitation of Liability
+
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUE, ARISING OUT OF OR RELATING TO THIS AGREEMENT OR THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+## 9. Governing Law
+
+This Agreement shall be governed by and construed in accordance with the laws of France. Any disputes arising under or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts located in France.
+
+## 10. Entire Agreement
+
+This Agreement constitutes the entire agreement between the parties regarding the Software and supersedes any prior or contemporaneous agreements, understandings, or communications, whether written or oral.
