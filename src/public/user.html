@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credential Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Credential Manager</h1>
+
+        <!-- CREDENTIAL LIST -->
+
+        <div id="credentials-list"></div>
+
+        <!-- ADD CREDENTIALS -->
+
+        <button id="add-credential-button">Add Credential</button>
+        <div id="company-list" style="display: none;">
+            <h2>Select a Company</h2>
+            <ul id="companies"></ul>
+        </div>
+
+        <!-- ADD CREDENTIAL FORM -->
+
+        <div id="add-credential-form-container" style="display: none;">
+            <h2>Add New Credential</h2>
+            <div class="company-item">
+                <img id="company-logo" src="" alt="" class="company-image">
+                <div class="company-info">
+                    <h3 id="company-name"></h3>
+                    <p id="company-description"></p>
+                </div>
+            </div>
+            <form id="add-credential-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Add Credential</button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

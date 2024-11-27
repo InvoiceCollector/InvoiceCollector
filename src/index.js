@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 
 const { MissingField } = require('./error.js')
@@ -11,6 +12,12 @@ const server = new Server();
 ENV_VARIABLES = [
     "PORT",
 ]
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/user', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'user.html'));
+});
 
 app.get('/api/v1/collectors', (req, res) => {
     console.log(`GET collectors`);
