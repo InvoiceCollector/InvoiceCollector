@@ -4,7 +4,8 @@ const FreeSelectors = require('./selectors.js');
 class FreeCollector extends ScrapperCollector {
 
     static CONFIG = {
-        name: "free",
+        key: "free",
+        name: "Free",
         description: "Free is a French telecommunications company.",
         version: "1",
         website: "https://www.free.fr",

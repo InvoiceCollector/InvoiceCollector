@@ -108,7 +108,7 @@ class Server {
 
     collectors() {
         console.log(`Listing all collectors`);
-        return collectors.map((collector) => collector.CONFIG.name);
+        return collectors.map((collector) => collector.CONFIG);
     }
 
     get_collector(name) {
