@@ -9,6 +9,7 @@
     "dev": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.js"
   },
   "dependencies": {
+    "@bitwarden/sdk-napi": "^1.0.0",
     "axios": "^1.6.2",
     "body-parser": "^1.20.2",
     "bullmq": "^5.15.0",
