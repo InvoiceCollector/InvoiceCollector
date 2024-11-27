@@ -8,8 +8,6 @@ const app = express()
 app.use(bodyParser.json());
 const server = new Server();
 
-process.env.PORT = 8080
-
 ENV_VARIABLES = [
     "PORT",
 ]
