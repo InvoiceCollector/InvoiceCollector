@@ -9,7 +9,7 @@ class FreeCollector extends ScrapperCollector {
         description: "Free is a French telecommunications company.",
         version: "1",
         website: "https://www.free.fr",
-        logo: "https://fr.wikipedia.org/wiki/Free_(entreprise)#/media/Fichier:Free_logo.svg",
+        logo: "https://www.free.fr/assets/img/freebox/home/cards/logos/free-app-logo.svg",
         params: [
             {
                 name: "username",
