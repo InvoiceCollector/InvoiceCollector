@@ -13,10 +13,44 @@ ENV_VARIABLES = [
     "PORT",
 ]
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.post('/api/v1/authorize', async (req, res) => {
+    try {
+        // Check if bearer field is missing
+        if(!req.headers.hasOwnProperty("authorization") || !req.headers.authorization.startsWith("Bearer ")) {
+            res.status(401).end();
+        }
+        const bearer = req.headers.authorization.split(' ')[1];
 
-app.get('/user', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'user.html'));
+        //Check if callback field is missing
+        if(!req.body.hasOwnProperty("callback")) {
+            throw new MissingField("callback");
+        }
+
+        //Check if collector field is missing
+        if(!req.body.hasOwnProperty("user_id")) {
+            throw new MissingField("user_id");
+        }
+
+        // Perform authorization
+        console.log('POST authorize');
+        const response = await server.post_authorize(bearer, req.body.callback, req.body.user_id);
+
+        // Build response
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(response));
+    } catch (e) {
+        console.error(e);
+        res.status(400).end(JSON.stringify({type: "error", reason: e.message}));
+    }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/api/v1/user', (req, res) => {
+    // Check if token exists in query
+    if(!req.query.hasOwnProperty("token") || !server.tokens.hasOwnProperty(req.query.token)) {
+        res.status(401).end();
+    }
+    res.sendFile(path.join(__dirname, '..', 'public', 'user.html'));
 });
 
 app.get('/api/v1/collectors', (req, res) => {

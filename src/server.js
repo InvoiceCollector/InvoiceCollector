@@ -2,6 +2,7 @@ const { Queue, Worker } = require('bullmq');
 const axios = require('axios');
 
 const { ElementNotFoundError, UnfinishedCollector } = require('./error.js')
+const utils = require('./utils.js')
 
 const invoice_collector_server = axios.create({
     baseURL: `${process.env.LOG_SERVER_ENDPOINT}/v1`,
@@ -18,6 +19,7 @@ class Server {
             host: process.env.REDIS_HOST,
             port: process.env.REDIS_PORT
         };
+        this.tokens = {}
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });
         this.collect_invoice_worker = new Worker(
             'collect_invoice',
@@ -105,6 +107,29 @@ class Server {
         
         console.log("Worker started!");
 	}
+
+    post_authorize(bearer, callback, user_id) {
+        // Check token is valid
+        // TODO
+
+        // Generate oauth token
+        const token = utils.generate_token();
+
+        // Create request record in
+        this.tokens[token] = {
+            bearer,
+            callback,
+            user_id
+        }
+
+        // Schedule token delete after 1 hour
+        setTimeout(() => {
+            delete this.tokens[token];
+            console.log(`Token ${token} deleted`);
+        }, 3600000);
+
+        return { token }
+    }
 
     collectors() {
         console.log(`Listing all collectors`);
