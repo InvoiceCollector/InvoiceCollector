@@ -38,17 +38,17 @@ class Server {
         this.collect_invoice_worker.on("completed", (job, invoices) => {
             console.log(`${job.id} has completed!`);
 
-            // Send invoices to webhook
-            axios.post(job.data.webhook, {
+            // Send invoices to callback
+            axios.post(job.data.callback, {
                 type: "invoices",
                 invoices,
                 metadata: job.data.metadata
             })
             .then(function (response) {
-                console.log("Webhook succesfully reached");
+                console.log("Callback succesfully reached");
             })
             .catch(function (error) {
-                console.error(`Could not reach webhook ${error.request.res.responseUrl}`);
+                console.error(`Could not reach callback ${error.request.res.responseUrl}`);
             });
 
             // Log success
@@ -67,8 +67,8 @@ class Server {
             console.error(`${job.id} has failed:`);
             console.error(err.stack);
 
-            // Send error to webhook
-            axios.post(job.data.webhook, {
+            // Send error to callback
+            axios.post(job.data.callback, {
                 type: "error",
                 error: {
                     collector: err.collector,
@@ -79,10 +79,10 @@ class Server {
                 metadata: job.data.metadata || {}
             })
             .then(function (response) {
-                console.log("Webhook succesfully reached");
+                console.log("Callback succesfully reached");
             })
             .catch(function (error) {
-                console.error(`Could not reach webhook ${error.request.res.responseUrl}`);
+                console.error(`Could not reach callback ${error.request.res.responseUrl}`);
             });
 
             // Log error if is ElementNotFoundError or UnfinishedCollector

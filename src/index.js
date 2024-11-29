@@ -64,9 +64,9 @@ app.get('/api/v1/collectors', (req, res) => {
 
 app.post('/api/v1/collect', async (req, res) => {
     try {
-        //Check if webhook field is missing
-        if(!req.body.hasOwnProperty("webhook")) {
-            throw new MissingField("webhook");
+        //Check if callback field is missing
+        if(!req.body.hasOwnProperty("callback")) {
+            throw new MissingField("callback");
         }
 
         //Check if collector field is missing
