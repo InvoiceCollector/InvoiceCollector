@@ -74,8 +74,7 @@ class Server {
                     collector: err.collector,
                     version: err.version,
                     name: err.name,
-                    message: err.message,
-                    stack: err.stack
+                    message: err.message
                 },
                 metadata: job.data.metadata || {}
             })
