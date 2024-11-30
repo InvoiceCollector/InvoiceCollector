@@ -48,14 +48,14 @@ app.post('/api/v1/authorize', async (req, res) => {
 
 // ---------- OAUTH TOKEN NEEDED ----------
 
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/v1/user', (req, res) => {
     // Check if token exists in query
     if(!req.query.hasOwnProperty("token") || !server.tokens.hasOwnProperty(req.query.token)) {
         res.status(401).end("Invalid token");
     }
-    res.sendFile(path.join(__dirname, 'public', 'user.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'user.html'));
 });
 
 // ---------- NO OAUTH TOKEN NEEDED ----------
