@@ -19,6 +19,17 @@ services:
     command: npm run dev
 
   redis:
-    image: redis:latest
+    image: redis:7.4.1
     ports:
       - 6379:6379
+
+  mongodb:
+    image : mongo:8.0.3
+    container_name: mongodb
+    volumes:
+      - ./mongodb/data:/data/db
+      - ./mongodb/config:/etc/mongo/
+    ports:
+      - 27017:27017
+    command: --logpath /dev/null
+    #command: --quiet --config /etc/mongo/mongod.conf # Quiet option not working
