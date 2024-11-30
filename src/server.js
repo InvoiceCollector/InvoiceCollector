@@ -1,7 +1,8 @@
 const { Queue, Worker } = require('bullmq');
 const axios = require('axios');
 
-const { ElementNotFoundError, UnfinishedCollector } = require('./error.js')
+const DatabaseFactory = require('./database/databaseFactory.js');
+const { AuthenticationBearerError, OauthError, ElementNotFoundError, UnfinishedCollector } = require('./error.js')
 const utils = require('./utils.js')
 
 const invoice_collector_server = axios.create({
@@ -19,14 +20,17 @@ class Server {
             host: process.env.REDIS_HOST,
             port: process.env.REDIS_PORT
         };
+
+        this.database = DatabaseFactory.getDatabase(process.env.DATABASE_TYPE);
         this.tokens = {}
+
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });
         this.collect_invoice_worker = new Worker(
             'collect_invoice',
-            async job => {
+            async data => {
                 return await this.collect(
-                    job.name,
-                    job.data
+                    data.key,
+                    data.params
                 );
             },
             {
@@ -107,77 +111,186 @@ class Server {
         console.log("Worker started!");
 	}
 
-    post_authorize(bearer, callback, user_id) {
-        // Check token is valid
-        // TODO
+    // ---------- AUTHORIZE ----------
+
+    async get_customer_from_bearer(bearer) {
+        // Check if bearer is missing or does not start with "Bearer "
+        if(!bearer || !bearer.startsWith("Bearer ")) {
+            throw new AuthenticationBearerError()
+        }
+
+        // Get customer from bearer
+        return await this.database.getCustomer(bearer.split(' ')[1]);
+    }
+
+    async post_authorize(bearer, remote_id) {
+        // Get user from bearer
+        const customer = await this.get_customer_from_bearer(bearer);
+
+        //Check if remote_id field is missing
+        if(!remote_id) {
+            throw new MissingField("remote_id");
+        }
+
+        // Check if customer exists
+        if(!customer) {
+            throw new AuthenticationBearerError();
+        }
 
         // Generate oauth token
         const token = utils.generate_token();
 
         // Create request record in
         this.tokens[token] = {
-            bearer,
-            callback,
-            user_id
+            customer_id: customer._id,
+            remote_id
         }
 
         // Schedule token delete after 1 hour
         setTimeout(() => {
             delete this.tokens[token];
             console.log(`Token ${token} deleted`);
-        }, 3600000);
+        }, 600000);
 
         return { token }
     }
+
+    // ---------- OAUTH TOKEN NEEDED ----------
+
+    get_token_mapping(token) {
+        // Check if token is missing or incorrect
+        if(!token || !this.tokens.hasOwnProperty(token)) {
+            throw new OauthError();
+        }
+
+        return this.tokens[token];
+    }
+
+    async get_credentials(token) {
+        // Get customer_id and remote_id from token
+         const { customer_id, remote_id } = this.get_token_mapping(token);
+
+        // Get user from customer_id and remote_id
+        const user = await this.database.getUser(customer_id, remote_id);
+
+        // Get credentials from user
+        let credentials = await this.database.getCredentials(user._id);
+
+        // Build response 
+        return credentials.map((credential) => {
+            const collector = this.get_collector(credential.key);
+            return {
+                collector: collector.CONFIG,
+                credential_id: credential._id.toString()
+            }
+        });
+    }
+
+    async post_credential(token, key, params) {
+        // Get customer_id and remote_id from token
+         const { customer_id, remote_id } = this.get_token_mapping(token);
+
+        //Check if key field is missing
+        if(!key) {
+            throw new MissingField("key");
+        }
+
+        //Check if params field is missing
+        if(!params) {
+            throw new MissingField("params");
+        }
+
+        // Get user from customer_id and remote_id
+        let user = await this.database.getUser(customer_id, remote_id);
+
+        // Save credentials to Secure Storage
+        // TODO: Implement Secure Storage
+        const ss_id = params;
+
+        // If user does not exist, create it
+        if(!user) {
+            user = await this.database.createUser({
+                customer_id,
+                remote_id
+            });
+        }
+
+        // Create credential
+        await this.database.createCredential({
+            user_id: user._id,
+            key,
+            ss_id
+        });
+    }
+
+    async delete_credential(token, credential_id) {
+        // Get customer_id and remote_id from token
+        const { customer_id, remote_id } = this.get_token_mapping(token);
+
+        // Get user from customer_id and remote_id
+        const user = await this.database.getUser(customer_id, remote_id);
+
+        // Delete credential
+        await this.database.deleteCredential(user._id, credential_id);
+    }
+
+    // ---------- NO OAUTH TOKEN NEEDED ----------
 
     collectors() {
         console.log(`Listing all collectors`);
         return collectors.map((collector) => collector.CONFIG);
     }
 
-    get_collector(name) {
-        const collector_pointers = collectors.filter((collector) => collector.CONFIG.name.toLowerCase() == name.toLowerCase())
+    get_collector(key) {
+        const collector_pointers = collectors.filter((collector) => collector.CONFIG.key.toLowerCase() == key.toLowerCase())
         if(collector_pointers.length == 0) {
-            throw new Error(`No collector named "${name}" found.`);
+            throw new Error(`No collector with key "${key}" found.`);
         }
         if(collector_pointers.length > 1) {
-            throw new Error(`Found ${collector_pointers.length} collectors named "${name}".`);
+            throw new Error(`Found ${collector_pointers.length} collectors with key "${key}".`);
         }
         return collector_pointers[0]
     }
 
-    async post_collect(data) {
-        //Get collector from name
-        const collector = this.get_collector(data.collector);
+    async post_collect(bearer, key, params) {
+        // Get customer from bearer
+        const customer = await this.get_customer_from_bearer(bearer);
 
-        //Check mandatory parameters
+        // Check if key field is missing
+        if(!key) {
+            throw new MissingField("key");
+        }
+
+        // Check if params field is missing
+        if(!params) {
+            throw new MissingField("params");
+        }
+
+        // Get collector from name
+        const collector = this.get_collector(key);
+
+        // Check mandatory parameters
         for(const collector_param of collector.CONFIG.params) {
-            if(collector_param.mandatory && !data.params.hasOwnProperty(collector_param.name)) {
+            if(collector_param.mandatory && !params.hasOwnProperty(collector_param.name)) {
                 throw new MissingField(`params.${collector_param.name}`);
             }
         }
 
-        //Add job in queue
-        console.log(`Adding job to the queue "${data.collector}"`);
-        let job = await this.collect_invoice_queue.add(collector.CONFIG.name, data);
+        // Add job in queue
+        console.log(`Adding job to the queue "${key}"`);
+        let job = await this.collect_invoice_queue.add(collector.CONFIG.name, {key, params});
     }
 
-    async collect(name, data) {
-        console.log(`Collecting invoices on "${name}"`);
+    async collect(key, params) {
+        console.log(`Collecting invoices on "${key}"`);
 
-        //Get collector from name
-        const collector_pointer = this.get_collector(name);
-        const collector = new collector_pointer();
+        // Get collector from key and instantiate it
+        const collector = this.get_collector(key)();
 
-        //Collect invoices
-        const invoices = await collector.collect(data.params);
+        // Collect invoices
+        const invoices = await collector.collect(params);
 
         return {type: "success", invoices}
-    }
-
-    async get_collect(token) {
-        //Return request record in database
-        //TODO
     }
 }
 

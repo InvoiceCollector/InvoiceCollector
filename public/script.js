@@ -14,12 +14,19 @@ async function loadCredentials() {
     credentialsList.innerHTML = '';
 
     credentials.forEach(credential => {
+        console.log(credential);
         const credentialItem = document.createElement('div');
         credentialItem.className = 'credential-item';
         credentialItem.innerHTML = `
-            <strong>Username:</strong> ${credential.username}<br>
-            <strong>Password:</strong> ${credential.password}<br>
-            <button onclick="deleteCredential('${credential.id}')">Delete</button>
+            <div>
+                <img src="${credential.collector.logo}" alt="${credential.collector.name}" class="company-image">
+                <div class="company-info">
+                    <strong>${credential.collector.name}</strong><br>
+                    ${credential.collector.description}<br>
+                    <br>
+                </div>
+            </div>
+            <button onclick="deleteCredential('${credential.credential_id}')">Delete</button>
         `;
         credentialsList.appendChild(credentialItem);
     });
@@ -118,7 +125,10 @@ async function addCredential(event) {
         body: JSON.stringify({
             key: event.target.dataset.key,
             params
-        })
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     });
 
     document.getElementById('add-credential-form').reset();

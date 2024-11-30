@@ -1,6 +1,28 @@
-class MissingField extends Error {
+class StatusError extends Error {
+    constructor(message, status_code, opts) {
+        super(message, opts);
+        this.name = this.constructor.name;
+        this.status_code = status_code;
+    }
+}
+
+class AuthenticationBearerError extends StatusError {
+    constructor(opts) {
+        super("Invalid Bearer token", 401, opts);
+        this.name = this.constructor.name;
+    }
+}
+
+class OauthError extends StatusError {
+    constructor(opts) {
+        super("Invalid Oauth token", 401, opts);
+        this.name = this.constructor.name;
+    }
+}
+
+class MissingField extends StatusError {
     constructor(field_name, opts) {
-        super(`The field "${field_name}" is missing.`, opts);
+        super(`The field "${field_name}" is missing.`, 400, opts);
         this.name = this.constructor.name;
     }
 }
@@ -47,6 +69,9 @@ class UnfinishedCollector extends Error {
 }
 
 module.exports = {
+    StatusError,
+    AuthenticationBearerError,
+    OauthError,
     MissingField,
 	ElementNotFoundError,
 	NotAuthenticatedError,

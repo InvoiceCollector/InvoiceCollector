@@ -58,6 +58,15 @@ button:hover {
     border-radius: 4px;
     background-color: #f9f9f9;
 }
+.credential-item > div{
+    display: flex;
+}
+
+.credential-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 20px;
+}
 
 .credential-item button {
     background-color: #dc3545;
