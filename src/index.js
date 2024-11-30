@@ -13,11 +13,13 @@ ENV_VARIABLES = [
     "PORT",
 ]
 
+// ---------- AUTHORIZE ----------
+
 app.post('/api/v1/authorize', async (req, res) => {
     try {
         // Check if bearer field is missing
         if(!req.headers.hasOwnProperty("authorization") || !req.headers.authorization.startsWith("Bearer ")) {
-            res.status(401).end();
+            res.status(401).end("Invalid Bearer token");
         }
         const bearer = req.headers.authorization.split(' ')[1];
 
@@ -44,14 +46,19 @@ app.post('/api/v1/authorize', async (req, res) => {
     }
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// ---------- OAUTH TOKEN NEEDED ----------
+
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 app.get('/api/v1/user', (req, res) => {
     // Check if token exists in query
     if(!req.query.hasOwnProperty("token") || !server.tokens.hasOwnProperty(req.query.token)) {
-        res.status(401).end();
+        res.status(401).end("Invalid token");
     }
-    res.sendFile(path.join(__dirname, '..', 'public', 'user.html'));
+    res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
+
+// ---------- NO OAUTH TOKEN NEEDED ----------
 
 app.get('/api/v1/collectors', (req, res) => {
     console.log(`GET collectors`);

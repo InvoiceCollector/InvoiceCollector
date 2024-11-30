@@ -1,18 +1,13 @@
-const token = 'YOUR_OAUTH_TOKEN'; // Replace with your OAuth token
+const token = new URLSearchParams(window.location.search).get('token');
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadCredentials();
-
+    loadCredentials(); 
     document.getElementById('add-credential-button').addEventListener('click', showCompanyList);
     document.getElementById('add-credential-form').addEventListener('submit', addCredential);
 });
 
 async function loadCredentials() {
-    const response = await fetch('/credentials', {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const response = await fetch(`credentials?token=${token}`);
     const credentials = await response.json();
 
     const credentialsList = document.getElementById('credentials-list');
@@ -31,11 +26,7 @@ async function loadCredentials() {
 }
 
 async function showCompanyList() {
-    const response = await fetch('/api/v1/collectors', {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const response = await fetch('collectors');
     const companies = await response.json();
 
     const companyList = document.getElementById('companies');
@@ -117,12 +108,8 @@ async function addCredential(event) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    await fetch('/api/v1/credential', {
+    await fetch(`credential?token=${token}`, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ companyId, username, password })
     });
 
@@ -132,11 +119,8 @@ async function addCredential(event) {
 }
 
 async function deleteCredential(id) {
-    await fetch(`/credential/${id}/delete`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+    await fetch(`credential/${id}?token=${token}`, {
+        method: 'DELETE'
     });
 
     loadCredentials();
