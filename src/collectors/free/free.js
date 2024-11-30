@@ -10,18 +10,18 @@ class FreeCollector extends ScrapperCollector {
         version: "1",
         website: "https://www.free.fr",
         logo: "https://www.free.fr/assets/img/freebox/home/cards/logos/free-app-logo.svg",
-        params: [
-            {
-                name: "username",
+        params: {
+            username: {
+                name: "Username",
                 description: "Email address of the account",
                 mandatory: true
             },
-            {
-                name: "password",
+            password: {
+                name: "Password",
                 description: "Password of the account",
                 mandatory: true,
             }
-        ],
+        },
         entry_url: "https://subscribe.free.fr/login/"
     }
 

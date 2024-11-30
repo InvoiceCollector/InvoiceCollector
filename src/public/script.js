@@ -66,10 +66,13 @@ function showAddCredentialForm(company) {
     const form = document.getElementById('add-credential-form');
     form.innerHTML = ''; // Clear any existing fields
 
-    company.params.forEach(param => {
+    Object.keys(company.params).forEach(key => {
+        // Get the parameter
+        const param = company.params[key];
+
         // Add label
         const label = document.createElement('label');
-        label.textContent = `${param.name} :`;
+        label.textContent = param.name;
 
         if (param.mandatory) {
             const required = document.createElement('span');
@@ -80,13 +83,12 @@ function showAddCredentialForm(company) {
 
         // Add input
         const input = document.createElement('input');
-        if (param.name === 'password' || param.name === 'token') {
+        if (key === 'password' || key === 'token') {
             input.setAttribute('type', 'password');
         } else {
             input.setAttribute('type', 'text');
         }
-        input.setAttribute('id', param.name);
-        input.setAttribute('name', param.name);
+        input.setAttribute('name', key);
         input.placeholder = param.description;
         input.required = param.mandatory;
 
@@ -104,13 +106,19 @@ function showAddCredentialForm(company) {
 async function addCredential(event) {
     event.preventDefault();
 
-    const companyId = event.target.dataset.companyId;
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    // Convert form data to object
+    const formData = new FormData(event.target);
+    let params = {};
+    formData.forEach((value, key) => {
+        params[key] = value;
+    });
 
     await fetch(`credential?token=${token}`, {
         method: 'POST',
-        body: JSON.stringify({ companyId, username, password })
+        body: JSON.stringify({
+            key: event.target.dataset.key,
+            params
+        })
     });
 
     document.getElementById('add-credential-form').reset();
