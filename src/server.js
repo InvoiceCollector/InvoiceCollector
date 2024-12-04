@@ -15,6 +15,8 @@ const { MissingField } = require('./error.js')
 
 class Server {
 
+    static OAUTH_TOKEN_VALIDITY_DURATION_MS = process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS || 600000; // 10 minutes, in ms
+
     constructor() {
         const connection = {
             host: process.env.REDIS_HOST,
@@ -150,7 +152,7 @@ class Server {
         setTimeout(() => {
             delete this.tokens[token];
             console.log(`Token ${token} deleted`);
-        }, 600000);
+        }, Server.OAUTH_TOKEN_VALIDITY_DURATION_MS);
 
         return { token }
     }
