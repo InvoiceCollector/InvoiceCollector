@@ -9,6 +9,7 @@ COPY package*.json .
 COPY src/ ./src/
 COPY public/ ./public/
 COPY test/ ./test/
+COPY .env ./.env
 RUN mkdir media/ log/
 
 # Set puppeteer env variables

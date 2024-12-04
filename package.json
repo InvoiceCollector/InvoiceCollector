@@ -18,6 +18,7 @@
     "puppeteer": "^21.6.1"
   },
   "devDependencies": {
+    "dotenv": "^16.4.7",
     "nodemon": "^3.1.7",
     "prompt-sync": "^4.2.0"
   },
