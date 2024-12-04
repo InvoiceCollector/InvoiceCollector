@@ -183,6 +183,7 @@ class Server {
             const collector = this.get_collector(credential.key);
             return {
                 collector: collector.CONFIG,
+                note: credential.note,
                 credential_id: credential._id.toString()
             }
         });
@@ -205,7 +206,11 @@ class Server {
         // Get user from customer_id and remote_id
         let user = await this.database.getUser(customer_id, remote_id);
 
-        // Save credentials to Secure Storage
+        // Get credential note
+        const note = params.note;
+        delete params.note;
+
+        // Add credential to Secure Storage
         // TODO: Implement Secure Storage
         const ss_id = params;
 
@@ -221,6 +226,7 @@ class Server {
         await this.database.createCredential({
             user_id: user._id,
             key,
+            note,
             ss_id
         });
     }
@@ -231,6 +237,9 @@ class Server {
 
         // Get user from customer_id and remote_id
         const user = await this.database.getUser(customer_id, remote_id);
+
+        // Delete credential from Secure Storage
+        // TODO: Implement Secure Storage
 
         // Delete credential
         await this.database.deleteCredential(user._id, credential_id);

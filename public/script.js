@@ -22,7 +22,7 @@ async function loadCredentials() {
                 <img src="${credential.collector.logo}" alt="${credential.collector.name}" class="company-image">
                 <div class="company-info">
                     <strong>${credential.collector.name}</strong><br>
-                    ${credential.collector.description}<br>
+                    ${credential.note || credential.collector.description}<br>
                     <br>
                 </div>
             </div>
@@ -102,6 +102,18 @@ function showAddCredentialForm(company) {
         form.appendChild(label);
         form.appendChild(input);
     });
+
+    // Add label note
+    const label = document.createElement('label');
+    label.textContent = "Note";
+    form.appendChild(label);
+
+    // Add input note
+    const input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('name', "note");
+    input.placeholder = "Custom note";
+    form.appendChild(input);
 
     // Add the submit button
     const submitButton = document.createElement('button');
