@@ -33,22 +33,22 @@ const prompt = require('prompt-sync')({sigint: true});
     let argv_index = 3;
 
     // Loop throught each config
-    for(const field of collector.config.params) {
+    for(const [param_key, param] of Object.entries(collector.config.params)) {
         if(process.argv[argv_index]) {
-            params[field.name] = process.argv[argv_index]
-            if(field.name.toLowerCase().includes("password")) {
-                console.log(`${field.name}:<hidden>`)
+            params[param_key] = process.argv[argv_index]
+            if(param_key.toLowerCase().includes("password") || param_key.toLowerCase().includes("secret") || param_key.toLowerCase().includes("token")) {
+                console.log(`${param_key}:<hidden>`)
             }
             else {
-                console.log(`${field.name}:${process.argv[argv_index]}`)
+                console.log(`${param_key}:${process.argv[argv_index]}`)
             }
         }
         else {
-            if(field.name.toLowerCase().includes("password")) {
-                params[field.name] = prompt.hide(`${field.name}:`);
+            if(param_key.toLowerCase().includes("password") || param_key.toLowerCase().includes("secret") || param_key.toLowerCase().includes("token")) {
+                params[param_key] = prompt.hide(`${param.name}:`);
             }
             else {
-                params[field.name] = prompt(`${field.name}:`);
+                params[param_key] = prompt(`${param.name}:`);
             }
         }
         argv_index++;
