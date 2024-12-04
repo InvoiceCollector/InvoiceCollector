@@ -1,12 +1,12 @@
 const MongoDB = require('./mongodb.js');
 
 class DatabaseFactory {
-    static getDatabase(databaseType) {
-        switch (databaseType) {
-            case 'MongoDB':
-                return new MongoDB();
-            default:
-                throw new Error('Unsupported database type');
+    static getDatabase(databaseUri = process.env.DATABASE_URI) {
+        if(databaseUri.startsWith('mongodb://')) {
+            return new MongoDB(databaseUri);
+        }
+        else {
+            throw new Error('Unsupported database type');
         }
     }
 }

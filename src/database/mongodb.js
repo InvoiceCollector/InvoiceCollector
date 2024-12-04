@@ -3,14 +3,12 @@ const AbstractDatabase = require('./abstractDatabase.js');
 
 class MongoDB extends AbstractDatabase {
 
-    static DEFAULT_URI = 'mongodb://mongodb:27017';
     static DB_NAME = 'invoice-collector';
-
     static CUSTOMER_COLLECTION = 'customers';
     static USER_COLLECTION = 'users';
     static CREDENTIAL_COLLECTION = 'credentials';
 
-    constructor(uri = MongoDB.DEFAULT_URI) {
+    constructor(uri) {
         super();
         this.client = new mongodb.MongoClient(uri);
         this.connect();

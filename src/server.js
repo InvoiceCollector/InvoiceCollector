@@ -23,7 +23,7 @@ class Server {
             port: process.env.REDIS_PORT
         };
 
-        this.database = DatabaseFactory.getDatabase(process.env.DATABASE_TYPE);
+        this.database = DatabaseFactory.getDatabase();
         this.tokens = {}
 
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });

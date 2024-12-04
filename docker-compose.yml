@@ -10,7 +10,7 @@ services:
       - redis
     environment:
       - PORT=8080
-      - DATABASE_TYPE=MongoDB
+      - DATABASE_URI=mongodb://mongodb:27017
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
