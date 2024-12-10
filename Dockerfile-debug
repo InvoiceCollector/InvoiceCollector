@@ -6,6 +6,7 @@ WORKDIR /usr/app
 
 # Copy necessary files and folder to the working directory
 COPY package*.json .
+COPY tsconfig.json ./tsconfig.json
 COPY src/ ./src/
 COPY public/ ./public/
 COPY test/ ./test/

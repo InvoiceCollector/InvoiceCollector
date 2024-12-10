@@ -17,7 +17,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
-    command: npm run dev
+    command: npm run debug
 
   redis:
     image: redis:7.4.1

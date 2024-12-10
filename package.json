@@ -4,9 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "node test/test.js",
-    "dev": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.js"
+    "start": "node dist/index.js",
+    "test": "ts-node test/test.js",
+    "dev": "ts-node src/index.js",
+    "build": "tsc",
+    "debug": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.js"
   },
   "dependencies": {
     "@bitwarden/sdk-napi": "^1.0.0",
@@ -15,17 +17,28 @@
     "bullmq": "^5.15.0",
     "express": "^4.18.2",
     "mongodb": "^6.11.0",
-    "puppeteer": "^21.6.1"
+    "puppeteer": "^21.6.1",
+    "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/parser": "^8.18.0",
     "dotenv": "^16.4.7",
     "nodemon": "^3.1.7",
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0"
   },
   "nodemonConfig": {
     "watch": [
       "src/",
       "public/"
-    ]
+    ],
+    "ext": "js,ts",
+    "execMap": {
+      "ts": "node --require ts-node/register"
+    }
   }
 }
