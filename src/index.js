@@ -10,7 +10,7 @@ const app = express()
 app.use(bodyParser.json());
 const server = new Server();
 
-ENV_VARIABLES = [
+const ENV_VARIABLES = [
     "PORT",
     "REDIS_HOST",
     "REDIS_PORT",
