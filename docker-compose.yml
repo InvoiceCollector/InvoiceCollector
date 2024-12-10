@@ -10,10 +10,13 @@ services:
       - redis
     environment:
       - PORT=8080
-      - DATABASE_URI=mongodb://mongodb:27017
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
+      - DATABASE_URI=mongodb://mongodb:27017
+      - SECRET_MANAGER_TYPE=bitwarden
+      - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
+      - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity
     command: npm run start
 
   redis:

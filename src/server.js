@@ -2,6 +2,7 @@ const { Queue, Worker } = require('bullmq');
 const axios = require('axios');
 
 const DatabaseFactory = require('./database/databaseFactory.js');
+const SecretManagerFactory = require('./secret_manager/secretManagerFactory.js');
 const { AuthenticationBearerError, OauthError, ElementNotFoundError, UnfinishedCollector } = require('./error.js')
 const utils = require('./utils.js')
 
@@ -24,6 +25,7 @@ class Server {
         };
 
         this.database = DatabaseFactory.getDatabase();
+        this.secret_manager = SecretManagerFactory.getSecretManager();
         this.tokens = {}
 
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });
@@ -211,8 +213,7 @@ class Server {
         delete params.note;
 
         // Add credential to Secure Storage
-        // TODO: Implement Secure Storage
-        const ss_id = params;
+        const secret = await this.secret_manager.addSecret(`${customer_id}_${user._id}_${key}`, params);
 
         // If user does not exist, create it
         if(!user) {
@@ -227,7 +228,7 @@ class Server {
             user_id: user._id,
             key,
             note,
-            ss_id
+            secret_manager_id: secret.id
         });
     }
 
@@ -238,8 +239,11 @@ class Server {
         // Get user from customer_id and remote_id
         const user = await this.database.getUser(customer_id, remote_id);
 
+        // Get credential from credential_id
+        const credential = await this.database.getCredential(credential_id);
+
         // Delete credential from Secure Storage
-        // TODO: Implement Secure Storage
+        this.secret_manager.deleteSecret(credential.secret_manager_id);
 
         // Delete credential
         await this.database.deleteCredential(user._id, credential_id);
