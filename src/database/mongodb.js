@@ -75,7 +75,7 @@ class MongoDB extends AbstractDatabase {
             throw new Error("Database is not connected");
         }
         if (typeof customer_id === 'string') {
-            customer_id = new ObjectID(customer_id);
+            customer_id = new mongodb.ObjectId(customer_id);
         }
         return await this.db.collection(MongoDB.USER_COLLECTION).findOne({ customer_id, remote_id });
     }
@@ -94,9 +94,19 @@ class MongoDB extends AbstractDatabase {
             throw new Error("Database is not connected");
         }
         if (typeof user_id === 'string') {
-            user_id = new ObjectID(user_id);
+            user_id = new mongodb.ObjectId(user_id);
         }
         return await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).find({ user_id }).toArray();
+    }
+
+    async getCredential(credential_id) {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        if (typeof credential_id === 'string') {
+            credential_id = new mongodb.ObjectId(credential_id);
+        }
+        return await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).findOne({ _id: credential_id });
     }
 
     async createCredential(credential) {

@@ -37,12 +37,18 @@ class AbstractDatabase {
         throw new Error("Method 'updateUser()' must be implemented.");
     }
 
-    async createCredential(credential) {
-        throw new Error("Method 'createCredential()' must be implemented.");
+    // CREDENTIAL
+
+    async getCredentials(user_id) {
+        throw new Error("Method 'getCredentials()' must be implemented.");
     }
 
-    async getCredentials(customer_id) {
-        throw new Error("Method 'getCredentials()' must be implemented.");
+    async getCredential(credential_id) {
+        throw new Error("Method 'getCredential()' must be implemented.");
+    }
+
+    async createCredential(credential) {
+        throw new Error("Method 'createCredential()' must be implemented.");
     }
 
     async updateCredential(credential) {
