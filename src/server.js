@@ -3,20 +3,14 @@ const axios = require('axios');
 
 const DatabaseFactory = require('./database/databaseFactory.js');
 const SecretManagerFactory = require('./secret_manager/secretManagerFactory.js');
-const { AuthenticationBearerError, OauthError, ElementNotFoundError, UnfinishedCollector } = require('./error.js')
+const LogServer = require('./log_server.ts');
+const { AuthenticationBearerError, OauthError, LoggableError, MissingField } = require('./error.js')
 const utils = require('./utils.js')
-
-const invoice_collector_server = axios.create({
-    baseURL: `${process.env.LOG_SERVER_ENDPOINT}/v1`,
-    //headers: {'Authorization': `Bearer ${}`}
-  });
-
 const collectors = require('./collectors/collectors.js')
-const { MissingField } = require('./error.js')
 
 class Server {
 
-    static OAUTH_TOKEN_VALIDITY_DURATION_MS = process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS || 600000; // 10 minutes, in ms
+    static OAUTH_TOKEN_VALIDITY_DURATION_MS = process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS || 600000; // 10 minutes, in ms 
 
     constructor() {
         const connection = {
@@ -26,6 +20,7 @@ class Server {
 
         this.database = DatabaseFactory.getDatabase();
         this.secret_manager = SecretManagerFactory.getSecretManager();
+        this.log_server = new LogServer()
         this.tokens = {}
 
         this.collect_invoice_queue = new Queue('collect_invoice', { connection });
@@ -60,15 +55,7 @@ class Server {
             });
 
             // Log success
-            invoice_collector_server.post("/log/success", {
-                collector: job.data.collector
-            })
-            .then(function (response) {
-                console.log("Invoice-Collector server succesfully reached");
-            })
-            .catch(function (error) {
-                console.error(`Could not reach Invoice-Collector server at ${error.request.res.responseUrl}`);
-            });
+            this.log_server.logSuccess(job.data.collector);
         });
         
         this.collect_invoice_worker.on("failed", (job, err) => {
@@ -93,22 +80,9 @@ class Server {
                 console.error(`Could not reach callback ${error.request.res.responseUrl}`);
             });
 
-            // Log error if is ElementNotFoundError or UnfinishedCollector
-            if(err instanceof ElementNotFoundError || err instanceof UnfinishedCollector) {
-                invoice_collector_server.post("/log/error", {
-                    collector: err.collector,
-                    version: err.version,
-                    error: err.name,
-                    traceback: err.stack,
-                    source_code: err.source_code,
-                    screenshot: err.screenshot
-                })
-                .then(function (response) {
-                    console.log("Invoice-Collector server succesfully reached");
-                })
-                .catch(function (error) {
-                    console.error(`Could not reach Invoice-Collector server at ${error.request.res.responseUrl}`);
-                });
+            // Log error if is LoggableError
+            if(err instanceof LoggableError) {
+                this.log_server.logError(err);
             }
         });
         

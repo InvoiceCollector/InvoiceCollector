@@ -21,7 +21,7 @@ class Driver {
                 const source_code = await this.page.content();
                 const source_code_base64 = Buffer.from(source_code).toString('base64')
                 const screenshot = await this.page.screenshot({encoding: 'base64'});
-                throw new ElementNotFoundError(url, source_code_base64, screenshot, selector, { cause: err })
+                throw new ElementNotFoundError(null, null, url, source_code_base64, screenshot, selector, { cause: err })
             }
             return null;
         }
