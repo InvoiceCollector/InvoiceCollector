@@ -119,8 +119,8 @@ app.get('/api/v1/collectors', (req, res) => {
 app.post('/api/v1/collect', async (req, res) => {
     try {
         // Collect invoices
-        console.log(`POST collect ${req.body.collector}`);
-        const response = await server.post_collect(req.authorization, req.body.collector);
+        console.log(`POST collect ${req.body.credential_id}`);
+        const response = await server.post_collect(req.headers.authorization, req.body.credential_id);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');

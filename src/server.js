@@ -28,8 +28,7 @@ class Server {
             'collect_invoice',
             async data => {
                 return await this.collect(
-                    data.key,
-                    data.params
+                    data.data.credential_id
                 );
             },
             {
@@ -44,14 +43,13 @@ class Server {
             // Send invoices to callback
             axios.post(job.data.callback, {
                 type: "invoices",
-                invoices,
-                metadata: job.data.metadata
+                invoices
             })
             .then(function (response) {
                 console.log("Callback succesfully reached");
             })
             .catch(function (error) {
-                console.error(`Could not reach callback ${error.request.res.responseUrl}`);
+                console.error(`Could not reach callback ${error.request._currentUrl}`);
             });
 
             // Log success
@@ -60,7 +58,6 @@ class Server {
         
         this.collect_invoice_worker.on("failed", (job, err) => {
             console.error(`${job.id} has failed:`);
-            console.error(err.stack);
 
             // Send error to callback
             axios.post(job.data.callback, {
@@ -77,7 +74,7 @@ class Server {
                 console.log("Callback succesfully reached");
             })
             .catch(function (error) {
-                console.error(`Could not reach callback ${error.request.res.responseUrl}`);
+                console.error(`Could not reach callback ${error.request._currentUrl}`);
             });
 
             // Log error if is LoggableError
@@ -179,6 +176,9 @@ class Server {
             throw new MissingField("params");
         }
 
+        // Get collector from name
+        const collector = this.get_collector(key);
+
         // Get user from customer_id and remote_id
         let user = await this.database.getUser(customer_id, remote_id);
 
@@ -216,6 +216,11 @@ class Server {
         // Get credential from credential_id
         const credential = await this.database.getCredential(credential_id);
 
+        // Check if credential exists
+        if (!credential) {
+            throw new Error(`Credential with id "${credential_id}" not found.`);
+        }
+
         // Delete credential from Secure Storage
         this.secret_manager.deleteSecret(credential.secret_manager_id);
 
@@ -241,43 +246,43 @@ class Server {
         return collector_pointers[0]
     }
 
-    async post_collect(bearer, key, params) {
+    async post_collect(bearer, credential_id) {
         // Get customer from bearer
         const customer = await this.get_customer_from_bearer(bearer);
 
-        // Check if key field is missing
-        if(!key) {
-            throw new MissingField("key");
+        // Check if credential_id field is missing
+        if(!credential_id) {
+            throw new MissingField("credential_id");
         }
 
-        // Check if params field is missing
-        if(!params) {
-            throw new MissingField("params");
-        }
+        // Get credential from credential_id
+        const credential = await this.database.getCredential(credential_id);
 
-        // Get collector from name
-        const collector = this.get_collector(key);
-
-        // Check mandatory parameters
-        for(const collector_param of collector.CONFIG.params) {
-            if(collector_param.mandatory && !params.hasOwnProperty(collector_param.name)) {
-                throw new MissingField(`params.${collector_param.name}`);
-            }
+        // Check if credential exists
+        if (!credential) {
+            throw new Error(`Credential with id "${credential_id}" not found.`);
         }
 
         // Add job in queue
-        console.log(`Adding job to the queue "${key}"`);
-        let job = await this.collect_invoice_queue.add(collector.CONFIG.name, {key, params});
+        console.log(`Adding job to the queue to collect ${credential._id}`);
+        let job = await this.collect_invoice_queue.add(credential.key, {credential_id, callback: customer.callback});
     }
 
-    async collect(key, params) {
-        console.log(`Collecting invoices on "${key}"`);
+    async collect(credential_id) {
+        console.log(`Collecting invoices for ${credential_id}`);
+
+        // Get credential from credential_id
+        const credential = await this.database.getCredential(credential_id);
+
+        // Get secret from secret_manager_id
+        const secret = await this.secret_manager.getSecret(credential.secret_manager_id);
 
         // Get collector from key and instantiate it
-        const collector = this.get_collector(key)();
+        const collector_class = this.get_collector(credential.key);
+        const collector = new collector_class();
 
         // Collect invoices
-        const invoices = await collector.collect(params);
+        const invoices = await collector.collect(secret.value);
 
         return {type: "success", invoices}
     }
