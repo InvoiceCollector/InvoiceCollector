@@ -31,7 +31,7 @@ class LogServer {
             console.log("Invoice-Collector server successfully reached");
         })
         .catch(error => {
-            console.error(`Could not reach Invoice-Collector server at ${error.request.res.responseUrl}`);
+            console.error(`Could not reach Invoice-Collector server at ${error.request._currentUrl}`);
         });
     }
 
@@ -48,7 +48,7 @@ class LogServer {
             console.log("Invoice-Collector server successfully reached");
         })
         .catch(error => {
-            console.error(`Could not reach Invoice-Collector server at ${error.request.res.responseUrl}`);
+            console.error(`Could not reach Invoice-Collector server at ${error.request._currentUrl}`);
         });
     }
 }
