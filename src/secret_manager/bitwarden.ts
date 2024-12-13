@@ -60,7 +60,9 @@ class Bitwarden extends AbstractSecretManager {
     }
 
     async getSecret(id: string) {
-        return await this.client.secrets().get(id);
+        const secret = await this.client.secrets().get(id);
+        secret.value = JSON.parse(secret.value);
+        return secret
     }
 
     async deleteSecret(id: string) {
