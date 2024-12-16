@@ -1,7 +1,6 @@
-import { Queue, Worker, QueueOptions } from 'bullmq';
+import { Queue, Worker } from 'bullmq';
 import axios from 'axios';
 
-import { AbstractDatabase } from './database/abstractDatabase';
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
@@ -29,6 +28,9 @@ export class Server {
             host: String(process.env.REDIS_HOST),
             port: Number(process.env.REDIS_PORT)
         };
+
+        // Connect to database
+        DatabaseFactory.getDatabase().connect();
 
         this.secret_manager = SecretManagerFactory.getSecretManager();
         this.log_server = new LogServer()

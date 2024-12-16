@@ -19,7 +19,6 @@ export class MongoDB extends AbstractDatabase {
         super();
         this.client = new MongoClient(uri);
         this.db = null;
-        this.connect();
     }
 
     async connect(): Promise<void> {
