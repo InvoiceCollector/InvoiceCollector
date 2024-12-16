@@ -18,24 +18,27 @@ const ENV_VARIABLES = [
     "LOG_SERVER_ENDPOINT"
 ]
 
-// ---------- AUTHORIZE ----------
-
-function handle_error(e, res){
-    let status = 500;
-    if(e instanceof StatusError) {
-        status = e.status_code;
-    }
-    else {
-        console.error(e);
-    }
-    res.status(status).end(JSON.stringify({type: "error", reason: e.message}));
-}
+// ---------- BEARER TOKEN NEEDED ----------
 
 app.post('/api/v1/authorize', async (req, res) => {
     try {
         // Perform authorization
         console.log('POST authorize');
         const response = await server.post_authorize(req.headers.authorization, req.body.remote_id);
+
+        // Build response
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(response));
+    } catch (e) {
+        handle_error(e, res);
+    }
+});
+
+app.post('/api/v1/collect', async (req, res) => {
+    try {
+        // Collect invoices
+        console.log(`POST collect ${req.body.credential_id}`);
+        const response = await server.post_collect(req.headers.authorization, req.body.credential_id);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');
@@ -117,19 +120,16 @@ app.get('/api/v1/collectors', (req, res) => {
     }
 });
 
-app.post('/api/v1/collect', async (req, res) => {
-    try {
-        // Collect invoices
-        console.log(`POST collect ${req.body.credential_id}`);
-        const response = await server.post_collect(req.headers.authorization, req.body.credential_id);
-
-        // Build response
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(response));
-    } catch (e) {
-        handle_error(e, res);
+function handle_error(e, res){
+    let status = 500;
+    if(e instanceof StatusError) {
+        status = e.status_code;
     }
-});
+    else {
+        console.error(e);
+    }
+    res.status(status).end(JSON.stringify({type: "error", reason: e.message}));
+}
 
 function has_env_variables(){
 	for(let env_var of ENV_VARIABLES) {
