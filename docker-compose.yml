@@ -18,3 +18,13 @@ services:
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
       - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity
     command: npm run start
+
+  mongodb:
+    image : mongo:8.0.3
+    container_name: mongodb
+    volumes:
+      - ./mongodb/data:/data/db
+      - ./mongodb/config:/etc/mongo/
+    ports:
+      - 27017:27017
+    command: --logpath /dev/null
