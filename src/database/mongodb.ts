@@ -149,7 +149,11 @@ export class MongoDB extends AbstractDatabase {
                 document.user_id.toString(),
                 document.key,
                 document.note,
-                document.secret_manager_id
+                document.secret_manager_id,
+                document.create_timestamp,
+                document.last_collect_timestamp,
+                document.next_collect_timestamp,
+                document.invoices
             );
             credential.id = document._id.toString();
             return credential;
@@ -170,7 +174,11 @@ export class MongoDB extends AbstractDatabase {
             document.user_id.toString(),
             document.key,
             document.note,
-            document.secret_manager_id
+            document.secret_manager_id,
+            document.create_timestamp,
+            document.last_collect_timestamp,
+            document.next_collect_timestamp,
+            document.invoices
         );
         credential.id = document._id.toString();
         return credential;
@@ -184,7 +192,11 @@ export class MongoDB extends AbstractDatabase {
             user_id: new ObjectId(credential.user_id),
             key: credential.key,
             note: credential.note,
-            secret_manager_id: credential.secret_manager_id
+            secret_manager_id: credential.secret_manager_id,
+            create_timestamp: credential.create_timestamp,
+            last_collect_timestamp: credential.last_collect_timestamp,
+            next_collect_timestamp: credential.next_collect_timestamp,
+            invoices: credential.invoices
         });
         credential.id = document.insertedId.toString();
         return credential;
@@ -200,7 +212,11 @@ export class MongoDB extends AbstractDatabase {
                 user_id: new ObjectId(credential.user_id),
                 key: credential.key,
                 note: credential.note,
-                secret_manager_id: credential.secret_manager_id
+                secret_manager_id: credential.secret_manager_id,
+                create_timestamp: credential.create_timestamp,
+                last_collect_timestamp: credential.last_collect_timestamp,
+                next_collect_timestamp: credential.next_collect_timestamp,
+                invoices: credential.invoices
             }}
         );
     }

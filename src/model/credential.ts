@@ -11,18 +11,30 @@ export class IcCredential {
     key: string;
     note: string;
     secret_manager_id: string;
+    create_timestamp: number;
+    last_collect_timestamp: number;
+    next_collect_timestamp: number;
+    invoices: any[];
 
     constructor(
         user_id: string,
         key: string,
         note: string,
-        secret_manager_id: string
+        secret_manager_id: string,
+        create_timestamp: number = Date.now(),
+        last_collect_timestamp: number = Number.NaN,
+        next_collect_timestamp: number = Number.NaN,
+        invoices: any[] = []
     ) {
         this.id = "";
         this.user_id = user_id;
         this.key = key;
         this.note = note;
         this.secret_manager_id = secret_manager_id;
+        this.create_timestamp = create_timestamp;
+        this.last_collect_timestamp = last_collect_timestamp;
+        this.next_collect_timestamp = next_collect_timestamp;
+        this.invoices = invoices;
     }
 
     async getUser() {
