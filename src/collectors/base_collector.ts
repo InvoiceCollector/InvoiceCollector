@@ -1,10 +1,12 @@
-const axios = require('axios');
-const fs = require('fs');
-const puppeteer = require('puppeteer');
-const { Driver } = require('../driver.js');
-const { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } = require('../error.js')
+import axios from 'axios';
+import fs from 'fs';
+import puppeteer, { PuppeteerLaunchOptions } from 'puppeteer';
+import { Driver } from '../driver';
+import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '../error';
 
-class AbstractCollector {
+export class AbstractCollector {
+    config: any;
+
     constructor(config) {
         this.config = config;
     }
@@ -30,9 +32,9 @@ class AbstractCollector {
     }
 }
 
-class ScrapperCollector extends AbstractCollector {
+export class ScrapperCollector extends AbstractCollector {
     
-    PUPPETEER_CONFIG = {
+    PUPPETEER_CONFIG: PuppeteerLaunchOptions = {
         headless:'new',
         args:[
             '--start-maximized', // you can also use '--start-fullscreen'
@@ -106,6 +108,14 @@ class ScrapperCollector extends AbstractCollector {
 
     //NOT IMPLEMENTED
 
+    async login(driver, params){
+        throw new Error('`login` is not implemented.');
+    }
+
+    async run(driver, params) {
+        throw new Error('`run` is not implemented.');
+    }
+
     async is_not_authenticated(driver, params){
         //Assume the password is correct
         return {
@@ -120,13 +130,8 @@ class ScrapperCollector extends AbstractCollector {
     }
 }
 
-class ApiCollector extends AbstractCollector {
+export class ApiCollector extends AbstractCollector {
     constructor(config) {
         super(config);
     }
-}
-
-module.exports = {
-	ScrapperCollector,
-    ApiCollector,
 }

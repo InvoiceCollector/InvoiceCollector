@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const collectors = []
+export var collectors: any[] = []
 
 // Dynamically import all collectors
 const folders = fs.readdirSync(__dirname, { withFileTypes: true });
@@ -19,7 +19,7 @@ for (const folder of folders) {
     }
 
     // Build the file path
-    const file = path.join(__dirname, folder.name, folder.name + ".js");
+    const file = path.join(__dirname, folder.name, folder.name + ".ts");
 
     // Check if the file exists
     if (!fs.existsSync(file)) {
@@ -41,5 +41,3 @@ for (const folder of folders) {
 }
 
 console.log(`${collectors.length} collectors loaded`);
-
-module.exports = collectors

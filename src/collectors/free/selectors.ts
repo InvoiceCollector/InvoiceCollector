@@ -1,4 +1,4 @@
-module.exports = {
+export const FreeSelectors = {
     //LOGIN PAGE
 
     FIELD_USERNAME: {

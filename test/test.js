@@ -1,4 +1,4 @@
-const collectors = require('../src/collectors/collectors.js')
+const { collectors } = require('../src/collectors/collectors.ts')
 const prompt = require('prompt-sync')({sigint: true});
 
 (async () => {

@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "test": "ts-node test/test.js",
-    "dev": "ts-node src/index.js",
+    "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "debug": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.js"
+    "debug": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.ts"
   },
   "dependencies": {
     "@bitwarden/sdk-napi": "^1.0.0",

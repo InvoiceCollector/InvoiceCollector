@@ -1,10 +1,11 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-require('dotenv').config();
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const { StatusError } = require('./error.js')
-const { Server } = require('./server.js');
+import { StatusError } from "./error"
+import { Server } from "./server"
 
 const app = express()
 app.use(bodyParser.json());
@@ -106,7 +107,7 @@ app.get('/api/v1/collectors', (req, res) => {
     try {
         // List all collectors
         console.log(`GET collectors`);
-        const response = server.collectors();
+        const response = server.get_collectors();
 
         // Build response
         res.setHeader('Content-Type', 'application/json');

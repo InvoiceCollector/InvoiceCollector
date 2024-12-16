@@ -1,8 +1,10 @@
-const { ElementNotFoundError } = require('./error.js')
+import { ElementNotFoundError } from './error';
 
-class Driver {
+export class Driver {
 
-    DEFAULT_TIMEOUT = 10000;
+    static DEFAULT_TIMEOUT = 10000;
+
+    page;
 
     constructor(page) {
         this.page = page;
@@ -61,8 +63,4 @@ class Driver {
     async check_element_exist(selector) {
         return this.page.$$(selector.selector).length > 0;
     }
-}
-
-module.exports = {
-	Driver,
 }

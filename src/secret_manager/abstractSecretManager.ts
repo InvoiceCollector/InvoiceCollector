@@ -1,4 +1,4 @@
-class AbstractSecretManager {
+export class AbstractSecretManager {
     constructor() {
         if (new.target === AbstractSecretManager) {
             throw new TypeError("Cannot construct AbstractSecretManager instances directly");
@@ -9,23 +9,21 @@ class AbstractSecretManager {
         throw new Error("Method 'connect()' must be implemented.");
     }
 
-    async disconnect() {
+    /*async disconnect() {
         throw new Error("Method 'disconnect()' must be implemented.");
-    }
+    }*/
 
     // SECRETS
 
-    async addSecret(key, params) {
+    async addSecret(key, params): Promise<any> {
         throw new Error("Method 'addSecret()' must be implemented.");
     }
 
-    async getSecret(id) {
+    async getSecret(id): Promise<any> {
         throw new Error("Method 'getSecret()' must be implemented.");
     }
 
-    async deleteSecret(id) {
+    async deleteSecret(id): Promise<any> {
         throw new Error("Method 'deleteSecret()' must be implemented.");
     }
 }
-
-module.exports = AbstractSecretManager;

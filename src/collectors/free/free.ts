@@ -1,7 +1,7 @@
-const { ScrapperCollector } = require('../base_collector.js');
-const FreeSelectors = require('./selectors.js');
+import { ScrapperCollector } from '../base_collector';
+import { FreeSelectors } from './selectors';
 
-class FreeCollector extends ScrapperCollector {
+export class FreeCollector extends ScrapperCollector {
 
     static CONFIG = {
         name: "Free",
@@ -51,21 +51,22 @@ class FreeCollector extends ScrapperCollector {
         //Build return array
         return links.map(link => {
             let search_params = new URLSearchParams(link);
-            const no_facture = search_params.get("no_facture")
-            const date_string = search_params.get("mois")
-            const year = date_string.slice(0, 4);
-            const month = date_string.slice(4, 6) - 1; // Months in JavaScript are indexed from 0 to 11
+            const no_facture = search_params.get("no_facture");
+            const date_string = search_params.get("mois");
+
+            let timestamp;
+            if (date_string) {
+                const year = parseInt(date_string.slice(0, 4));
+                const month = parseInt(date_string.slice(4, 6)) - 1; // Months in JavaScript are indexed from 0 to 11
+                timestamp = Date.UTC(year, month)
+            }
             return {
                 id: no_facture,
                 type: "link",
                 mime: 'application/pdf',
-                timestamp: Date.UTC(year, month),
+                timestamp: timestamp || null,
                 link: link
             };
         });
     }
-}
-
-module.exports = {
-	FreeCollector,
 }

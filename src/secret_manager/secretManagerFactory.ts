@@ -1,8 +1,8 @@
-require('ts-node').register();
-const Bitwarden = require('./bitwarden.ts');
+import { Bitwarden } from './bitwarden';
+import { AbstractSecretManager } from './abstractSecretManager';
 
-class SecretManagerFactory {
-    static getSecretManager() {
+export class SecretManagerFactory {
+    static getSecretManager(): AbstractSecretManager {
         const type = process.env.SECRET_MANAGER_TYPE;
         switch(type) {
             case 'bitwarden':
@@ -12,5 +12,3 @@ class SecretManagerFactory {
         }
     }
 }
-
-module.exports = SecretManagerFactory;

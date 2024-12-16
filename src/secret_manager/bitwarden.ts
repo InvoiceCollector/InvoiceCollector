@@ -1,13 +1,13 @@
 import { BitwardenClient, ClientSettings, DeviceType, LogLevel } from "@bitwarden/sdk-napi";
-const AbstractSecretManager = require('./abstractSecretManager.js');
+import { AbstractSecretManager } from "./abstractSecretManager";
 
-
-class Bitwarden extends AbstractSecretManager {
+export class Bitwarden extends AbstractSecretManager {
 
     static stateFile: string = "./bitwarden/state";
 
-    organizationId: string;
     accessToken: string;
+    organizationId: string;
+    projectId: string;
     client: BitwardenClient;
 
     constructor() {
@@ -69,5 +69,3 @@ class Bitwarden extends AbstractSecretManager {
         return await this.client.secrets().delete([id]);
     }
 }
-
-module.exports = Bitwarden;

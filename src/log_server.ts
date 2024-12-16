@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { LoggableError } from './error.js'
+import { LoggableError } from './error'
 
-class LogServer {
+export class LogServer {
     static VERSION = "v1"
     private client: AxiosInstance;
 
@@ -52,5 +52,3 @@ class LogServer {
         });
     }
 }
-
-module.exports = LogServer;
