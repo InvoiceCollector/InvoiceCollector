@@ -17,7 +17,6 @@ export class Server {
 
     static OAUTH_TOKEN_VALIDITY_DURATION_MS = Number(process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS) || 600000; // 10 minutes, in ms 
 
-    database: AbstractDatabase;
     secret_manager: AbstractSecretManager;
     log_server: LogServer;
     tokens: object;
@@ -31,7 +30,6 @@ export class Server {
             port: Number(process.env.REDIS_PORT)
         };
 
-        this.database = DatabaseFactory.getDatabase();
         this.secret_manager = SecretManagerFactory.getSecretManager();
         this.log_server = new LogServer()
         this.tokens = {}
@@ -100,21 +98,11 @@ export class Server {
         console.log("Worker started!");
 	}
 
-    // ---------- AUTHORIZE ----------
-
-    async get_customer_from_bearer(bearer): Promise<Customer|null> {
-        // Check if bearer is missing or does not start with "Bearer "
-        if(!bearer || !bearer.startsWith("Bearer ")) {
-            throw new AuthenticationBearerError()
-        }
-
-        // Get customer from bearer
-        return await this.database.getCustomer(bearer.split(' ')[1]);
-    }
+    // ---------- BEARER TOKEN NEEDED ----------
 
     async post_authorize(bearer, remote_id) {
         // Get user from bearer
-        const customer = await this.get_customer_from_bearer(bearer);
+        const customer = await Customer.fromBearer(bearer);
 
         // Check if customer exists
         if(!customer) {
@@ -126,14 +114,21 @@ export class Server {
             throw new MissingField("remote_id");
         }
 
+        // Get user from remote_id
+        let user = await customer.getUserFromRemoteId(remote_id);
+
+        // If user does not exist, create it
+        if(!user) {
+            user = new User(customer.id, remote_id);
+            // Create user in database
+            user.commit();
+        }
+
         // Generate oauth token
         const token = generate_token();
 
-        // Create request record in
-        this.tokens[token] = {
-            customer_id: customer.id,
-            remote_id
-        }
+        // Map token with user
+        this.tokens[token] = user;
 
         // Schedule token delete after 1 hour
         setTimeout(() => {
@@ -144,9 +139,49 @@ export class Server {
         return { token }
     }
 
+    async post_collect(bearer, credential_id) {
+        // Get customer from bearer
+        const customer = await Customer.fromBearer(bearer);
+
+        // Check if customer exists
+        if(!customer) {
+            throw new AuthenticationBearerError();
+        }
+
+        // Check if credential_id field is missing
+        if(!credential_id) {
+            throw new MissingField("credential_id");
+        }
+
+        // Get credential from credential_id
+        const credential = await IcCredential.fromId(credential_id);
+
+        // Check if credential exists
+        if (!credential) {
+            throw new Error(`Credential with id "${credential_id}" not found.`);
+        }
+
+        // Get user from credential
+        const user = await credential.getUser();
+
+        // Check if user exists
+        if (!user) {
+            throw new Error(`Could not find user for credential with id "${credential.id}".`);
+        }
+
+        // Check if user belongs to customer
+        if (user.customer_id != customer.id) {
+            throw new Error(`User with id "${user.id}" does not belong to customer with id "${customer.id}".`);
+        }
+
+        // Add job in queue
+        console.log(`Adding job to the queue to collect ${credential.id}`);
+        let job = await this.collect_invoice_queue.add(credential.key, {credential_id: credential.id, callback: customer.callback});
+    }
+
     // ---------- OAUTH TOKEN NEEDED ----------
 
-    get_token_mapping(token) {
+    get_token_mapping(token): User {
         // Check if token is missing or incorrect
         if(!token || !this.tokens.hasOwnProperty(token)) {
             throw new OauthError();
@@ -156,19 +191,11 @@ export class Server {
     }
 
     async get_credentials(token) {
-        // Get customer_id and remote_id from token
-         const { customer_id, remote_id } = this.get_token_mapping(token);
-
-        // Get user from customer_id and remote_id
-        const user = await this.database.getUser(customer_id, remote_id);
-
-        // Check if user exists
-        if(!user) {
-            throw new Error(`User with customer_id "${customer_id}" and remote_id "${remote_id}" not found.`);
-        }
+        // Get user from token
+         const user = this.get_token_mapping(token);
 
         // Get credentials from user
-        let credentials = await this.database.getCredentials(user.id);
+        let credentials = await user.getCredentials();
 
         // Build response 
         return credentials.map((credential) => {
@@ -182,8 +209,8 @@ export class Server {
     }
 
     async post_credential(token, key, params) {
-        // Get customer_id and remote_id from token
-         const { customer_id, remote_id } = this.get_token_mapping(token);
+        // Get user from token
+         const user = this.get_token_mapping(token);
 
         //Check if key field is missing
         if(!key) {
@@ -195,58 +222,49 @@ export class Server {
             throw new MissingField("params");
         }
 
-        // Get collector from name
-        const collector = this.get_collector(key);
-
-        // Get user from customer_id and remote_id
-        let user = await this.database.getUser(customer_id, remote_id);
-
-        // If user does not exist, create it
-        if(!user) {
-            user = await this.database.createUser(new User(customer_id, remote_id));
-        }
+        // Check if collector exists
+        this.get_collector(key);
 
         // Get credential note
         const note = params.note;
         delete params.note;
 
         // Add credential to Secure Storage
-        const secret = await this.secret_manager.addSecret(`${customer_id}_${user.id}_${key}`, params);
+        const secret = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${key}`, params);
 
         // Create credential
-        await this.database.createCredential(new IcCredential(
+        let credential = new IcCredential(
             user.id,
             key,
             note,
             secret.id
-        ));
+        );
+        // Create credential in database
+        await credential.commit();
     }
 
     async delete_credential(token, credential_id) {
-        // Get customer_id and remote_id from token
-        const { customer_id, remote_id } = this.get_token_mapping(token);
-
-        // Get user from customer_id and remote_id
-        const user = await this.database.getUser(customer_id, remote_id);
-
-        // Check if user exists
-        if(!user) {
-            throw new Error(`User with customer_id "${customer_id}" and remote_id "${remote_id}" not found.`);
-        }
+        // Get user from token
+        const user = this.get_token_mapping(token);
 
         // Get credential from credential_id
-        const credential = await this.database.getCredential(credential_id);
+        const credential = await user.getCredential(credential_id);
 
         // Check if credential exists
         if (!credential) {
             throw new Error(`Credential with id "${credential_id}" not found.`);
         }
 
+        // Check if credential belongs to user
+        if (credential.user_id != user.id) {
+            throw new Error(`Credential with id "${credential_id}" does not belong to user.`);
+        }
+
         // Delete credential from Secure Storage
         await this.secret_manager.deleteSecret(credential.secret_manager_id);
 
         // Delete credential
-        await this.database.deleteCredential(user.id, credential_id);
+        await credential.delete();
     }
 
     // ---------- NO OAUTH TOKEN NEEDED ----------
@@ -267,38 +285,11 @@ export class Server {
         return collector_pointers[0]
     }
 
-    async post_collect(bearer, credential_id) {
-        // Get customer from bearer
-        const customer = await this.get_customer_from_bearer(bearer);
-
-        // Check if customer exists
-        if(!customer) {
-            throw new AuthenticationBearerError();
-        }
-
-        // Check if credential_id field is missing
-        if(!credential_id) {
-            throw new MissingField("credential_id");
-        }
-
-        // Get credential from credential_id
-        const credential = await this.database.getCredential(credential_id);
-
-        // Check if credential exists
-        if (!credential) {
-            throw new Error(`Credential with id "${credential_id}" not found.`);
-        }
-
-        // Add job in queue
-        console.log(`Adding job to the queue to collect ${credential.id}`);
-        let job = await this.collect_invoice_queue.add(credential.key, {credential_id, callback: customer.callback});
-    }
-
     async collect(credential_id) {
         console.log(`Collecting invoices for ${credential_id}`);
 
         // Get credential from credential_id
-        const credential = await this.database.getCredential(credential_id);
+        const credential = await IcCredential.fromId(credential_id);
 
         // Check if credential exists
         if (!credential) {

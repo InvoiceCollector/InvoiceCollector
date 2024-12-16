@@ -29,12 +29,16 @@ export class AbstractDatabase {
 
     // USER
     
-    async createUser(user: User): Promise<User> {
-        throw new Error("Method 'createUser()' must be implemented.");
+    async getUser(user_id: string): Promise<User|null> {
+        throw new Error("Method 'getUser()' must be implemented.");
+    }
+
+    async getUserFromCustomerIdAndRemoteId(customer_id: string, remote_id: string): Promise<User|null> {
+        throw new Error("Method 'getUserFromCustomerIdAndRemoteId()' must be implemented.");
     }
     
-    async getUser(customer_id: string, remote_id: string): Promise<User|null> {
-        throw new Error("Method 'getUser()' must be implemented.");
+    async createUser(user: User): Promise<User> {
+        throw new Error("Method 'createUser()' must be implemented.");
     }
 
     async updateUser(user: User): Promise<void> {

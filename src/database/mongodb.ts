@@ -75,19 +75,25 @@ export class MongoDB extends AbstractDatabase {
 
     // USER
 
-    async createUser(user: User): Promise<User> {
+    async getUser(user_id: string): Promise<User|null> {
         if (!this.db) {
             throw new Error("Database is not connected");
         }
-        const document = await this.db.collection(MongoDB.USER_COLLECTION).insertOne({
-            customer_id: new ObjectId(user.customer_id),
-            remote_id: user.remote_id
+        const document = await this.db.collection(MongoDB.USER_COLLECTION).findOne({
+            _id: new ObjectId(user_id)
         });
-        user.id = document.insertedId.toString();
+        if (!document) {
+            return null;
+        }
+        let user = new User(
+            document.customer_id.toString(),
+            document.remote_id
+        );
+        user.id = document._id.toString();
         return user;
     }
 
-    async getUser(customer_id: string, remote_id: string): Promise<User|null> {
+    async getUserFromCustomerIdAndRemoteId(customer_id: string, remote_id: string): Promise<User|null> {
         if (!this.db) {
             throw new Error("Database is not connected");
         }
@@ -103,6 +109,18 @@ export class MongoDB extends AbstractDatabase {
             document.remote_id
         );
         user.id = document._id.toString();
+        return user;
+    }
+
+    async createUser(user: User): Promise<User> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        const document = await this.db.collection(MongoDB.USER_COLLECTION).insertOne({
+            customer_id: new ObjectId(user.customer_id),
+            remote_id: user.remote_id
+        });
+        user.id = document.insertedId.toString();
         return user;
     }
 
@@ -142,7 +160,9 @@ export class MongoDB extends AbstractDatabase {
         if (!this.db) {
             throw new Error("Database is not connected");
         }
-        const document = await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).findOne({ _id: new ObjectId(credential_id) });
+        const document = await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).findOne({
+            _id: new ObjectId(credential_id)
+        });
         if (!document) {
             return null;
         }
