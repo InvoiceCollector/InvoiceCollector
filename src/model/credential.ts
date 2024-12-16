@@ -1,9 +1,17 @@
 import { DatabaseFactory } from "../database/databaseFactory";
 
 export class IcCredential {
+
+    static ONE_DAY_MS: number = 86400000;
+    static ONE_WEEK_MS: number = 604800000;
+
     static async fromId(id: string): Promise<IcCredential|null> {    
         // Get customer from bearer
         return await DatabaseFactory.getDatabase().getCredential(id);
+    }
+
+    static async getCredentialsIdToCollect(): Promise<string[]> {
+        return await DatabaseFactory.getDatabase().getCredentialsIdToCollect();
     }
 
     id: string;
@@ -54,5 +62,40 @@ export class IcCredential {
             // Create credential
             await DatabaseFactory.getDatabase().createCredential(this);
         }
+    }
+
+    computeNextCollect() {
+        // If last_collect_timestamp and next_collect_timestamp are NaN, the invoices has never been collected
+        if (isNaN(this.last_collect_timestamp) && isNaN(this.next_collect_timestamp)) {
+            // Plan the next collection now
+            this.next_collect_timestamp = this.create_timestamp;
+        }
+        else if (this.next_collect_timestamp < this.last_collect_timestamp) { // If next_collect_timestamp is before last_collect_timestamp
+            if (this.invoices.length < 2) { // If has less than 2 invoices
+                // Plan the next collect in one week
+                this.next_collect_timestamp = this.last_collect_timestamp + IcCredential.ONE_WEEK_MS;
+            }
+            else { // If has more than 2 invoices
+                // Take the last 10 invoices
+                let invoices = this.invoices.slice(-10);
+
+                // Compute the average time between invoices
+                let sum = 0;
+                for (let i = 1; i < invoices.length; i++) {
+                    sum += invoices[i].timestamp - invoices[i-1].timestamp;
+                }
+                let avg = sum / (invoices.length - 1);
+
+                // Plan the next collect in the average time between invoices
+                this.next_collect_timestamp = this.last_collect_timestamp + avg;
+            }
+        }
+    }
+
+    addInvoices(invoices: any[]) {
+        this.invoices = this.invoices.concat(invoices);
+
+        // Order invoices by timestamp
+        this.invoices.sort((a, b) => a.timestamp - b.timestamp);
     }
 }

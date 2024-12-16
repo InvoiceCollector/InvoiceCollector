@@ -18,8 +18,3 @@ services:
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
       - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity
     command: npm run start
-
-  redis:
-    image: redis:latest
-    ports:
-      - 6379:6379

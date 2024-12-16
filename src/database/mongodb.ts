@@ -47,11 +47,26 @@ export class MongoDB extends AbstractDatabase {
 
     // CUSTOMER
 
-    async getCustomer(bearer: string): Promise<Customer|null> {
+    async getCustomerFromBearer(bearer: string): Promise<Customer|null> {
         if (!this.db) {
             throw new Error("Database is not connected");
         }
         const document = await this.db.collection(MongoDB.CUSTOMER_COLLECTION).findOne({ bearer });
+        if (!document) {
+            return null;
+        }
+        let customer = new Customer(document.callback);
+        customer.id = document._id.toString();
+        return customer;
+    }
+
+    async getCustomer(customer_id: string): Promise<Customer|null> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        const document = await this.db.collection(MongoDB.CUSTOMER_COLLECTION).findOne({
+            _id: new ObjectId(customer_id)
+        });
         if (!document) {
             return null;
         }
@@ -137,6 +152,28 @@ export class MongoDB extends AbstractDatabase {
     }
 
     // CREDENTIAL
+
+    async getCredentialsIdToCollect(): Promise<string[]> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        const query = {
+            $or: [
+                { last_collect_timestamp: NaN },
+                {
+                    $and: [
+                        { $expr: { $lt: [ "$last_collect_timestamp", "$next_collect_timestamp" ] } },
+                        { $expr: { $lt: [ "$next_collect_timestamp", Date.now() ] } }
+                    ]
+                }
+            ]
+        };
+        const documents = await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).aggregate([
+            { $match: query },
+            { $project: { _id: 1 } }
+        ]).toArray();
+        return documents.map(document => document._id.toString());
+    }
 
     async getCredentials(user_id: string): Promise<IcCredential[]> {
         if (!this.db) {

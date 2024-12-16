@@ -19,7 +19,11 @@ export class AbstractDatabase {
 
     // CUSTOMER
     
-    async getCustomer(bearer: string): Promise<Customer|null> {
+    async getCustomerFromBearer(bearer: string): Promise<Customer|null> {
+        throw new Error("Method 'getCustomerFromBearer()' must be implemented.");
+    }
+    
+    async getCustomer(customer_id: string): Promise<Customer|null> {
         throw new Error("Method 'getCustomer()' must be implemented.");
     }
 
@@ -46,6 +50,10 @@ export class AbstractDatabase {
     }
 
     // CREDENTIAL
+
+    async getCredentialsIdToCollect(): Promise<string[]> {
+        throw new Error("Method 'getCredentialsToCollect()' must be implemented.");
+    }
 
     async getCredentials(user_id: string|null): Promise<IcCredential[]> {
         throw new Error("Method 'getCredentials()' must be implemented.");

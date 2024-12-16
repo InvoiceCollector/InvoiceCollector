@@ -1,103 +1,31 @@
-import { Queue, Worker } from 'bullmq';
-import axios from 'axios';
-
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
-import { LogServer } from './log_server';
-import { AuthenticationBearerError, OauthError, LoggableError, MissingField } from './error';
+import { AuthenticationBearerError, OauthError, MissingField } from './error';
 import { generate_token } from './utils';
 import { collectors } from './collectors/collectors';
 import { User } from './model/user';
 import { Customer } from './model/customer';
 import { IcCredential } from './model/credential';
+import { CollectionTask } from './task/collectionTask';
 
 export class Server {
 
     static OAUTH_TOKEN_VALIDITY_DURATION_MS = Number(process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS) || 600000; // 10 minutes, in ms 
 
     secret_manager: AbstractSecretManager;
-    log_server: LogServer;
     tokens: object;
 
-    collect_invoice_queue: Queue;
-    collect_invoice_worker: Worker;
+    collection_task: CollectionTask;
 
     constructor() {
-        const connection = {
-            host: String(process.env.REDIS_HOST),
-            port: Number(process.env.REDIS_PORT)
-        };
-
         // Connect to database
         DatabaseFactory.getDatabase().connect();
 
         this.secret_manager = SecretManagerFactory.getSecretManager();
-        this.log_server = new LogServer()
         this.tokens = {}
 
-        this.collect_invoice_queue = new Queue('collect_invoice', { connection });
-        this.collect_invoice_worker = new Worker(
-            'collect_invoice',
-            async data => {
-                return await this.collect(
-                    data.data.credential_id
-                );
-            },
-            {
-                connection,
-                concurrency: 1
-            }
-        );
-        
-        this.collect_invoice_worker.on("completed", (job, invoices) => {
-            console.log(`${job.id} has completed!`);
-
-            // Send invoices to callback
-            axios.post(job.data.callback, {
-                type: "invoices",
-                invoices
-            })
-            .then(function (response) {
-                console.log("Callback succesfully reached");
-            })
-            .catch(function (error) {
-                console.error(`Could not reach callback ${error.request._currentUrl}`);
-            });
-
-            // Log success
-            this.log_server.logSuccess(job.data.collector);
-        });
-        
-        this.collect_invoice_worker.on("failed", (job, err) => {
-            console.error(`${job?.id} has failed:`);
-
-            // Log error if is LoggableError
-            if(err instanceof LoggableError) {
-
-                // Send error to callback
-                axios.post(job?.data.callback, {
-                    type: "error",
-                    error: {
-                        collector: err.collector,
-                        version: err.version,
-                        name: err.name,
-                        message: err.message
-                    }
-                })
-                .then(function (response) {
-                    console.log("Callback succesfully reached");
-                })
-                .catch(function (error) {
-                    console.error(`Could not reach callback ${error.request._currentUrl}`);
-                });
-
-                // Log error
-                this.log_server.logError(err);
-            }
-        });
-        
-        console.log("Worker started!");
+        this.collection_task = new CollectionTask(this.secret_manager);
 	}
 
     // ---------- BEARER TOKEN NEEDED ----------
@@ -176,9 +104,11 @@ export class Server {
             throw new Error(`User with id "${user.id}" does not belong to customer with id "${customer.id}".`);
         }
 
-        // Add job in queue
-        console.log(`Adding job to the queue to collect ${credential.id}`);
-        let job = await this.collect_invoice_queue.add(credential.key, {credential_id: credential.id, callback: customer.callback});
+        // Schedule next collect now
+        credential.next_collect_timestamp = Date.now()
+
+        // Update credential in database
+        await credential.commit();
     }
 
     // ---------- OAUTH TOKEN NEEDED ----------
@@ -241,6 +171,10 @@ export class Server {
             note,
             secret.id
         );
+
+        // Compute next collect
+        credential.computeNextCollect();
+
         // Create credential in database
         await credential.commit();
     }
@@ -285,29 +219,5 @@ export class Server {
             throw new Error(`Found ${collector_pointers.length} collectors with key "${key}".`);
         }
         return collector_pointers[0]
-    }
-
-    async collect(credential_id) {
-        console.log(`Collecting invoices for ${credential_id}`);
-
-        // Get credential from credential_id
-        const credential = await IcCredential.fromId(credential_id);
-
-        // Check if credential exists
-        if (!credential) {
-            throw new Error(`Credential with id "${credential_id}" not found.`);
-        }
-
-        // Get secret from secret_manager_id
-        const secret = await this.secret_manager.getSecret(credential.secret_manager_id);
-
-        // Get collector from key and instantiate it
-        const collector_class = this.get_collector(credential.key);
-        const collector = new collector_class();
-
-        // Collect invoices
-        const invoices = await collector.collect(secret.value);
-
-        return {type: "success", invoices}
     }
 }

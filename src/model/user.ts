@@ -12,6 +12,10 @@ export class User {
         this.remote_id = remote_id;
     }
 
+    async getCustomer() {
+        return await DatabaseFactory.getDatabase().getCustomer(this.customer_id);
+    }
+
     async getCredential(credential_id: string) {
         return await DatabaseFactory.getDatabase().getCredential(credential_id);
     }

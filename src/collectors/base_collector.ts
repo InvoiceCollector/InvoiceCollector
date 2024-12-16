@@ -23,6 +23,9 @@ export class AbstractCollector {
                 invoice.type = "base64";
             }
         }
+
+        // Order invoices by timestamp
+        invoices.sort((a, b) => a.timestamp - b.timestamp);
     }
 
     //NOT IMPLEMENTED

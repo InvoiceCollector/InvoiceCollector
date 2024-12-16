@@ -10,7 +10,7 @@ export class Customer {
         }
     
         // Get customer from bearer
-        return await DatabaseFactory.getDatabase().getCustomer(bearer.split(' ')[1]);
+        return await DatabaseFactory.getDatabase().getCustomerFromBearer(bearer.split(' ')[1]);
     }
 
     id: string;
