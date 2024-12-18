@@ -7,11 +7,9 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - redis
+      - mongodb
     environment:
       - PORT=8080
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
       - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
       - DATABASE_URI=mongodb://mongodb:27017
       - SECRET_MANAGER_TYPE=bitwarden

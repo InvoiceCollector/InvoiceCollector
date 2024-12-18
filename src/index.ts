@@ -13,8 +13,6 @@ const server = new Server();
 
 const ENV_VARIABLES = [
     "PORT",
-    "REDIS_HOST",
-    "REDIS_PORT",
     "LOG_SERVER_ENDPOINT"
 ]
 
