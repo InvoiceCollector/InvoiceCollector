@@ -24,6 +24,3 @@ RUN apt-get update && apt-get install -y chromium
 
 # Expose the port your app runs on
 EXPOSE 8080
-
-# Command to run your application
-CMD ["npm", "run", "start"]

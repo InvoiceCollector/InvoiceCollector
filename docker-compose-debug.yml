@@ -1,9 +1,11 @@
 services:
   invoice-collector:
-    image: invoice-collector-debug:latest
+    image: invoice-collector:latest
     build:
       context: .
-      dockerfile: Dockerfile-debug
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
       - 8080:8080
       - 9229:9229
