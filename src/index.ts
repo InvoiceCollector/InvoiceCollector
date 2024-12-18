@@ -13,7 +13,9 @@ const server = new Server();
 
 const ENV_VARIABLES = [
     "PORT",
-    "LOG_SERVER_ENDPOINT"
+    "LOG_SERVER_ENDPOINT",
+    "DATABASE_URI",
+    "SECRET_MANAGER_TYPE"
 ]
 
 // ---------- BEARER TOKEN NEEDED ----------
