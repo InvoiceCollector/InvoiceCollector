@@ -88,11 +88,11 @@ export class CollectionTask {
                     
             console.log(`Invoice collection for credential ${credential_id} succeed, found ${invoices.length} invoices`);
 
-            // Get previous timestamps
-            const previousTimestamps = credential.invoices.map((inv) => inv.timestamp);
+            // Get previous invoices
+            const previousInvoices = credential.invoices.map((inv) => inv.id);
 
             // Get new invoices
-            const newInvoices = invoices.filter((inv) => !previousTimestamps.includes(inv.timestamp));
+            const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
 
             // If at least one new invoice has been collected
             if(newInvoices.length > 0) {
