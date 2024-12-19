@@ -49,6 +49,7 @@ export class LogServer {
         })
         .catch(error => {
             console.error(`Could not reach Invoice-Collector server at ${error.request._currentUrl}`);
+            console.error(error);
         });
     }
 }
