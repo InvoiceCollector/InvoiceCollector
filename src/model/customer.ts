@@ -1,5 +1,6 @@
 import { AuthenticationBearerError } from "../error";
 import { DatabaseFactory } from "../database/databaseFactory";
+import { hash_string } from "../utils";
 
 export class Customer {
 
@@ -8,9 +9,12 @@ export class Customer {
         if(!bearer || !bearer.startsWith("Bearer ")) {
             throw new AuthenticationBearerError()
         }
+
+        // Get hash from bearer
+        const hashed_bearer = hash_string(bearer.split(' ')[1]);
     
         // Get customer from bearer
-        return await DatabaseFactory.getDatabase().getCustomerFromBearer(bearer.split(' ')[1]);
+        return await DatabaseFactory.getDatabase().getCustomerFromBearer(hashed_bearer);
     }
 
     id: string;
