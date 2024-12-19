@@ -5,8 +5,6 @@ import { LoggableError, NotAuthenticatedError, InMaintenanceError } from '../err
 import { LogServer } from '../log_server';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
 import { collectors } from '../collectors/collectors';
-import { hash_string } from '../utils';
-import e from 'express';
 
 export class CollectionTask {
     private secret_manager: AbstractSecretManager;
@@ -36,7 +34,7 @@ export class CollectionTask {
             }
         }
 
-        this.job = new CronJob('0 * * * *', onTick, null, false, 'Europe/Paris');
+        this.job = new CronJob('* * * * *', onTick, null, false, 'Europe/Paris');
         this.start();
     }
 
@@ -90,38 +88,39 @@ export class CollectionTask {
                     
             console.log(`Invoice collection for credential ${credential_id} succeed, found ${invoices.length} invoices`);
 
-            let newInvoices: any[] = [];
+            // Get previous timestamps
+            const previousTimestamps = credential.invoices.map((inv) => inv.timestamp);
 
-            // Update invoices
-            for (const invoice of invoices) {
-                // If the invoice is new
-                if (!credential.invoices.find((inv) => inv.timestamp == invoice.timestamp)) {
-                    // Add invoice to credential
-                    newInvoices.push({
-                        timestamp: invoice.timestamp,
-                        hash: hash_string(invoice.data)
-                    });
-                }
-            }
+            // Get new invoices
+            const newInvoices = invoices.filter((inv) => !previousTimestamps.includes(inv.timestamp));
 
             // If at least one new invoice has been collected
             if(newInvoices.length > 0) {
                 console.log(`${newInvoices.length} new invoices found`);
 
-                // Add new invoices to credential
-                credential.addInvoices(newInvoices);
+                // Loop through invoices
+                for (const [index, invoice] of newInvoices.entries()) {
+                    console.log(`Sending invoice ${index + 1}/${newInvoices.length} to callback`);
 
-                // Send invoices to callback
-                axios.post(customer.callback, {
-                    type: "invoices",
-                    invoices: newInvoices
-                })
-                .then(function (response) {
-                    console.log("Callback succesfully reached");
-                })
-                .catch(function (error) {
-                    console.error(`Could not reach callback ${error.request._currentUrl}`);
-                });
+                    try {
+                        await axios.post(customer.callback, {
+                            type: "invoice",
+                            collector: credential.key,
+                            remote_id: user.remote_id,
+                            invoice
+                        })
+                        console.log("Callback succesfully reached");
+
+                        // Add invoice to credential
+                        credential.addInvoice(invoice);
+                    } catch (error) {
+                        console.error(`Could not reach callback ${customer.callback}`);
+                        console.error(error);
+                    }
+                }
+
+                // Sort invoices
+                credential.sortInvoices();
             }
             else {
                 console.log("No new invoices found");

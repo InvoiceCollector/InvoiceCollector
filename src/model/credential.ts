@@ -92,9 +92,11 @@ export class IcCredential {
         }
     }
 
-    addInvoices(invoices: any[]) {
-        this.invoices = this.invoices.concat(invoices);
+    addInvoice(invoice: any) {
+        this.invoices.push({timestamp: invoice.timestamp});
+    }
 
+    sortInvoices() {
         // Order invoices by timestamp
         this.invoices.sort((a, b) => a.timestamp - b.timestamp);
     }
