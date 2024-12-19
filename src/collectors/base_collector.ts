@@ -12,7 +12,7 @@ export class AbstractCollector {
     }
 
     async download(params, invoices) {
-        console.log(`Downloading invoices`);
+        console.log(`Downloading ${invoices.length} invoices`);
 
         for(let invoice of invoices) {
             if(invoice.type == "link") {
