@@ -34,7 +34,7 @@ export class CollectionTask {
             }
         }
 
-        this.job = new CronJob('* * * * *', onTick, null, false, 'Europe/Paris');
+        this.job = new CronJob('0 * * * *', onTick, null, false, 'Europe/Paris');
         this.start();
     }
 
