@@ -15,7 +15,7 @@ export class LogServer {
             // headers: {'Authorization': `Bearer ${process.env.LOG_SERVER_ACCESS_TOKEN}`},
         });
 
-        if (!process.env.LOG_SERVER_ACCESS_TOKEN) {
+        if (process.env.LOG_SERVER_ACCESS_TOKEN) {
             this.client.defaults.headers.common['Authorization'] = `Bearer ${process.env.LOG_SERVER_ACCESS_TOKEN}`;
         }
         else {
