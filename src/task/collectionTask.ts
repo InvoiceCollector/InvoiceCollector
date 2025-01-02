@@ -150,8 +150,11 @@ export class CollectionTask {
                 this.log_server.logError(err);
             }
             else if (err instanceof NotAuthenticatedError) {
-                // Update credential
-                // TODO: Update credential stating that credential is incorrect
+                // If credential exists
+                if (credential) {
+                    // Update credential
+                    credential.error = err.message;
+                }
             }
             else if (err instanceof InMaintenanceError) {
                 // Schedule next collect in 12 hour

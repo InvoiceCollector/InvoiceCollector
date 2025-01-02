@@ -23,6 +23,7 @@ export class IcCredential {
     last_collect_timestamp: number;
     next_collect_timestamp: number;
     invoices: any[];
+    error: string;
 
     constructor(
         user_id: string,
@@ -32,7 +33,8 @@ export class IcCredential {
         create_timestamp: number = Date.now(),
         last_collect_timestamp: number = Number.NaN,
         next_collect_timestamp: number = Number.NaN,
-        invoices: any[] = []
+        invoices: any[] = [],
+        error: string = ""
     ) {
         this.id = "";
         this.user_id = user_id;
@@ -43,6 +45,7 @@ export class IcCredential {
         this.last_collect_timestamp = last_collect_timestamp;
         this.next_collect_timestamp = next_collect_timestamp;
         this.invoices = invoices;
+        this.error = error;
     }
 
     async getUser() {
@@ -65,30 +68,37 @@ export class IcCredential {
     }
 
     computeNextCollect() {
-        // If last_collect_timestamp and next_collect_timestamp are NaN, the invoices has never been collected
-        if (isNaN(this.last_collect_timestamp) && isNaN(this.next_collect_timestamp)) {
-            // Plan the next collection now
-            this.next_collect_timestamp = this.create_timestamp;
-        }
-        else if (this.next_collect_timestamp < this.last_collect_timestamp) { // If next_collect_timestamp is before last_collect_timestamp
-            if (this.invoices.length < 2) { // If has less than 2 invoices
-                // Plan the next collect in one week
-                this.next_collect_timestamp = this.last_collect_timestamp + IcCredential.ONE_WEEK_MS;
+        // If not in error
+        if (this.error && this.error.length == 0) {
+            // If last_collect_timestamp and next_collect_timestamp are NaN, the invoices has never been collected
+            if (isNaN(this.last_collect_timestamp) && isNaN(this.next_collect_timestamp)) {
+                // Plan the next collection now
+                this.next_collect_timestamp = this.create_timestamp;
             }
-            else { // If has more than 2 invoices
-                // Take the last 10 invoices
-                let invoices = this.invoices.slice(-10);
-
-                // Compute the average time between invoices
-                let sum = 0;
-                for (let i = 1; i < invoices.length; i++) {
-                    sum += invoices[i].timestamp - invoices[i-1].timestamp;
+            else if (this.next_collect_timestamp < this.last_collect_timestamp) { // If next_collect_timestamp is before last_collect_timestamp
+                if (this.invoices.length < 2) { // If has less than 2 invoices
+                    // Plan the next collect in one week
+                    this.next_collect_timestamp = this.last_collect_timestamp + IcCredential.ONE_WEEK_MS;
                 }
-                let avg = sum / (invoices.length - 1);
+                else { // If has more than 2 invoices
+                    // Take the last 10 invoices
+                    let invoices = this.invoices.slice(-10);
 
-                // Plan the next collect in the average time between invoices
-                this.next_collect_timestamp = this.last_collect_timestamp + avg;
+                    // Compute the average time between invoices
+                    let sum = 0;
+                    for (let i = 1; i < invoices.length; i++) {
+                        sum += invoices[i].timestamp - invoices[i-1].timestamp;
+                    }
+                    let avg = sum / (invoices.length - 1);
+
+                    // Plan the next collect in the average time between invoices
+                    this.next_collect_timestamp = this.last_collect_timestamp + avg;
+                }
             }
+        }
+        else {
+            // Cancel next collect
+            this.next_collect_timestamp = Number.NaN;
         }
     }
 

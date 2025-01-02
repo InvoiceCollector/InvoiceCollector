@@ -159,13 +159,14 @@ export class MongoDB extends AbstractDatabase {
         }
         const query = {
             $or: [
-                { last_collect_timestamp: NaN },
-                {
-                    $and: [
-                        { $expr: { $lt: [ "$last_collect_timestamp", "$next_collect_timestamp" ] } },
-                        { $expr: { $lt: [ "$next_collect_timestamp", Date.now() ] } }
-                    ]
-                }
+            { last_collect_timestamp: NaN },
+            {
+                $and: [
+                    { $expr: { $lt: [ "$last_collect_timestamp", "$next_collect_timestamp" ] } },
+                    { $expr: { $lt: [ "$next_collect_timestamp", Date.now() ] } },
+                    { error: { $eq: "" } }
+                ]
+            }
             ]
         };
         const documents = await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).aggregate([
@@ -189,7 +190,8 @@ export class MongoDB extends AbstractDatabase {
                 document.create_timestamp,
                 document.last_collect_timestamp,
                 document.next_collect_timestamp,
-                document.invoices
+                document.invoices,
+                document.error
             );
             credential.id = document._id.toString();
             return credential;
@@ -214,7 +216,8 @@ export class MongoDB extends AbstractDatabase {
             document.create_timestamp,
             document.last_collect_timestamp,
             document.next_collect_timestamp,
-            document.invoices
+            document.invoices,
+            document.error
         );
         credential.id = document._id.toString();
         return credential;
@@ -232,7 +235,8 @@ export class MongoDB extends AbstractDatabase {
             create_timestamp: credential.create_timestamp,
             last_collect_timestamp: credential.last_collect_timestamp,
             next_collect_timestamp: credential.next_collect_timestamp,
-            invoices: credential.invoices
+            invoices: credential.invoices,
+            error: credential.error
         });
         credential.id = document.insertedId.toString();
         return credential;
@@ -252,7 +256,8 @@ export class MongoDB extends AbstractDatabase {
                 create_timestamp: credential.create_timestamp,
                 last_collect_timestamp: credential.last_collect_timestamp,
                 next_collect_timestamp: credential.next_collect_timestamp,
-                invoices: credential.invoices
+                invoices: credential.invoices,
+                error: credential.error
             }}
         );
     }
