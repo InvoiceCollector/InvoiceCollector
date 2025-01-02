@@ -118,7 +118,7 @@ function showAddCredentialForm(company) {
     // Add the submit button
     const submitButton = document.createElement('button');
     submitButton.setAttribute('type', 'submit');
-    submitButton.textContent = 'Add Credential';
+    submitButton.textContent = 'Add collector';
     form.appendChild(submitButton);
 }
 

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credential Manager</title>
+    <title>My collectors</title>
     <link rel="stylesheet" href="/public/styles.css">
 </head>
 <body>
     <script src="/public/script.js"></script>
     <div class="container">
-        <h1>Credential Manager</h1>
+        <h1>My collectors</h1>
 
         <!-- CREDENTIAL LIST -->
 
@@ -17,16 +17,16 @@
 
         <!-- ADD CREDENTIALS -->
 
-        <button id="add-credential-button">Add Credential</button>
+        <button id="add-credential-button">Add collector</button>
         <div id="company-list" style="display: none;">
-            <h2>Select a Company</h2>
+            <h2>Select a collector</h2>
             <ul id="companies"></ul>
         </div>
 
         <!-- ADD CREDENTIAL FORM -->
 
         <div id="add-credential-form-container" style="display: none;">
-            <h2>Add New Credential</h2>
+            <h2>Add collector</h2>
             <div class="company-item">
                 <img id="company-logo" src="" alt="" class="company-image">
                 <div class="company-info">
@@ -35,11 +35,6 @@
                 </div>
             </div>
             <form id="add-credential-form">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">Add Credential</button>
             </form>
         </div>
     </div>
