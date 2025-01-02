@@ -8,6 +8,7 @@ import { User } from './model/user';
 import { Customer } from './model/customer';
 import { IcCredential } from './model/credential';
 import { CollectionTask } from './task/collectionTask';
+import { error } from 'console';
 
 export class Server {
 
@@ -135,7 +136,9 @@ export class Server {
             return {
                 collector: collector.CONFIG,
                 note: credential.note,
-                credential_id: credential.id
+                credential_id: credential.id,
+                state: credential.state,
+                error: credential.error
             }
         });
     }

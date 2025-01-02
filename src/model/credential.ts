@@ -1,5 +1,11 @@
 import { DatabaseFactory } from "../database/databaseFactory";
 
+export enum State {
+    PENDING = "PENDING",
+    VALID = "VALID",
+    ERROR = "ERROR"
+}
+
 export class IcCredential {
 
     static ONE_DAY_MS: number = 86400000;
@@ -23,6 +29,7 @@ export class IcCredential {
     last_collect_timestamp: number;
     next_collect_timestamp: number;
     invoices: any[];
+    state: State;
     error: string;
 
     constructor(
@@ -34,6 +41,7 @@ export class IcCredential {
         last_collect_timestamp: number = Number.NaN,
         next_collect_timestamp: number = Number.NaN,
         invoices: any[] = [],
+        state: State = State.PENDING,
         error: string = ""
     ) {
         this.id = "";
@@ -45,6 +53,7 @@ export class IcCredential {
         this.last_collect_timestamp = last_collect_timestamp;
         this.next_collect_timestamp = next_collect_timestamp;
         this.invoices = invoices;
+        this.state = state;
         this.error = error;
     }
 
@@ -69,7 +78,7 @@ export class IcCredential {
 
     computeNextCollect() {
         // If not in error
-        if (this.error && this.error.length == 0) {
+        if (this.state != State.ERROR) {
             // If last_collect_timestamp and next_collect_timestamp are NaN, the invoices has never been collected
             if (isNaN(this.last_collect_timestamp) && isNaN(this.next_collect_timestamp)) {
                 // Plan the next collection now

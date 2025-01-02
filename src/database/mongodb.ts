@@ -164,7 +164,7 @@ export class MongoDB extends AbstractDatabase {
                 $and: [
                     { $expr: { $lt: [ "$last_collect_timestamp", "$next_collect_timestamp" ] } },
                     { $expr: { $lt: [ "$next_collect_timestamp", Date.now() ] } },
-                    { error: { $eq: "" } }
+                    { state: { $ne: "ERROR" } }
                 ]
             }
             ]
@@ -191,6 +191,7 @@ export class MongoDB extends AbstractDatabase {
                 document.last_collect_timestamp,
                 document.next_collect_timestamp,
                 document.invoices,
+                document.state,
                 document.error
             );
             credential.id = document._id.toString();
@@ -217,6 +218,7 @@ export class MongoDB extends AbstractDatabase {
             document.last_collect_timestamp,
             document.next_collect_timestamp,
             document.invoices,
+            document.state,
             document.error
         );
         credential.id = document._id.toString();
@@ -236,6 +238,7 @@ export class MongoDB extends AbstractDatabase {
             last_collect_timestamp: credential.last_collect_timestamp,
             next_collect_timestamp: credential.next_collect_timestamp,
             invoices: credential.invoices,
+            state: credential.state,
             error: credential.error
         });
         credential.id = document.insertedId.toString();
@@ -257,6 +260,7 @@ export class MongoDB extends AbstractDatabase {
                 last_collect_timestamp: credential.last_collect_timestamp,
                 next_collect_timestamp: credential.next_collect_timestamp,
                 invoices: credential.invoices,
+                state: credential.state,
                 error: credential.error
             }}
         );

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { CronJob } from 'cron';
-import { IcCredential } from '../model/credential';
+import { IcCredential, State } from '../model/credential';
 import { LoggableError, NotAuthenticatedError, InMaintenanceError } from '../error';
 import { LogServer } from '../log_server';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
@@ -133,6 +133,9 @@ export class CollectionTask {
                 console.log("No new invoices found");
             }
 
+            // Update state
+            credential.state = State.VALID;
+
             // Log success
             this.log_server.logSuccess(collector.config.key);
         }
@@ -153,6 +156,7 @@ export class CollectionTask {
                 // If credential exists
                 if (credential) {
                     // Update credential
+                    credential.state = State.ERROR;
                     credential.error = err.message;
                 }
             }
