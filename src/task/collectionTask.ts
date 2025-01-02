@@ -100,22 +100,29 @@ export class CollectionTask {
 
                 // Loop through invoices
                 for (const [index, invoice] of newInvoices.entries()) {
-                    console.log(`Sending invoice ${index + 1}/${newInvoices.length} to callback`);
+                    // If not the first collect
+                    if (credential.last_collect_timestamp) {
+                        console.log(`Sending invoice ${index + 1}/${newInvoices.length} to callback`);
+    
+                        try {
+                            await axios.post(customer.callback, {
+                                type: "invoice",
+                                collector: credential.key,
+                                remote_id: user.remote_id,
+                                invoice
+                            })
+                            console.log("Callback succesfully reached");
 
-                    try {
-                        await axios.post(customer.callback, {
-                            type: "invoice",
-                            collector: credential.key,
-                            remote_id: user.remote_id,
-                            invoice
-                        })
-                        console.log("Callback succesfully reached");
-
+                            // Add invoice to credential only if callback successfully reached
+                            credential.addInvoice(invoice);
+                        } catch (error) {
+                            console.error(`Could not reach callback ${customer.callback}`);
+                            console.error(error);
+                        }
+                    }
+                    else {
                         // Add invoice to credential
                         credential.addInvoice(invoice);
-                    } catch (error) {
-                        console.error(`Could not reach callback ${customer.callback}`);
-                        console.error(error);
                     }
                 }
 
