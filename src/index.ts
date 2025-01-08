@@ -2,15 +2,37 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import { I18n } from 'i18n';
 dotenv.config();
 
 import { StatusError } from "./error"
 import { Server } from "./server"
 
+// Configure i18n
+const i18n = new I18n({
+    locales: ['en', 'fr'],
+    directory: path.join(__dirname, '..', 'locales'),
+    defaultLocale: 'en',
+    cookie: 'lang'
+});
+
+// Configure express
 const app = express()
 app.use(bodyParser.json());
-const server = new Server();
+app.use(i18n.init);
+app.use('/views', express.static(path.join(__dirname, '..', 'views')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '..', 'views'));
+declare global {
+    namespace Express {
+        interface Request {
+            setLocale: (locale: string) => void;
+        }
+    }
+}
 
+// Create server
+const server = new Server();
 const ENV_VARIABLES = [
     "PORT",
     "LOG_SERVER_ENDPOINT",
@@ -50,15 +72,14 @@ app.post('/api/v1/collect', async (req, res) => {
 
 // ---------- OAUTH TOKEN NEEDED ----------
 
-app.use('/public', express.static(path.join(__dirname, '..', 'public')));
-
 app.get('/api/v1/user', (req, res) => {
     try {
         // Check if token exists
         server.get_token_mapping(req.query.token);
 
-        // Send user.html
-        res.sendFile(path.join(__dirname, '..', 'public', 'user.html'));
+        // Render user.ejs
+        req.setLocale('fr');
+        res.render('user');
     } catch (e) {
         handle_error(e, res);
     }

@@ -8,8 +8,9 @@ WORKDIR /usr/app
 COPY package*.json .
 COPY tsconfig.json ./tsconfig.json
 COPY src/ ./src/
-COPY public/ ./public/
+COPY views/ ./views/
 COPY test/ ./test/
+COPY locales/ ./locales/
 RUN mkdir media/ log/
 
 # Set puppeteer env variables
