@@ -35,9 +35,11 @@
   },
   "nodemonConfig": {
     "watch": [
-      "src/"
+      "src/",
+      "locales/",
+      "views/"
     ],
-    "ext": "js,ts",
+    "ext": "js,ts,json,ejs,css",
     "execMap": {
       "ts": "node --require ts-node/register"
     }

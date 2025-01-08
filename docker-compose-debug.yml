@@ -11,6 +11,8 @@ services:
       - 9229:9229
     volumes:
       - ./src:/usr/app/src
+      - ./locales:/usr/app/locales
+      - ./views:/usr/app/views
     depends_on:
       - mongodb
     environment:
