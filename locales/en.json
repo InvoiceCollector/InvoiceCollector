@@ -1,5 +1,6 @@
 {
     "i18n.views.manage.my-collectors": "My collectors",
     "i18n.views.manage.select-collectors": "Select collectors",
-    "i18n.views.manage.add-collectors": "Add collector"
+    "i18n.views.manage.add-collectors": "Add collector",
+    "i18n.views.manage.return": "Return"
 }

@@ -8,25 +8,38 @@
 </head>
 <body>
     <script src="/views/script.js"></script>
-    <div class="container">
+
+    <!-- CREDENTIALS CONTAINER -->
+
+    <div id="credentials-container" class="container">
+        <!-- TITLE -->
         <h1><%= __('i18n.views.manage.my-collectors') %></h1>
-
-        <!-- CREDENTIAL LIST -->
-
+        <!-- CREDENTIALS LIST -->
         <div id="credentials-list"></div>
+        <!-- BUTTON -->
+        <button id="add-credential-button" class="button action-button"><%= __('i18n.views.manage.add-collectors') %></button>
+    </div>
 
-        <!-- ADD CREDENTIALS -->
+    <!-- COMPANIES CONTAINER -->
 
-        <button id="add-credential-button"><%= __('i18n.views.manage.add-collectors') %></button>
-        <div id="company-list" style="display: none;">
-            <h2><%= __('i18n.views.manage.select-collectors') %></h2>
-            <ul id="companies"></ul>
-        </div>
+    <div id="companies-container" class="container" hidden>
+        <!-- BUTTON -->
+        <button id="return-to-credentials-button" class="button return-button"><%= __('i18n.views.manage.return') %></button>
+        <!-- TITLE -->
+        <h1><%= __('i18n.views.manage.add-collectors') %></h1>
+        <!-- COMPANIES LIST -->
+        <ul id="companies-list"></ul>
+    </div>
 
-        <!-- ADD CREDENTIAL FORM -->
-
-        <div id="add-credential-form-container" style="display: none;">
-            <h2><%= __('i18n.views.manage.add-collectors') %></h2>
+    <!-- FORM CONTAINER -->
+        
+    <div id="form-container" class="container" hidden>
+        <!-- BUTTON -->
+        <button id="return-to-companies-button" class="button return-button"><%= __('i18n.views.manage.return') %></button>
+        <!-- TITLE -->
+        <h1><%= __('i18n.views.manage.add-collectors') %></h1>
+        <!-- FORM -->
+        <div id="add-credential-form-container">
             <div class="company-item">
                 <img id="company-logo" src="" alt="" class="company-image">
                 <div class="company-info">

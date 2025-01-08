@@ -1,12 +1,18 @@
 const token = new URLSearchParams(window.location.search).get('token');
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadCredentials(); 
-    document.getElementById('add-credential-button').addEventListener('click', showCompanyList);
+    showCredentials(); 
+    document.getElementById('add-credential-button').addEventListener('click', showCompanies);
+    document.getElementById('return-to-credentials-button').addEventListener('click', showCredentials);
+    document.getElementById('return-to-companies-button').addEventListener('click', showCompanies);
     document.getElementById('add-credential-form').addEventListener('submit', addCredential);
 });
 
-async function loadCredentials() {
+async function showCredentials() {
+    document.getElementById('credentials-container').hidden = false;
+    document.getElementById('companies-container').hidden = true;
+    document.getElementById('form-container').hidden = true;
+
     const response = await fetch(`credentials?token=${token}`);
     const credentials = await response.json();
 
@@ -26,17 +32,21 @@ async function loadCredentials() {
                     <br>
                 </div>
             </div>
-            <button onclick="deleteCredential('${credential.credential_id}')">Delete</button>
+            <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">Delete</button>
         `;
         credentialsList.appendChild(credentialItem);
     });
 }
 
-async function showCompanyList() {
+async function showCompanies() {
+    document.getElementById('credentials-container').hidden = true;
+    document.getElementById('companies-container').hidden = false;
+    document.getElementById('form-container').hidden = true;
+
     const response = await fetch('collectors');
     const companies = await response.json();
 
-    const companyList = document.getElementById('companies');
+    const companyList = document.getElementById('companies-list');
     companyList.innerHTML = '';
 
     companies.forEach(company => {
@@ -49,25 +59,21 @@ async function showCompanyList() {
                 <p>${company.description}</p>
             </div>
         `;
-        companyItem.addEventListener('click', () => showAddCredentialForm(company));
+        companyItem.addEventListener('click', () => showForm(company));
         companyList.appendChild(companyItem);
     });
-
-    document.getElementById('company-list').style.display = 'block';
-    document.getElementById('add-credential-form-container').style.display = 'none';
 }
 
-function showAddCredentialForm(company) {
-    // Hide the company list and show the add credential form
-    document.getElementById('company-list').style.display = 'none';
-    document.getElementById('add-credential-form-container').style.display = 'block';
+function showForm(company) {
+    document.getElementById('credentials-container').hidden = true;
+    document.getElementById('companies-container').hidden = true;
+    document.getElementById('form-container').hidden = false;
     
     // Update the form with the company's information
     document.getElementById('company-logo').src = company.logo;
     document.getElementById('company-name').textContent = company.name;
     document.getElementById('company-description').textContent = company.description;
     document.getElementById('add-credential-form').dataset.key = company.key;
-
 
     // Add input fields
     const form = document.getElementById('add-credential-form');
@@ -118,6 +124,7 @@ function showAddCredentialForm(company) {
     // Add the submit button
     const submitButton = document.createElement('button');
     submitButton.setAttribute('type', 'submit');
+    submitButton.className = 'button action-button';
     submitButton.textContent = 'Add collector';
     form.appendChild(submitButton);
 }
@@ -144,8 +151,7 @@ async function addCredential(event) {
     });
 
     document.getElementById('add-credential-form').reset();
-    document.getElementById('add-credential-form-container').style.display = 'none';
-    loadCredentials();
+    showCredentials();
 }
 
 async function deleteCredential(id) {
@@ -153,5 +159,5 @@ async function deleteCredential(id) {
         method: 'DELETE'
     });
 
-    loadCredentials();
+    showCredentials();
 }

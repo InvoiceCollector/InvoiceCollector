@@ -34,17 +34,44 @@ input {
     border-radius: 4px;
 }
 
-button {
+/* BUTTONS */
+
+.button {
     padding: 10px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-button:hover {
+.action-button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+}
+
+.action-button:hover {
     background-color: #0056b3;
+}
+
+.return-button {
+    background-color: #fff;
+    border-color: #000;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+.return-button:hover {
+    background-color: #eee;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+    color: #fff;
 }
 
 #credentials-list {
@@ -76,7 +103,8 @@ button:hover {
     background-color: #c82333;
 }
 
-#company-list ul {
+#companies-list {
+    display: block;
     list-style-type: none;
     padding: 0;
 }
@@ -100,7 +128,7 @@ button:hover {
     border: 0.5px solid #ccc;
 }
 .company-item-selectable:hover {
-    background-color: #e9e9e9
+    background-color: #eee;
 }
 
 #company-info {
