@@ -22,15 +22,12 @@ async function showCredentials() {
     credentials.forEach(credential => {
         console.log(credential);
         const credentialItem = document.createElement('div');
-        credentialItem.className = 'credential-item';
+        credentialItem.className = 'credential-item company-item';
         credentialItem.innerHTML = `
+            <img src="${credential.collector.logo}" alt="${credential.collector.name}">
             <div>
-                <img src="${credential.collector.logo}" alt="${credential.collector.name}" class="company-image">
-                <div class="company-info">
-                    <strong>${credential.collector.name}</strong><br>
-                    ${credential.note || credential.collector.description}<br>
-                    <br>
-                </div>
+                <h3>${credential.collector.name}</h3>
+                <p>${credential.note || credential.collector.description}</p>
             </div>
             <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">Delete</button>
         `;
@@ -53,8 +50,8 @@ async function showCompanies() {
         const companyItem = document.createElement('li');
         companyItem.className = 'company-item company-item-selectable';
         companyItem.innerHTML = `
-            <img src="${company.logo}" alt="${company.name}" class="company-image">
-            <div class="company-info">
+            <img src="${company.logo}" alt="${company.name}">
+            <div>
                 <h3>${company.name}</h3>
                 <p>${company.description}</p>
             </div>

@@ -74,34 +74,24 @@ input {
     color: #fff;
 }
 
+/* CREDENTIALS */
+
 #credentials-list {
     margin-bottom: 20px;
 }
 
 .credential-item {
-    padding: 10px;
     border: 1px solid #ccc;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-}
-.credential-item > div{
-    display: flex;
+    background-color: #fff;
+    display: flex
 }
 
-.credential-item img {
-    width: 50px;
-    height: 50px;
-    margin-right: 20px;
+.credential-item > button {
+    margin-left: auto;
+    align-self: flex-start;
 }
 
-.credential-item button {
-    background-color: #dc3545;
-}
-
-.credential-item button:hover {
-    background-color: #c82333;
-}
+/* COMPANIES */
 
 #companies-list {
     display: block;
@@ -115,29 +105,19 @@ input {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 4px;
-    cursor: pointer;
-}
-
-.company-item > img {
-    width: 50px;
-    height: 50px;
-    margin-right: 20px;
 }
 
 .company-item-selectable {
     border: 0.5px solid #ccc;
+    cursor: pointer;
 }
 .company-item-selectable:hover {
     background-color: #eee;
 }
 
-#company-info {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.company-image {
-    max-width: 100px;
+.company-item > img {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
     border-radius: 50%;
-    margin-bottom: 10px;
 }
