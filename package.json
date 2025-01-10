@@ -4,10 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "ts-node --transpile-only src/index.ts",
     "test": "ts-node test/test.js",
-    "dev": "ts-node src/index.ts",
-    "build": "tsc",
     "debug": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.ts"
   },
   "dependencies": {
