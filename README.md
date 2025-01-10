@@ -6,27 +6,29 @@
 
 Invoice Collector is a free docker image used to retrieve invoices and receipts from suppliers. It can connect to customer areas, APIs and inboxes to get the invoices.
 
+## Prerequisits
+- [Install docker engine](https://docs.docker.com/engine/install/)
+
 ## Installation
 
 Use the [docker-compose.yml](https://github.com/InvoiceCollector/InvoiceCollector/blob/master/docker-compose.yml) file to build and run a container.
 
-### Prerequisits
-- [Install docker engine](https://docs.docker.com/engine/install/)
+1. Download the `docker-compose.yml` file from Github repo.
 
 ```bash
-# Get docker-compose.yml from github repo
 curl https://raw.githubusercontent.com/InvoiceCollector/InvoiceCollector/refs/heads/master/docker-compose.yml >> docker-compose.yml
+```
 
-# Get Dockerfile from github repo
-curl https://raw.githubusercontent.com/InvoiceCollector/InvoiceCollector/refs/heads/master/Dockerfile >> Dockerfile
+2. Edit the `docker-compose.yml` and set the values for the env variables:
+    - `SECRET_MANAGER_BITWARDEN_ACCESS_TOKEN`
+    - `SECRET_MANAGER_BITWARDEN_ORGANIZATION_ID`
+    - `SECRET_MANAGER_BITWARDEN_PROJECT_ID`
+    - `LOG_SERVER_ACCESS_TOKEN`
 
-# Create a .env file with your values
-echo "SECRET_MANAGER_BITWARDEN_ACCESS_TOKEN=<TBD>" >> .env
-echo "SECRET_MANAGER_BITWARDEN_ORGANIZATION_ID=<TBD>" >> .env
-echo "SECRET_MANAGER_BITWARDEN_PROJECT_ID=<TBD>" >> .env
-echo "LOG_SERVER_ACCESS_TOKEN=<TBD>" >> .env
+3. Build and run the container
 
-# Run the container
+```
+# Run the container*
 sudo docker compose up --build
 ```
 

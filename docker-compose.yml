@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     ports:
       - 8080:8080
     depends_on:
@@ -17,6 +15,10 @@ services:
       - SECRET_MANAGER_TYPE=bitwarden
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
       - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity
+      - SECRET_MANAGER_BITWARDEN_ACCESS_TOKEN=
+      - SECRET_MANAGER_BITWARDEN_ORGANIZATION_ID=
+      - SECRET_MANAGER_BITWARDEN_PROJECT_ID=
+      - LOG_SERVER_ACCESS_TOKEN=
     command: npm run start
 
   mongodb:
