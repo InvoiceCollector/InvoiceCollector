@@ -121,3 +121,11 @@ input {
     margin-right: 20px;
     border-radius: 50%;
 }
+
+.company-item > div > h3 {
+    margin-top: 0px;
+}
+
+.company-item > div > p {
+    margin: 0px;
+}
