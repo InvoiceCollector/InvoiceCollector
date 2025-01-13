@@ -2,24 +2,15 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { I18n } from 'i18n';
 dotenv.config();
 
 import { StatusError } from "./error"
 import { Server } from "./server"
 
-// Configure i18n
-const i18n = new I18n({
-    locales: ['en', 'fr'],
-    directory: path.join(__dirname, '..', 'locales'),
-    defaultLocale: 'en',
-    cookie: 'lang'
-});
-
 // Configure express
 const app = express()
 app.use(bodyParser.json());
-app.use(i18n.init);
+app.use(Server.i18n.init);
 app.use('/views', express.static(path.join(__dirname, '..', 'views')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
@@ -46,7 +37,7 @@ app.post('/api/v1/authorize', async (req, res) => {
     try {
         // Perform authorization
         console.log('POST authorize');
-        const response = await server.post_authorize(req.headers.authorization, req.body.remote_id);
+        const response = await server.post_authorize(req.headers.authorization, req.body.remote_id, req.body.locale);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');
@@ -74,11 +65,11 @@ app.post('/api/v1/collect', async (req, res) => {
 
 app.get('/api/v1/user', (req, res) => {
     try {
-        // Check if token exists
-        server.get_token_mapping(req.query.token);
+        // Get locale from token
+        const locale = server.get_token_mapping(req.query.token).locale;
 
         // Render user.ejs
-        req.setLocale('fr');
+        req.setLocale(locale);
         res.render('user');
     } catch (e) {
         handle_error(e, res);
@@ -131,7 +122,7 @@ app.get('/api/v1/collectors', (req, res) => {
     try {
         // List all collectors
         console.log(`GET collectors`);
-        const response = server.get_collectors();
+        const response = server.get_collectors(req.query.locale, req.query.token);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');

@@ -5,19 +5,19 @@ export class FreeCollector extends ScrapperCollector {
 
     static CONFIG = {
         name: "Free",
-        description: "Free is a French telecommunications company.",
+        description: "i18n.collectors.free.description",
         version: "1",
         website: "https://www.free.fr",
         logo: "https://www.free.fr/assets/img/freebox/home/cards/logos/free-app-logo.svg",
         params: {
             username: {
-                name: "Username",
-                description: "Email address of the account",
+                name: "i18n.collectors.all.identifier",
+                placeholder: "i18n.collectors.free.identifier.placeholder",
                 mandatory: true
             },
             password: {
-                name: "Password",
-                description: "Password of the account",
+                name: "i18n.collectors.all.password",
+                placeholder: "i18n.collectors.all.password.placeholder",
                 mandatory: true,
             }
         },

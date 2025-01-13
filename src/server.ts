@@ -1,3 +1,4 @@
+import path from 'path';
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
@@ -8,11 +9,20 @@ import { User } from './model/user';
 import { Customer } from './model/customer';
 import { IcCredential } from './model/credential';
 import { CollectionTask } from './task/collectionTask';
-import { error } from 'console';
+import { I18n } from 'i18n';
 
 export class Server {
 
-    static OAUTH_TOKEN_VALIDITY_DURATION_MS = Number(process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS) || 600000; // 10 minutes, in ms 
+    static OAUTH_TOKEN_VALIDITY_DURATION_MS = Number(process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS) || 600000; // 10 minutes, in ms
+    static LOCALES = ['en', 'fr'];
+    static i18n = new I18n({
+        locales: Server.LOCALES,
+        directory: path.join(__dirname, '..', 'locales'),
+        defaultLocale: 'en',
+        retryInDefaultLocale: true,
+        updateFiles: false,
+        cookie: 'lang'
+    });
 
     secret_manager: AbstractSecretManager;
     tokens: object;
@@ -31,7 +41,7 @@ export class Server {
 
     // ---------- BEARER TOKEN NEEDED ----------
 
-    async post_authorize(bearer, remote_id) {
+    async post_authorize(bearer, remote_id: string, locale: string) {
         // Get user from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -43,6 +53,16 @@ export class Server {
         //Check if remote_id field is missing
         if(!remote_id) {
             throw new MissingField("remote_id");
+        }
+
+        //Check if locale field is missing
+        if(!locale) {
+            throw new MissingField("locale");
+        }
+
+        //Check if locale is supported
+        if(locale && !Server.LOCALES.includes(locale)) {
+            throw new Error(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`);
         }
 
         // Get user from remote_id
@@ -59,7 +79,7 @@ export class Server {
         const token = generate_token();
 
         // Map token with user
-        this.tokens[token] = user;
+        this.tokens[token] = { user, locale };
 
         // Schedule token delete after 1 hour
         setTimeout(() => {
@@ -114,9 +134,12 @@ export class Server {
 
     // ---------- OAUTH TOKEN NEEDED ----------
 
-    get_token_mapping(token): User {
+    get_token_mapping(token, raise_error: boolean = true): {user: User, locale: string} {
         // Check if token is missing or incorrect
-        if(!token || !this.tokens.hasOwnProperty(token)) {
+        if((!token || !this.tokens.hasOwnProperty(token)) && raise_error ) {
+            throw new OauthError();
+        }
+        else if((!token || !this.tokens.hasOwnProperty(token)) && !raise_error) {
             throw new OauthError();
         }
 
@@ -125,7 +148,7 @@ export class Server {
 
     async get_credentials(token) {
         // Get user from token
-         const user = this.get_token_mapping(token);
+         const user = this.get_token_mapping(token).user;
 
         // Get credentials from user
         let credentials = await user.getCredentials();
@@ -145,7 +168,7 @@ export class Server {
 
     async post_credential(token, key, params) {
         // Get user from token
-         const user = this.get_token_mapping(token);
+         const user = this.get_token_mapping(token).user;
 
         //Check if key field is missing
         if(!key) {
@@ -184,7 +207,7 @@ export class Server {
 
     async delete_credential(token, credential_id) {
         // Get user from token
-        const user = this.get_token_mapping(token);
+         const user = this.get_token_mapping(token).user;
 
         // Get credential from credential_id
         const credential = await user.getCredential(credential_id);
@@ -208,9 +231,40 @@ export class Server {
 
     // ---------- NO OAUTH TOKEN NEEDED ----------
 
-    get_collectors(): object {
+    get_collectors(locale, token): object {
+        // Check if token exists
+        if(token) {
+            //Get locale from token
+            locale = this.get_token_mapping(token, false).locale
+        }
+
+        //Check if locale field is missing
+        if(!locale) {
+            throw new MissingField("locale");
+        }
+
+        //Check if locale is supported
+        if(locale && !Server.LOCALES.includes(locale)) {
+            throw new Error(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`);
+        }
+
         console.log(`Listing all collectors`);
-        return collectors.map((collector) => collector.CONFIG);
+        return collectors.map((collector) => {
+            const description = Server.i18n.__({ phrase: collector.CONFIG.description, locale });
+            const params = Object.keys(collector.CONFIG.params).reduce((acc, key) => {
+                acc[key] = {
+                    ...collector.CONFIG.params[key],
+                    name: Server.i18n.__({ phrase: collector.CONFIG.params[key].name, locale }),
+                    placeholder: Server.i18n.__({ phrase: collector.CONFIG.params[key].placeholder, locale })
+                };
+                return acc;
+            }, {});
+            return {
+            ...collector.CONFIG,
+            description,
+            params
+            };
+        });
     }
 
     get_collector(key) {

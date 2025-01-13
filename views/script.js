@@ -40,7 +40,7 @@ async function showCompanies() {
     document.getElementById('companies-container').hidden = false;
     document.getElementById('form-container').hidden = true;
 
-    const response = await fetch('collectors');
+    const response = await fetch(`collectors?token=${token}`);
     const companies = await response.json();
 
     const companyList = document.getElementById('companies-list');
@@ -99,7 +99,7 @@ function showForm(company) {
             input.setAttribute('type', 'text');
         }
         input.setAttribute('name', key);
-        input.placeholder = param.description;
+        input.placeholder = param.placeholder;
         input.required = param.mandatory;
 
         form.appendChild(label);

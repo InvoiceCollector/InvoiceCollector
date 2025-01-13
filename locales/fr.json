@@ -2,5 +2,17 @@
 	"i18n.views.manage.my-collectors": "Mes collecteurs",
 	"i18n.views.manage.select-collectors": "Sélectionner des collecteurs",
 	"i18n.views.manage.add-collectors": "Ajouter un collecteur",
-	"i18n.views.manage.return": "Retour"
+	"i18n.views.manage.return": "Retour",
+    
+	"i18n.collectors.all.username": "Utilisateur",
+	"i18n.collectors.all.username.placeholder": "Utilisateur du compte",
+	"i18n.collectors.all.identifier": "Identifiant",
+	"i18n.collectors.all.identifier.placeholder": "Identifiant du compte",
+	"i18n.collectors.all.password": "Mot de passe",
+	"i18n.collectors.all.password.placeholder": "Mot de passe du compte",
+	"i18n.collectors.all.note": "Note",
+	"i18n.collectors.all.note.placeholder": "Note personnalisée",
+
+    "i18n.collectors.free.description": "Free est un opérateur de télécommunications français.",
+    "i18n.collectors.free.identifier.placeholder": "Identifiant du compte (ex: fbx12345670)"
 }

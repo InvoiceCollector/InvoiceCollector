@@ -2,5 +2,17 @@
     "i18n.views.manage.my-collectors": "My collectors",
     "i18n.views.manage.select-collectors": "Select collectors",
     "i18n.views.manage.add-collectors": "Add collector",
-    "i18n.views.manage.return": "Return"
+    "i18n.views.manage.return": "Return",
+    
+	"i18n.collectors.all.username": "Username",
+	"i18n.collectors.all.username.placeholder": "Username of the account",
+	"i18n.collectors.all.identifier": "Identifier",
+	"i18n.collectors.all.identifier.placeholder": "Identifier of the account",
+	"i18n.collectors.all.password": "Password",
+	"i18n.collectors.all.password.placeholder": "Password of the account",
+	"i18n.collectors.all.note": "Note",
+	"i18n.collectors.all.note.placeholder": "Custom note",
+
+    "i18n.collectors.free.description": "Free is a French telecommunications company.",
+    "i18n.collectors.free.identifier.placeholder": "Identifier of the account (ex: fbx12345670)"
 }
