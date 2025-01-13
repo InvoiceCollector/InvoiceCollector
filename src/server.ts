@@ -70,16 +70,20 @@ export class Server {
 
         // If user does not exist, create it
         if(!user) {
-            user = new User(customer.id, remote_id);
+            user = new User(customer.id, remote_id, locale);
             // Create user in database
             user.commit();
+        }
+        else {
+            // Update user locale
+            user.locale = locale;
         }
 
         // Generate oauth token
         const token = generate_token();
 
         // Map token with user
-        this.tokens[token] = { user, locale };
+        this.tokens[token] = user;
 
         // Schedule token delete after 1 hour
         setTimeout(() => {
@@ -134,7 +138,7 @@ export class Server {
 
     // ---------- OAUTH TOKEN NEEDED ----------
 
-    get_token_mapping(token, raise_error: boolean = true): {user: User, locale: string} {
+    get_token_mapping(token, raise_error: boolean = true): User {
         // Check if token is missing or incorrect
         if((!token || !this.tokens.hasOwnProperty(token)) && raise_error ) {
             throw new OauthError();
@@ -148,7 +152,7 @@ export class Server {
 
     async get_credentials(token) {
         // Get user from token
-         const user = this.get_token_mapping(token).user;
+         const user = this.get_token_mapping(token);
 
         // Get credentials from user
         let credentials = await user.getCredentials();
@@ -168,7 +172,7 @@ export class Server {
 
     async post_credential(token, key, params) {
         // Get user from token
-         const user = this.get_token_mapping(token).user;
+         const user = this.get_token_mapping(token);
 
         //Check if key field is missing
         if(!key) {
@@ -207,7 +211,7 @@ export class Server {
 
     async delete_credential(token, credential_id) {
         // Get user from token
-         const user = this.get_token_mapping(token).user;
+         const user = this.get_token_mapping(token);
 
         // Get credential from credential_id
         const credential = await user.getCredential(credential_id);
