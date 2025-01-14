@@ -48,6 +48,10 @@
                 </div>
             </div>
             <form id="add-credential-form">
+                <div id="add-credential-form-params"></div>
+                <label><%= __('i18n.collectors.all.note') %></label>
+                <input type="text" name="note" placeholder="<%= __('i18n.collectors.all.note.placeholder') %>">
+                <button type="submit" class="button action-button"><%= __('i18n.views.manage.add-collectors') %></button>
             </form>
         </div>
     </div>

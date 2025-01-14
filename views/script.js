@@ -78,7 +78,7 @@ function showForm(company) {
     document.getElementById('add-credential-form').dataset.key = company.key;
 
     // Add input fields
-    const form = document.getElementById('add-credential-form');
+    const form = document.getElementById('add-credential-form-params');
     form.innerHTML = ''; // Clear any existing fields
 
     Object.keys(company.params).forEach(key => {
@@ -110,25 +110,6 @@ function showForm(company) {
         form.appendChild(label);
         form.appendChild(input);
     });
-
-    // Add label note
-    const label = document.createElement('label');
-    label.textContent = "Note";
-    form.appendChild(label);
-
-    // Add input note
-    const input = document.createElement('input');
-    input.setAttribute('type', 'text');
-    input.setAttribute('name', "note");
-    input.placeholder = "Custom note";
-    form.appendChild(input);
-
-    // Add the submit button
-    const submitButton = document.createElement('button');
-    submitButton.setAttribute('type', 'submit');
-    submitButton.className = 'button action-button';
-    submitButton.textContent = 'Add collector';
-    form.appendChild(submitButton);
 }
 
 async function addCredential(event) {

@@ -22,6 +22,11 @@ form {
     flex-direction: column;
 }
 
+form > div {
+    display: flex;
+    flex-direction: column;
+}
+
 label {
     margin-top: 10px;
 }
