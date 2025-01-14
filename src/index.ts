@@ -70,7 +70,7 @@ app.get('/api/v1/user', (req, res) => {
 
         // Render user.ejs
         req.setLocale(locale);
-        res.render('user');
+        res.render('user', { locale });
     } catch (e) {
         handle_error(e, res);
     }

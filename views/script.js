@@ -1,12 +1,20 @@
 const token = new URLSearchParams(window.location.search).get('token');
+let companies = [];
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    companies = await getCollectors();
+
     showCredentials(); 
     document.getElementById('add-credential-button').addEventListener('click', showCompanies);
     document.getElementById('return-to-credentials-button').addEventListener('click', showCredentials);
     document.getElementById('return-to-companies-button').addEventListener('click', showCompanies);
     document.getElementById('add-credential-form').addEventListener('submit', addCredential);
 });
+
+async function getCollectors() {
+    const response = await fetch(`collectors?locale=${locale}`);
+    return await response.json();
+}
 
 async function showCredentials() {
     document.getElementById('credentials-container').hidden = false;
@@ -39,9 +47,6 @@ async function showCompanies() {
     document.getElementById('credentials-container').hidden = true;
     document.getElementById('companies-container').hidden = false;
     document.getElementById('form-container').hidden = true;
-
-    const response = await fetch(`collectors?token=${token}`);
-    const companies = await response.json();
 
     const companyList = document.getElementById('companies-list');
     companyList.innerHTML = '';
