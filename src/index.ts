@@ -122,7 +122,7 @@ app.get('/api/v1/collectors', (req, res) => {
     try {
         // List all collectors
         console.log(`GET collectors`);
-        const response = server.get_collectors(req.query.locale, req.query.token);
+        const response = server.get_collectors(req.query.locale);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');

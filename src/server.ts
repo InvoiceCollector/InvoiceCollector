@@ -15,10 +15,11 @@ export class Server {
 
     static OAUTH_TOKEN_VALIDITY_DURATION_MS = Number(process.env.OAUTH_TOKEN_VALIDITY_DURATION_MS) || 600000; // 10 minutes, in ms
     static LOCALES = ['en', 'fr'];
+    static DEFAULT_LOCALE = 'en';
     static i18n = new I18n({
         locales: Server.LOCALES,
         directory: path.join(__dirname, '..', 'locales'),
-        defaultLocale: 'en',
+        defaultLocale: Server.DEFAULT_LOCALE,
         retryInDefaultLocale: true,
         updateFiles: false,
         cookie: 'lang'
@@ -235,16 +236,11 @@ export class Server {
 
     // ---------- NO OAUTH TOKEN NEEDED ----------
 
-    get_collectors(locale, token): object {
-        // Check if token exists
-        if(token) {
-            //Get locale from token
-            locale = this.get_token_mapping(token, false).locale
-        }
-
+    get_collectors(locale): object {
         //Check if locale field is missing
         if(!locale) {
-            throw new MissingField("locale");
+            //Set default locale
+            locale = Server.DEFAULT_LOCALE;
         }
 
         //Check if locale is supported
