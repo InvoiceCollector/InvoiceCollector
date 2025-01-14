@@ -28,7 +28,6 @@ async function showCredentials() {
     credentialsList.innerHTML = '';
 
     credentials.forEach(credential => {
-        console.log(credential);
         const credentialItem = document.createElement('div');
         credentialItem.className = 'credential-item company-item';
         credentialItem.innerHTML = `
