@@ -1,5 +1,5 @@
 # Use the official node image as the base image
-FROM node:22
+FROM node:22-slim
 
 # Set the working directory in the container
 WORKDIR /usr/app
