@@ -47,6 +47,19 @@ app.post('/api/v1/authorize', async (req, res) => {
     }
 });
 
+app.delete('/api/v1/user', async (req, res) => {
+    try {
+        // Delete user
+        console.log('DELETE user');
+        await server.delete_user(req.headers.authorization, req.body.remote_id);
+
+        // Build response
+        res.end()
+    } catch (e) {
+        handle_error(e, res);
+    }
+});
+
 app.post('/api/v1/collect', async (req, res) => {
     try {
         // Collect invoices

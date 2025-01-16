@@ -95,6 +95,40 @@ export class Server {
         return { token }
     }
 
+    async delete_user(bearer: string|undefined, remote_id: string) {
+        // Get customer from bearer
+        const customer = await Customer.fromBearer(bearer);
+
+        // Check if customer exists
+        if(!customer) {
+            throw new AuthenticationBearerError();
+        }
+
+        //Check if remote_id field is missing
+        if(!remote_id) {
+            throw new MissingField("remote_id");
+        }
+
+        // Get user from remote_id
+        const user = await customer.getUserFromRemoteId(remote_id);
+
+        // Check if user exists
+        if (!user) {
+            throw new Error(`User with remote_id "${remote_id}" not found.`);
+        }
+
+        // Delete user and all its credentials
+        await user.delete();
+
+        // Delete user from token mapping
+        for (let token in this.tokens) {
+            if (this.tokens[token].id === user.id) {
+                delete this.tokens[token];
+                console.log(`Token ${token} deleted`);
+            }
+        }
+    }
+
     async post_collect(bearer, credential_id) {
         // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);

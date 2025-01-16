@@ -36,4 +36,12 @@ export class User {
             await DatabaseFactory.getDatabase().createUser(this);
         }
     }
+
+    async delete() {
+        // Delete all credentials
+        await DatabaseFactory.getDatabase().deleteCredentials(this.id);
+
+        // Delete the user
+        await DatabaseFactory.getDatabase().deleteUser(this.id);
+    }
 }

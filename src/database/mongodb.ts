@@ -151,6 +151,13 @@ export class MongoDB extends AbstractDatabase {
         );
     }
 
+    async deleteUser(user_id: string): Promise<void> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        await this.db.collection(MongoDB.USER_COLLECTION).deleteOne({ _id: new ObjectId(user_id) });
+    }
+
     // CREDENTIAL
 
     async getCredentialsIdToCollect(): Promise<string[]> {
@@ -271,5 +278,12 @@ export class MongoDB extends AbstractDatabase {
             throw new Error("Database is not connected");
         }
         await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).deleteOne({ _id: new ObjectId(credential_id), user_id: new ObjectId(user_id) });
+    }
+
+    async deleteCredentials(user_id: string): Promise<void> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).deleteMany({ user_id: new ObjectId(user_id) });
     }
 }

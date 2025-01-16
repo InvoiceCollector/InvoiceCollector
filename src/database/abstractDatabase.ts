@@ -49,6 +49,10 @@ export class AbstractDatabase {
         throw new Error("Method 'updateUser()' must be implemented.");
     }
 
+    async deleteUser(user_id: string): Promise<void> {
+        throw new Error("Method 'deleteUser()' must be implemented.");
+    }
+
     // CREDENTIAL
 
     async getCredentialsIdToCollect(): Promise<string[]> {
@@ -73,5 +77,9 @@ export class AbstractDatabase {
 
     async deleteCredential(user_id: string, credential_id: string): Promise<void> {
         throw new Error("Method 'deleteCredential()' must be implemented.");
+    }
+
+    async deleteCredentials(user_id: string): Promise<void> {
+        throw new Error("Method 'deleteCredentials()' must be implemented.");
     }
 }
