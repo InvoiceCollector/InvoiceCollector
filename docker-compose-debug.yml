@@ -17,7 +17,7 @@ services:
       - mongodb
     environment:
       - PORT=8080
-      - LOG_SERVER_ENDPOINT=https://api.invoice-collector.com
+      - REGISTRY_SERVER_ENDPOINT=https://registry.invoice-collector.com
       - DATABASE_URI=mongodb://mongodb:27017
       - SECRET_MANAGER_TYPE=bitwarden
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api

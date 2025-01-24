@@ -2,18 +2,18 @@ import axios from 'axios';
 import { CronJob } from 'cron';
 import { IcCredential, State } from '../model/credential';
 import { LoggableError, NotAuthenticatedError, InMaintenanceError } from '../error';
-import { LogServer } from '../log_server';
+import { RegistryServer } from '../log_server';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
 import { collectors } from '../collectors/collectors';
 
 export class CollectionTask {
     private secret_manager: AbstractSecretManager;
-    private log_server: LogServer;
+    private registry_server: RegistryServer;
     private job: CronJob;
 
     constructor(secret_manager: AbstractSecretManager) {
         this.secret_manager = secret_manager;
-        this.log_server = new LogServer()
+        this.registry_server = new RegistryServer()
 
         const onTick = async () => {
             console.log('Collection Task wakes up!');
@@ -137,7 +137,7 @@ export class CollectionTask {
             credential.state = State.SUCCESS;
 
             // Log success
-            this.log_server.logSuccess(collector.config.key);
+            this.registry_server.logSuccess(collector.config.key);
         }
         catch (err) {
             // If error is not LoggableError nor NotAuthenticatedError nor InMaintenanceError
@@ -150,7 +150,7 @@ export class CollectionTask {
             // If error is LoggableError
             if(err instanceof LoggableError) {
                 // Log error
-                this.log_server.logError(err);
+                this.registry_server.logError(err);
             }
             else if (err instanceof NotAuthenticatedError) {
                 // If credential exists

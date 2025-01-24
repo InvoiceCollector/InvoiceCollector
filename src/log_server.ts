@@ -1,25 +1,24 @@
 import axios, { AxiosInstance } from 'axios';
 import { LoggableError } from './error'
 
-export class LogServer {
+export class RegistryServer {
     static VERSION = "v1"
     private client: AxiosInstance;
 
     constructor() {
-        if (!process.env.LOG_SERVER_ENDPOINT) {
-            throw new Error("LOG_SERVER_ENDPOINT environment variable is required");
+        if (!process.env.REGISTRY_SERVER_ENDPOINT) {
+            throw new Error("REGISTRY_SERVER_ENDPOINT environment variable is required");
         }
 
         this.client = axios.create({
-            baseURL: `${process.env.LOG_SERVER_ENDPOINT}/${LogServer.VERSION}`,
-            // headers: {'Authorization': `Bearer ${process.env.LOG_SERVER_ACCESS_TOKEN}`},
+            baseURL: `${process.env.REGISTRY_SERVER_ENDPOINT}/${RegistryServer.VERSION}`
         });
 
-        if (process.env.LOG_SERVER_ACCESS_TOKEN) {
-            this.client.defaults.headers.common['Authorization'] = `Bearer ${process.env.LOG_SERVER_ACCESS_TOKEN}`;
+        if (process.env.REGISTRY_SERVER_ACCESS_TOKEN) {
+            this.client.defaults.headers.common['Authorization'] = `Bearer ${process.env.REGISTRY_SERVER_ACCESS_TOKEN}`;
         }
         else {
-            console.warn("No LOG_SERVER_ACCESS_TOKEN environment variable found. Requests to log server will not be authenticated.");
+            console.warn("No REGISTRY_SERVER_ACCESS_TOKEN environment variable found. Requests to log server will not be authenticated.");
         }
     }
 
