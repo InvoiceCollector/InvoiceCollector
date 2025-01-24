@@ -69,7 +69,7 @@ export class ScrapperCollector extends AbstractCollector {
         await page.setViewport(this.PAGE_CONFIG);
         await page.goto(this.config.entry_url);
 
-        let driver = new Driver(page);
+        let driver = new Driver(page, this);
 
         //Check if website is in maintenance
         const is_in_maintenance = await this.is_in_maintenance(driver, params)
