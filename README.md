@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="100%" src="https://github.com/InvoiceCollector/InvoiceCollector/raw/master/images/preview/preview.svg" />
+  <img width="100%" src="https://github.com/invoice-collector/invoice-collector/raw/master/images/preview/preview.svg" />
 </p>
 
 # Invoice Collector
@@ -11,12 +11,12 @@ Invoice Collector is a free docker image used to retrieve invoices and receipts 
 
 ## Installation
 
-Use the [docker-compose.yml](https://github.com/InvoiceCollector/InvoiceCollector/blob/master/docker-compose.yml) file to build and run a container.
+Use the [docker-compose.yml](https://github.com/invoice-collector/invoice-collector/blob/master/docker-compose.yml) file to build and run a container.
 
 1. Download the `docker-compose.yml` file from Github repo.
 
 ```bash
-curl https://raw.githubusercontent.com/InvoiceCollector/InvoiceCollector/refs/heads/master/docker-compose.yml >> docker-compose.yml
+curl https://raw.githubusercontent.com/invoice-collector/invoice-collector/refs/heads/master/docker-compose.yml >> docker-compose.yml
 ```
 
 2. Edit the `docker-compose.yml` and set the values for the env variables:
@@ -36,17 +36,17 @@ sudo docker compose up --build
 ## Contribution
 
 There are two ways you can contribute to Invoice-Collector:
-- [Open a new issue to report a bug are request a new feature](https://github.com/InvoiceCollector/InvoiceCollector/issues/new/choose)
+- [Open a new issue to report a bug are request a new feature](https://github.com/invoice-collector/invoice-collector/issues/new/choose)
 - Create a new collector for the benefit of all
 
 Here is how to run the docker container on your local machine.
 
 ```bash
 # Clone the repo
-git clone https://github.com/InvoiceCollector/InvoiceCollector.git
+git clone https://github.com/invoice-collector/invoice-collector.git
 
 # Enter the folder
-cd InvoiceCollector
+cd invoice-collector
 
 # Create a .env file with your values
 echo "SECRET_MANAGER_BITWARDEN_ACCESS_TOKEN=<TBD>" >> .env
