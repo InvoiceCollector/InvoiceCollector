@@ -34,7 +34,7 @@ export class FreeCollector extends ScrapperCollector {
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
     }
 
-    async is_not_authenticated(driver, params){
+    async get_authentication_error(driver, params){
         const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000)
         if (login_alert) {
             return await login_alert.evaluate(el => el.textContent)

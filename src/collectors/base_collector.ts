@@ -1,5 +1,4 @@
 import axios from 'axios';
-import fs from 'fs';
 import puppeteer, { PuppeteerLaunchOptions } from 'puppeteer';
 import { Driver } from '../driver';
 import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '../error';
@@ -83,10 +82,10 @@ export class ScrapperCollector extends AbstractCollector {
         await this.login(driver, params)
 
         //Check if not authenticated
-        const not_authenticated_message = await this.is_not_authenticated(driver, params)
-        if (not_authenticated_message) {
+        const authentication_error = await this.get_authentication_error(driver, params)
+        if (authentication_error) {
             await browser.close()
-            throw new NotAuthenticatedError(not_authenticated_message, this.config.name, this.config.version);
+            throw new NotAuthenticatedError(authentication_error, this.config.name, this.config.version);
         }
 
         //Collect invoices
@@ -119,7 +118,7 @@ export class ScrapperCollector extends AbstractCollector {
         throw new Error('`run` is not implemented.');
     }
 
-    async is_not_authenticated(driver, params){
+    async get_authentication_error(driver, params){
         //Assume the password is correct
         return null;
     }
