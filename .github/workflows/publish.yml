@@ -25,7 +25,10 @@ jobs:
 
     steps:
     - name: Echo workflow run event
-      run: echo ${{ toJson(github.event.workflow_run) }}
+      run: |
+        echo ${{ toJson(github.event.workflow_run) }}
+        echo ${{ github.event.release.tag_name }}
+        echo ${{ github.event.inputs.tag_name }}
 
     - name: Checkout
       uses: actions/checkout@v4
