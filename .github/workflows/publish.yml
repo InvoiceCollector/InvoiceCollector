@@ -12,7 +12,6 @@ on:
         default: '0.1'
 
 permissions:
-  contents: write
   packages: write
 
 jobs:
