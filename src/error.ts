@@ -58,9 +58,9 @@ export class InMaintenanceError extends CollectorError {
 }
 
 export class NotAuthenticatedError extends CollectorError {
-    constructor(collector: string, version: string, opts = {}) {
+    constructor(message: string, collector: string, version: string, opts = {}) {
         super(
-            `Could not authenticate. Please verify your credentials.`,
+            message,
             collector,
             version,
             opts

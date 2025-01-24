@@ -86,7 +86,7 @@ export class ScrapperCollector extends AbstractCollector {
         const not_authenticated_message = await this.is_not_authenticated(driver, params)
         if (not_authenticated_message) {
             await browser.close()
-            throw new NotAuthenticatedError(this.config.name, this.config.version, {cause: not_authenticated_message});
+            throw new NotAuthenticatedError(not_authenticated_message, this.config.name, this.config.version);
         }
 
         //Collect invoices
@@ -121,10 +121,7 @@ export class ScrapperCollector extends AbstractCollector {
 
     async is_not_authenticated(driver, params){
         //Assume the password is correct
-        return {
-            authenticated: true,
-            message: null
-        };
+        return null;
     }
 
     async is_in_maintenance(driver, params){
