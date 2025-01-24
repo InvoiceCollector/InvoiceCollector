@@ -12,6 +12,7 @@ on:
         default: '0.1'
 
 permissions:
+  contents: read
   packages: write
 
 jobs:
@@ -41,4 +42,7 @@ jobs:
         context: .
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ghcr.io/invoice-collector/invoice-collector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }},ghcr.io/invoice-collector/invoice-collector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
+        provenance: false
+        tags: |
+          ghcr.io/invoice-collector/invoice-collector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }}
+          ghcr.io/invoice-collector/invoice-collector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
