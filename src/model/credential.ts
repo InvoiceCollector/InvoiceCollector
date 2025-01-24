@@ -2,7 +2,7 @@ import { DatabaseFactory } from "../database/databaseFactory";
 
 export enum State {
     PENDING = "PENDING",
-    VALID = "VALID",
+    SUCCESS = "SUCCESS",
     ERROR = "ERROR"
 }
 

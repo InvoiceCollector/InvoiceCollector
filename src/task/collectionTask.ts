@@ -134,7 +134,7 @@ export class CollectionTask {
             }
 
             // Update state
-            credential.state = State.VALID;
+            credential.state = State.SUCCESS;
 
             // Log success
             this.log_server.logSuccess(collector.config.key);
