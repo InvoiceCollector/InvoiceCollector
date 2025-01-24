@@ -5,7 +5,8 @@ on:
     types:
       - published
   workflow_run:
-    workflows: ["release"]
+    workflows:
+      - Create release
     types:
       - completed
   workflow_dispatch:
