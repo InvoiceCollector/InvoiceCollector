@@ -1,5 +1,5 @@
 import axios from 'axios';
-import puppeteer, { PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteer, { LaunchOptions } from 'puppeteer';
 import { Driver } from '../driver';
 import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '../error';
 
@@ -36,8 +36,8 @@ export class AbstractCollector {
 
 export class ScrapperCollector extends AbstractCollector {
     
-    PUPPETEER_CONFIG: PuppeteerLaunchOptions = {
-        headless:'new',
+    PUPPETEER_CONFIG: LaunchOptions = {
+        headless: true,
         args:[
             '--start-maximized', // you can also use '--start-fullscreen'
             '--no-sandbox',
