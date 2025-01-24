@@ -1,0 +1,33 @@
+name: Create release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: 'Create a draft release'
+        required: true
+        default: 'true'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Get package version
+      id: get_version
+      run: |
+        VERSION=$(jq -r '.version' package.json)
+        echo "Package version is $VERSION"
+        echo "::set-output name=version::$VERSION"
+
+    - name: Create release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.get_version.outputs.version }}
+        draft: ${{ github.event_name == 'push' && 'false' || github.event.inputs.draft }}
