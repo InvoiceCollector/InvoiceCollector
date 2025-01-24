@@ -41,6 +41,4 @@ jobs:
         context: .
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: |
-          ghcr.io/invoicecollector/invoicecollector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }}
-          ghcr.io/invoicecollector/invoicecollector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
+        tags: ghcr.io/invoicecollector/invoicecollector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }},ghcr.io/invoicecollector/invoicecollector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
