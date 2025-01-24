@@ -79,6 +79,11 @@ input {
     color: #fff;
 }
 
+.delete-button > img {
+    height: 15px;
+    width: 15px;
+}
+
 /* CREDENTIALS */
 
 #credentials-list {

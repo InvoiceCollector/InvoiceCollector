@@ -59,10 +59,12 @@ async function showCredentials() {
         credentialItem.innerHTML = `
             <img src="${credential.collector.logo}" alt="${credential.collector.name}">
             <div>
-                <h3>${credential.collector.name}</h3>
-                <p>${credential.note || credential.collector.description}</p>
+            <h3>${credential.collector.name}</h3>
+            <p>${credential.note || credential.collector.description}</p>
             </div>
-            <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">Delete</button>
+            <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">
+                <img src="/views/icons/delete.png" alt="Delete"/>
+            </button>
             ${buildCredentialFooter(credential)}
         `;
         credentialsList.appendChild(credentialItem);
