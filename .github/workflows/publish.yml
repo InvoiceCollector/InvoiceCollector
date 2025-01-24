@@ -24,11 +24,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Echo workflow run event
+    - name: Echo workflow_run
       run: |
-        echo ${{ toJson(github.event.workflow_run) }}
-        echo ${{ github.event.release.tag_name }}
-        echo ${{ github.event.inputs.tag_name }}
+        echo ${{ github.event.workflow_run }}
+
+    - name: Echo release
+      run: |
+        echo ${{ github.event.release }}
+
+    - name: Echo inputs
+      run: |
+        echo ${{ github.event.inputs }}
 
     - name: Checkout
       uses: actions/checkout@v4
