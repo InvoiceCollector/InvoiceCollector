@@ -1,6 +1,5 @@
 import express from 'express';
 import path from 'path';
-import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,7 +8,7 @@ import { Server } from "./server"
 
 // Configure express
 const app = express()
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(Server.i18n.init);
 app.use('/views', express.static(path.join(__dirname, '..', 'views')));
 app.set('view engine', 'ejs');
