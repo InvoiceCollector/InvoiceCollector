@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Echo release
+    - name: Echo event
       run: |
-        echo ${{ toJson(github.event.release) }}
+        echo ${{ toJson(github.event) }}
 
     - name: Checkout
       uses: actions/checkout@v4
