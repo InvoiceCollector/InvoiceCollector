@@ -88,12 +88,50 @@ input {
 .credential-item {
     border: 1px solid #ccc;
     background-color: #fff;
-    display: flex
+    display: flex;
+    position: relative;
 }
 
 .credential-item > button {
     margin-left: auto;
     align-self: flex-start;
+}
+
+.credential-footer {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.credential-footer > img {
+    margin-left: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 15px;
+    width: 15px;
+}
+
+.credential-footer > div {
+    margin-left: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.credential-error {
+    background-color: lightcoral;
+}
+
+.credential-warning {
+    background-color: none;
+}
+
+.credential-success {
+    background-color: none;
 }
 
 /* COMPANIES */

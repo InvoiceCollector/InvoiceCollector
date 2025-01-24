@@ -16,6 +16,32 @@ async function getCollectors() {
     return await response.json();
 }
 
+function buildCredentialFooter(credential) {
+    console.log(credential);
+    if (credential.state == "ERROR") {
+        return `
+            <div class="credential-footer credential-error">
+                <img src="/views/icons/error.png" title="Error"/>
+                <div>${credential.error}</div>
+            </div>
+        `;
+    }
+    else if (credential.state == "PENDING") {
+        return `
+            <div class="credential-footer credential-warning">
+                <img src="/views/icons/pending.png"/>
+            </div>
+        `;
+    }
+    else {
+        return `
+            <div class="credential-footer credential-success">
+                <img src="/views/icons/success.png"/>
+            </div>
+        `;
+    }
+}
+
 async function showCredentials() {
     document.getElementById('credentials-container').hidden = false;
     document.getElementById('companies-container').hidden = true;
@@ -37,6 +63,7 @@ async function showCredentials() {
                 <p>${credential.note || credential.collector.description}</p>
             </div>
             <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">Delete</button>
+            ${buildCredentialFooter(credential)}
         `;
         credentialsList.appendChild(credentialItem);
     });
