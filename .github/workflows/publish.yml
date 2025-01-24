@@ -12,7 +12,7 @@ on:
         default: '0.1'
 
 permissions:
-  contents: write
+  contents: read
   packages: write
 
 jobs:
