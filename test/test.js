@@ -6,10 +6,10 @@ const prompt = require('prompt-sync')({sigint: true});
     let name;
     if(process.argv[2]) {
         name = process.argv[2]
-        console.log(`Collector:${name}`)
+        console.log(`collector: ${name}`)
     }
     else {
-        name = prompt('Collector:');
+        name = prompt('collector: ');
     }
 
     // Get collectors
@@ -33,22 +33,22 @@ const prompt = require('prompt-sync')({sigint: true});
     let argv_index = 3;
 
     // Loop throught each config
-    for(const [param_key, param] of Object.entries(collector.config.params)) {
+    for(const param_key of Object.keys(collector.config.params)) {
         if(process.argv[argv_index]) {
             params[param_key] = process.argv[argv_index]
             if(param_key.toLowerCase().includes("password") || param_key.toLowerCase().includes("secret") || param_key.toLowerCase().includes("token")) {
-                console.log(`${param_key}:<hidden>`)
+                console.log(`${param_key}: <hidden>`)
             }
             else {
-                console.log(`${param_key}:${process.argv[argv_index]}`)
+                console.log(`${param_key}: ${process.argv[argv_index]}`)
             }
         }
         else {
             if(param_key.toLowerCase().includes("password") || param_key.toLowerCase().includes("secret") || param_key.toLowerCase().includes("token")) {
-                params[param_key] = prompt.hide(`${param.name}:`);
+                params[param_key] = prompt.hide(`${param_key}: `);
             }
             else {
-                params[param_key] = prompt(`${param.name}:`);
+                params[param_key] = prompt(`${param_key}: `);
             }
         }
         argv_index++;
