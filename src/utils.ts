@@ -5,5 +5,5 @@ export function generate_token(size=64): string {
 }
 
 export function hash_string(input: string): string {
-    return crypto.createHash('sha256').update(input).digest('hex');
+    return crypto.createHash('sha3-512').update(input).digest('hex');
 }
