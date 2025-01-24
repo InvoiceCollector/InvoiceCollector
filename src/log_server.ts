@@ -13,13 +13,6 @@ export class RegistryServer {
         this.client = axios.create({
             baseURL: `${process.env.REGISTRY_SERVER_ENDPOINT}/${RegistryServer.VERSION}`
         });
-
-        if (process.env.REGISTRY_SERVER_ACCESS_TOKEN) {
-            this.client.defaults.headers.common['Authorization'] = `Bearer ${process.env.REGISTRY_SERVER_ACCESS_TOKEN}`;
-        }
-        else {
-            console.warn("No REGISTRY_SERVER_ACCESS_TOKEN environment variable found. Requests to log server will not be authenticated.");
-        }
     }
 
     logSuccess(collector: string) {
@@ -34,7 +27,7 @@ export class RegistryServer {
         });
     }
 
-    logError(err: LoggableError) {
+    logError(bearer: string, err: LoggableError) {
         this.client.post("/log/error", {
             collector: err.collector,
             version: err.version,
@@ -42,6 +35,11 @@ export class RegistryServer {
             traceback: err.stack,
             source_code: err.source_code,
             screenshot: err.screenshot
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${bearer}`
+            }
         })
         .then(response => {
             console.log("Invoice-Collector server successfully reached");

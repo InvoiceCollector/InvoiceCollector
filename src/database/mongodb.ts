@@ -55,7 +55,7 @@ export class MongoDB extends AbstractDatabase {
         if (!document) {
             return null;
         }
-        let customer = new Customer(document.callback);
+        let customer = new Customer(document.callback, document.bearer);
         customer.id = document._id.toString();
         return customer;
     }
@@ -70,7 +70,7 @@ export class MongoDB extends AbstractDatabase {
         if (!document) {
             return null;
         }
-        let customer = new Customer(document.callback);
+        let customer = new Customer(document.callback, document.bearer);
         customer.id = document._id.toString();
         return customer;
     }

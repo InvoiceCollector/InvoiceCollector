@@ -19,10 +19,12 @@ export class Customer {
 
     id: string;
     callback: string;
+    bearer: string;
 
-    constructor(callback) {
+    constructor(callback: string, bearer: string) {
         this.id = "";
         this.callback = callback;
+        this.bearer = bearer;
     }
 
     async getUserFromRemoteId(remote_id: string) {

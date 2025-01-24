@@ -49,6 +49,7 @@ export class CollectionTask {
 
     async collect(credential_id: string) {
         let credential: IcCredential|null = null;
+        let customer;
         try {
             console.log(`Collecting invoices for ${credential_id}`);
 
@@ -69,7 +70,7 @@ export class CollectionTask {
             }
 
             // Get customer from user
-            const customer = await user.getCustomer();
+            customer = await user.getCustomer();
 
             // Check if customer exists
             if (!customer) {
@@ -150,7 +151,7 @@ export class CollectionTask {
             // If error is LoggableError
             if(err instanceof LoggableError) {
                 // Log error
-                this.registry_server.logError(err);
+                this.registry_server.logError(customer.bearer, err);
             }
             else if (err instanceof NotAuthenticatedError) {
                 // If credential exists
