@@ -11,6 +11,9 @@ on:
         required: true
         default: 'true'
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -29,6 +32,5 @@ jobs:
     - name: Create release
       uses: softprops/action-gh-release@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         tag_name: ${{ steps.get_version.outputs.version }}
         draft: ${{ github.event_name == 'push' && 'false' || github.event.inputs.draft }}
