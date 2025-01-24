@@ -21,7 +21,7 @@ function buildCredentialFooter(credential) {
     if (credential.state == "ERROR") {
         return `
             <div class="credential-footer credential-error">
-                <img src="/views/icons/error.png" title="Error"/>
+                <img src="/views/icons/error.png" alt="Error"/>
                 <div>${credential.error}</div>
             </div>
         `;
@@ -29,14 +29,14 @@ function buildCredentialFooter(credential) {
     else if (credential.state == "PENDING") {
         return `
             <div class="credential-footer credential-warning">
-                <img src="/views/icons/pending.png"/>
+                <img src="/views/icons/pending.png" alt="Pending"/>
             </div>
         `;
     }
     else {
         return `
             <div class="credential-footer credential-success">
-                <img src="/views/icons/success.png"/>
+                <img src="/views/icons/success.png" alt="Success"/>
             </div>
         `;
     }
