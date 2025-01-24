@@ -37,5 +37,5 @@ jobs:
         context: .
         push: true
         tags: |
-          InvoiceCollector/InvoiceCollector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }}
-          InvoiceCollector/InvoiceCollector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
+          invoice-collector/invoice-collector:${{ github.event_name == 'release' && github.event.release.tag_name || github.event.inputs.tag_name }}
+          invoice-collector/invoice-collector:${{ github.event_name == 'release' && 'latest' || 'draft' }}
