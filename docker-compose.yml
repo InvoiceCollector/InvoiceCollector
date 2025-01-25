@@ -12,6 +12,7 @@ services:
       - PORT=8080
       - REGISTRY_SERVER_ENDPOINT=https://registry.invoice-collector.com
       - DATABASE_URI=mongodb://mongodb:27017
+      - DATABASE_MONGODB_NAME=prod
       - SECRET_MANAGER_TYPE=bitwarden
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
       - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity

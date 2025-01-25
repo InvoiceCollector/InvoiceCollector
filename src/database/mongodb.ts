@@ -7,17 +7,22 @@ import { IcCredential } from "../model/credential";
 
 export class MongoDB extends AbstractDatabase {
 
-    static DB_NAME = 'invoice-collector';
     static CUSTOMER_COLLECTION = 'customers';
     static USER_COLLECTION = 'users';
     static CREDENTIAL_COLLECTION = 'credentials';
 
     client: MongoClient;
+    db_name: string;
     db: Db|null;
 
     constructor(uri) {
+        if (!process.env.DATABASE_MONGODB_NAME) {
+            throw new Error("DATABASE_MONGODB_NAME environment variable is required");
+        }
+
         super();
         this.client = new MongoClient(uri);
+        this.db_name = process.env.DATABASE_MONGODB_NAME;
         this.db = null;
     }
 
@@ -25,7 +30,7 @@ export class MongoDB extends AbstractDatabase {
         try {
             await this.client.connect();
             console.log("Connected successfully to MongoDB");
-            this.db = this.client.db(MongoDB.DB_NAME);
+            this.db = this.client.db(this.db_name);
 
             // Create collection if not existing
             await this.db.createCollection(MongoDB.CUSTOMER_COLLECTION);
