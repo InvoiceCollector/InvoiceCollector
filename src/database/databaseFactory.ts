@@ -7,7 +7,7 @@ export class DatabaseFactory {
     static getDatabase(): AbstractDatabase {
         if (!DatabaseFactory.instance) {
             const databaseUri = process.env.DATABASE_URI;
-            if(databaseUri && databaseUri.startsWith('mongodb://')) {
+            if(databaseUri && databaseUri.startsWith('mongodb')) {
                 DatabaseFactory.instance = new MongoDB(databaseUri);
             }
             else {
