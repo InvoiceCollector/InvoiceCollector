@@ -2,7 +2,7 @@ name: Tag Latest
 
 on:
   release:
-    types: [released]
+    types: [edited]
 
 permissions:
   packages: write
