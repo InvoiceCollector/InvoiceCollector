@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: 'Package version'
+        required: true
 
 permissions:
   contents: write
@@ -22,7 +27,11 @@ jobs:
     - name: Get package version
       id: get_version
       run: |
-        VERSION=$(jq -r '.version' package.json)
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.package_version }}"
+        else
+          VERSION=$(jq -r '.version' package.json)
+        fi
         echo "Package version is $VERSION"
         echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
