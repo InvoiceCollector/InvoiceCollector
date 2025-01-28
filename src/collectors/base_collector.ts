@@ -5,24 +5,20 @@ import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '
 
 export class AbstractCollector {
     config: any;
+    downloadMethods: { [key: string]: (invoice: any) => Promise<void> };
 
     constructor(config) {
         this.config = config;
+        this.downloadMethods = {
+            "link": this.download_direct_link,
+            "bytes": this.download_bytes,
+        };
     }
 
     async download(invoices): Promise<void> {
         for(let invoice of invoices) {
-            if(invoice.type == "link") {
-                const response = await axios.get(invoice.link, {
-                    responseType: 'arraybuffer',
-                });
-                invoice.data = response.data.toString("base64");
-                invoice.type = "base64";
-            }
-            else if(invoice.type == "bytes") {
-                invoice.data = btoa(String.fromCharCode.apply(null, invoice.bytes));
-                delete invoice.bytes;
-                invoice.type = "base64";
+            if (this.downloadMethods[invoice.type]) {
+                await this.downloadMethods[invoice.type].call(this, invoice);
             }
         }
 
@@ -30,8 +26,22 @@ export class AbstractCollector {
         invoices.sort((a, b) => a.timestamp - b.timestamp);
     }
 
+    async download_direct_link(invoice): Promise<void> {
+        const response = await axios.get(invoice.link, {
+            responseType: 'arraybuffer',
+        });
+        invoice.data = response.data.toString("base64");
+        invoice.type = "base64";
+    }
+
+    async download_bytes(invoice): Promise<void> {
+        invoice.data = btoa(String.fromCharCode.apply(null, invoice.bytes));
+        delete invoice.bytes;
+        invoice.type = "base64";
+    }
+
     async collect_new_invoices(params, download, previousInvoices): Promise<any[]> {
-        const invoices = await this.collect(params, download);
+        const invoices = await this.collect(params);
 
         // Get new invoices
         const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
@@ -52,13 +62,20 @@ export class AbstractCollector {
             console.log(`Found ${invoices.length} invoices but none are new`);
         }
 
+        // Close the collector resources
+        this.close();
+
         return newInvoices;
     }
 
     //NOT IMPLEMENTED
 
-    async collect(params, download=true): Promise<any[]> {
+    async collect(params): Promise<any[]> {
         throw new Error('`collect` is not implemented.');
+    }
+
+    async close() {
+        // Assume the collector does not need to close anything
     }
 }
 
@@ -77,14 +94,33 @@ export class ScrapperCollector extends AbstractCollector {
         height: 1080,
     };
 
+    driver: Driver | null;
     authentication_error: string | null;
 
     constructor(config) {
         super(config);
+        this.driver = null;
         this.authentication_error = null;
+        this.downloadMethods['webpage'] = this.download_webpage;
     }
 
-    async collect(params, download=true): Promise<any[]> {
+    async download_webpage(invoice): Promise<void> {
+        if (!this.driver) {
+            throw new Error('Driver is not initialized.');
+        }
+        await this.driver.page.goto(invoice.link, {
+            waitUntil: 'networkidle0',
+        });
+
+        invoice.bytes = await this.driver.page.pdf({
+            scale: 0.5,
+            format: 'A4',
+            printBackground: true,
+        });
+        await this.download_bytes(invoice);
+    }
+
+    async collect(params): Promise<any[]> {
         if(!params.username) {
             throw new Error('Field "username" is missing.');
         }
@@ -100,27 +136,27 @@ export class ScrapperCollector extends AbstractCollector {
         await page.setViewport(this.PAGE_CONFIG);
         await page.goto(this.config.entry_url);
 
-        let driver = new Driver(page, this);
+        this.driver = new Driver(page, this);
 
         // Check if website is in maintenance
-        const is_in_maintenance = await this.is_in_maintenance(driver, params)
+        const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
         if (is_in_maintenance) {
             await browser.close()
             throw new InMaintenanceError(this.config.name, this.config.version);
         }
 
         // Login
-        await this.login(driver, params)
+        await this.login(this.driver, params)
 
         // Check if not authenticated
-        const authentication_error = await this.get_authentication_error(driver, params)
+        const authentication_error = await this.get_authentication_error(this.driver, params)
         if (authentication_error) {
             await browser.close()
             throw new NotAuthenticatedError(authentication_error, this.config.name, this.config.version);
         }
 
         // Collect invoices
-        const invoices = await this.run(driver, params)
+        const invoices = await this.run(this.driver, params)
         if (invoices === undefined) {
             const url = await page.url();
             const source_code = await page.content();
@@ -130,10 +166,12 @@ export class ScrapperCollector extends AbstractCollector {
             throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code_base64, screenshot);
         }
 
-        // Close the borwser
-        await browser.close()
-
         return invoices;
+    }
+
+    async close() {
+        // Close the browser
+        await this.driver?.page.browser().close();
     }
 
     //NOT IMPLEMENTED
