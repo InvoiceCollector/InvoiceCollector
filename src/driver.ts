@@ -1,10 +1,11 @@
+import { Page } from 'puppeteer';
 import { ElementNotFoundError } from './error';
 
 export class Driver {
 
     static DEFAULT_TIMEOUT = 10000;
 
-    page;
+    page: Page;
     collector;
 
     constructor(page, collector) {
@@ -63,6 +64,6 @@ export class Driver {
     //CHECK
 
     async check_element_exist(selector) {
-        return this.page.$$(selector.selector).length > 0;
+        return (await this.page.$$(selector.selector)).length > 0;
     }
 }
