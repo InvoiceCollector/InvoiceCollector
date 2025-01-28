@@ -84,8 +84,11 @@ export class CollectionTask {
             const collector_class = this.get_collector(credential.key);
             const collector = new collector_class();
 
+            // Compute if this is the first collect
+            const first_collect = !credential.last_collect_timestamp;
+
             // Collect invoices
-            const invoices = await collector.collect(secret.value);
+            const invoices = await collector.collect(secret.value, !first_collect);
                     
             console.log(`Invoice collection for credential ${credential_id} succeed, found ${invoices.length} invoices`);
 
@@ -102,7 +105,7 @@ export class CollectionTask {
                 // Loop through invoices
                 for (const [index, invoice] of newInvoices.entries()) {
                     // If not the first collect
-                    if (credential.last_collect_timestamp) {
+                    if (!first_collect) {
                         console.log(`Sending invoice ${index + 1}/${newInvoices.length} to callback`);
     
                         try {
