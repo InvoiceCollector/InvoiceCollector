@@ -91,7 +91,7 @@ export class CollectionTask {
             const previousInvoices = credential.invoices.map((inv) => inv.id);
 
             // Collect invoices
-            const newInvoices = await collector.collect_new_invoices(secret.value, !first_collect, previousInvoices);
+            const newInvoices = await collector.collect_new_invoices(secret.value, !first_collect, previousInvoices, user.locale);
                     
             console.log(`Invoice collection for credential ${credential_id} succeed`);
 

@@ -2,6 +2,7 @@ import axios from 'axios';
 import puppeteer, { LaunchOptions } from 'puppeteer';
 import { Driver } from '../driver';
 import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '../error';
+import { Server } from "../server"
 
 export class AbstractCollector {
     config: any;
@@ -40,37 +41,37 @@ export class AbstractCollector {
         invoice.type = "base64";
     }
 
-    async collect_new_invoices(params, download, previousInvoices): Promise<any[]> {
-        const invoices = await this.collect(params);
+    async collect_new_invoices(params, download, previousInvoices, locale): Promise<any[]> {
+            const invoices = await this.collect(params, locale);
 
-        // Get new invoices
-        const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
+            // Get new invoices
+            const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
 
-        if(newInvoices.length > 0) {
-            console.log(`Found ${invoices.length} invoices but only ${newInvoices.length} are new`);
+            if(newInvoices.length > 0) {
+                console.log(`Found ${invoices.length} invoices but only ${newInvoices.length} are new`);
 
-            // Download new invoices if needed
-            if(download) {
-                console.log(`Downloading ${newInvoices.length} invoices`);
-                await this.download(newInvoices);
+                // Download new invoices if needed
+                if(download) {
+                    console.log(`Downloading ${newInvoices.length} invoices`);
+                    await this.download(newInvoices);
+                }
+                else {
+                    console.log(`This is the first collect. Do not download invoices`);
+                }
             }
             else {
-                console.log(`This is the first collect. Do not download invoices`);
+                console.log(`Found ${invoices.length} invoices but none are new`);
             }
-        }
-        else {
-            console.log(`Found ${invoices.length} invoices but none are new`);
-        }
 
-        // Close the collector resources
-        this.close();
+            // Close the collector resources
+            this.close();
 
-        return newInvoices;
+            return newInvoices;
     }
 
     //NOT IMPLEMENTED
 
-    async collect(params): Promise<any[]> {
+    async collect(params, locale): Promise<any[]> {
         throw new Error('`collect` is not implemented.');
     }
 
@@ -120,7 +121,7 @@ export class ScrapperCollector extends AbstractCollector {
         await this.download_bytes(invoice);
     }
 
-    async collect(params): Promise<any[]> {
+    async collect(params, locale): Promise<any[]> {
         if(!params.username) {
             throw new Error('Field "username" is missing.');
         }
@@ -152,7 +153,7 @@ export class ScrapperCollector extends AbstractCollector {
         const authentication_error = await this.get_authentication_error(this.driver, params)
         if (authentication_error) {
             await browser.close()
-            throw new NotAuthenticatedError(authentication_error, this.config.name, this.config.version);
+            throw new NotAuthenticatedError(Server.i18n.__({ phrase: authentication_error, locale }), this.config.name, this.config.version);
         }
 
         // Collect invoices

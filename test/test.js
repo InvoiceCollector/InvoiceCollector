@@ -1,6 +1,7 @@
-const { collectors } = require('../src/collectors/collectors.ts')
 const prompt = require('prompt-sync')({sigint: true});
 const fs = require('fs');
+const { Server } = require("../src/server.ts");
+const { collectors } = require('../src/collectors/collectors.ts');
 
 (async () => {
     // Get collector name
@@ -56,7 +57,7 @@ const fs = require('fs');
     }
 
     // Collect invoices
-    const invoices = await collector.collect_new_invoices(params, true, []);
+    const invoices = await collector.collect_new_invoices(params, true, [], Server.DEFAULT_LOCALE);
     console.log(invoices);
 
     for (const invoice of invoices) {
