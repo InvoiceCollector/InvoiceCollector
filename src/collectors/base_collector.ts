@@ -147,13 +147,12 @@ export class ScrapperCollector extends AbstractCollector {
         }
 
         // Login
-        await this.login(this.driver, params)
+        const login_error = await this.login(this.driver, params)
 
         // Check if not authenticated
-        const authentication_error = await this.get_authentication_error(this.driver, params)
-        if (authentication_error) {
+        if (login_error) {
             await browser.close()
-            throw new NotAuthenticatedError(Server.i18n.__({ phrase: authentication_error, locale }), this.config.name, this.config.version);
+            throw new NotAuthenticatedError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
         }
 
         // Collect invoices
@@ -177,16 +176,12 @@ export class ScrapperCollector extends AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async login(driver, params): Promise<void>{
+    async login(driver, params): Promise<string | null>{
         throw new Error('`login` is not implemented.');
     }
 
     async run(driver, params): Promise<any[]> {
         throw new Error('`run` is not implemented.');
-    }
-
-    async get_authentication_error(driver, params): Promise<string | null> {
-        return this.authentication_error;
     }
 
     async is_in_maintenance(driver, params): Promise<boolean>{
