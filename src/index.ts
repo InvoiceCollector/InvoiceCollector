@@ -144,6 +144,12 @@ app.get('/api/v1/collectors', (req, res) => {
     }
 });
 
+// Handle non-existing endpoints
+app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(404).end(JSON.stringify({type: "error", reason: "Endpoint not found"}));
+});
+
 function handle_error(e, res){
     res.setHeader('Content-Type', 'application/json');
     let status_code, reason;
