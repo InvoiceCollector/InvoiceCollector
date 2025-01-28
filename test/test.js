@@ -1,5 +1,6 @@
 const { collectors } = require('../src/collectors/collectors.ts')
 const prompt = require('prompt-sync')({sigint: true});
+const fs = require('fs');
 
 (async () => {
     // Get collector name
@@ -57,4 +58,9 @@ const prompt = require('prompt-sync')({sigint: true});
     // Collect invoices
     const invoices = await collector.collect(params);
     console.log(invoices);
+
+    for (const invoice of invoices) {
+        // Save data to file
+        fs.writeFileSync(`./media/${name}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
+    }
 })();
