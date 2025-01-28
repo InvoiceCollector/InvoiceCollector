@@ -10,9 +10,13 @@
 	"i18n.collectors.all.identifier.placeholder": "Identifiant du compte",
 	"i18n.collectors.all.password": "Mot de passe",
 	"i18n.collectors.all.password.placeholder": "Mot de passe du compte",
+	"i18n.collectors.all.password.error": "Mot de passe incorrect",
 	"i18n.collectors.all.note": "Note",
 	"i18n.collectors.all.note.placeholder": "Note personnalisée",
 
     "i18n.collectors.free.description": "Free est un opérateur de télécommunications français.",
-    "i18n.collectors.free.identifier.placeholder": "Identifiant du compte (ex: fbx12345670)"
+    "i18n.collectors.free.identifier.placeholder": "Identifiant du compte (ex: fbx12345670)",
+
+	"i18n.collectors.amazon.description": "Amazon est un site de commerce en ligne.",
+	"i18n.collectors.amazon.identifier.placeholder": "Email ou numéro de téléphone"
 }
