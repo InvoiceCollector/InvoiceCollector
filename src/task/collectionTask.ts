@@ -87,27 +87,22 @@ export class CollectionTask {
             // Compute if this is the first collect
             const first_collect = !credential.last_collect_timestamp;
 
-            // Collect invoices
-            const invoices = await collector.collect(secret.value, !first_collect);
-                    
-            console.log(`Invoice collection for credential ${credential_id} succeed, found ${invoices.length} invoices`);
-
             // Get previous invoices
             const previousInvoices = credential.invoices.map((inv) => inv.id);
 
-            // Get new invoices
-            const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
+            // Collect invoices
+            const newInvoices = await collector.collect_new_invoices(secret.value, !first_collect, previousInvoices);
+                    
+            console.log(`Invoice collection for credential ${credential_id} succeed`);
 
-            // If at least one new invoice has been collected
+            // If at least one new invoice has been downloaded
             if(newInvoices.length > 0) {
-                console.log(`${newInvoices.length} new invoices found`);
-
                 // Loop through invoices
                 for (const [index, invoice] of newInvoices.entries()) {
                     // If not the first collect
                     if (!first_collect) {
                         console.log(`Sending invoice ${index + 1}/${newInvoices.length} to callback`);
-    
+
                         try {
                             await axios.post(customer.callback, {
                                 type: "invoice",
@@ -115,7 +110,7 @@ export class CollectionTask {
                                 remote_id: user.remote_id,
                                 invoice
                             })
-                            console.log("Callback succesfully reached");
+                        console.log("Callback succesfully reached");
 
                             // Add invoice to credential only if callback successfully reached
                             credential.addInvoice(invoice);
@@ -132,9 +127,6 @@ export class CollectionTask {
 
                 // Sort invoices
                 credential.sortInvoices();
-            }
-            else {
-                console.log("No new invoices found");
             }
 
             // Update state

@@ -10,9 +10,7 @@ export class AbstractCollector {
         this.config = config;
     }
 
-    async download(params, invoices): Promise<void> {
-        console.log(`Downloading ${invoices.length} invoices`);
-
+    async download(invoices): Promise<void> {
         for(let invoice of invoices) {
             if(invoice.type == "link") {
                 const response = await axios.get(invoice.link, {
@@ -30,6 +28,31 @@ export class AbstractCollector {
 
         // Order invoices by timestamp
         invoices.sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    async collect_new_invoices(params, download, previousInvoices): Promise<any[]> {
+        const invoices = await this.collect(params, download);
+
+        // Get new invoices
+        const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
+
+        if(newInvoices.length > 0) {
+            console.log(`Found ${invoices.length} invoices but only ${newInvoices.length} are new`);
+
+            // Download new invoices if needed
+            if(download) {
+                console.log(`Downloading ${newInvoices.length} invoices`);
+                await this.download(newInvoices);
+            }
+            else {
+                console.log(`This is the first collect. Do not download invoices`);
+            }
+        }
+        else {
+            console.log(`Found ${invoices.length} invoices but none are new`);
+        }
+
+        return newInvoices;
     }
 
     //NOT IMPLEMENTED
@@ -105,11 +128,6 @@ export class ScrapperCollector extends AbstractCollector {
             const screenshot = await page.screenshot({encoding: 'base64'});
             await browser.close()
             throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code_base64, screenshot);
-        }
-
-        // Download invoices to token folder
-        if(download) {
-            await this.download(params, invoices);
         }
 
         // Close the borwser
