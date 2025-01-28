@@ -154,7 +154,7 @@ function handle_error(e, res){
     res.setHeader('Content-Type', 'application/json');
     let status_code, reason;
     if(e instanceof StatusError) {
-        status_code = status_code;
+        status_code = e.status_code;
         reason = e.message;
     }
     else {
