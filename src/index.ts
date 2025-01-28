@@ -145,14 +145,24 @@ app.get('/api/v1/collectors', (req, res) => {
 });
 
 function handle_error(e, res){
-    let status = 500;
+    res.setHeader('Content-Type', 'application/json');
+    let status_code, reason;
     if(e instanceof StatusError) {
-        status = e.status_code;
+        status_code = status_code;
+        reason = e.message;
     }
     else {
         console.error(e);
+        status_code = 500;
+        console.log(process.env.DEBUG)
+        if (process.env.DEBUG === 'true') {
+            reason = e.message;
+        }
+        else {
+            reason = "Internal server error"
+        }
     }
-    res.status(status).end(JSON.stringify({type: "error", reason: e.message}));
+    res.status(status_code).end(JSON.stringify({type: "error", reason}));
 }
 
 function has_env_variables(){

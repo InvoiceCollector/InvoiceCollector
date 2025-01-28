@@ -23,6 +23,7 @@ services:
       - SECRET_MANAGER_TYPE=bitwarden
       - SECRET_MANAGER_BITWARDEN_API_URI=https://vault.bitwarden.eu/api
       - SECRET_MANAGER_BITWARDEN_IDENTITY_URI=https://vault.bitwarden.eu/identity
+      - DEBUG=true
     command: npm run debug
 
   mongodb:
