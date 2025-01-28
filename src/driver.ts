@@ -33,30 +33,30 @@ export class Driver {
 
     // ACTIONS
 
-    async get_all_elements(selector) {
-        await this.wait_for_element(selector);
+    async get_all_elements(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        await this.wait_for_element(selector, raise_exception, timeout);
         return this.page.$$(selector);
     }
 
-    async get_all_attributes(selector, attributeName) {
-        await this.wait_for_element(selector);
+    async get_all_attributes(selector, attributeName, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        await this.wait_for_element(selector, raise_exception, timeout);
         return await this.page.$$eval(selector.selector, (elements, attr) => {
             return elements.map(element => element[attr]);
         }, attributeName);
     }
 
-    async left_click(selector) {
-        await this.wait_for_element(selector);
+    async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        await this.wait_for_element(selector, raise_exception, timeout);
         await this.page.click(selector.selector);
     }
 
-    async input_text(selector, text) {
-        await this.wait_for_element(selector);
+    async input_text(selector, text, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        await this.wait_for_element(selector, raise_exception, timeout);
         await this.page.type(selector.selector, text);
     }
 
-    async select_dropdown_menu_option(selector, option) {
-        await this.wait_for_element(selector);
+    async select_dropdown_menu_option(selector, option, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        await this.wait_for_element(selector, raise_exception, timeout);
         //TODO
     }
 
