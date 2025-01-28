@@ -56,7 +56,7 @@ const fs = require('fs');
     }
 
     // Collect invoices
-    const invoices = await collector.collect(params);
+    const invoices = await collector.collect_new_invoices(params, true, []);
     console.log(invoices);
 
     for (const invoice of invoices) {
