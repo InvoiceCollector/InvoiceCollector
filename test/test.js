@@ -4,23 +4,23 @@ const { Server } = require("../src/server.ts");
 const { collectors } = require('../src/collectors/collectors.ts');
 
 (async () => {
-    // Get collector name
-    let name;
+    // Get collector key
+    let key;
     if(process.argv[2]) {
-        name = process.argv[2]
-        console.log(`collector: ${name}`)
+        key = process.argv[2]
+        console.log(`collector: ${key}`)
     }
     else {
-        name = prompt('collector: ');
+        key = prompt('collector: ');
     }
 
     // Get collectors
-    const collector_pointers = collectors.filter((collector) => collector.CONFIG.name.toLowerCase() == name.toLowerCase())
+    const collector_pointers = collectors.filter((collector) => collector.CONFIG.key == key.toLowerCase())
     if(collector_pointers.length == 0) {
-        throw new Error(`No collector named "${name}" found.`);
+        throw new Error(`No collector named "${key}" found.`);
     }
     if(collector_pointers.length > 1) {
-        throw new Error(`Found ${collector_pointers.length} collectors named "${name}".`);
+        throw new Error(`Found ${collector_pointers.length} collectors named "${key}".`);
     }
 
     // Get collectors
@@ -62,6 +62,6 @@ const { collectors } = require('../src/collectors/collectors.ts');
 
     for (const invoice of invoices) {
         // Save data to file
-        fs.writeFileSync(`./media/${name}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
+        fs.writeFileSync(`./media/${key}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
     }
 })();
