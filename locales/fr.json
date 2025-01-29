@@ -21,5 +21,7 @@
     "i18n.collectors.free.identifier.placeholder": "Identifiant du compte (ex: fbx12345670)",
 
 	"i18n.collectors.amazon.description": "Amazon est un site de commerce en ligne.",
-	"i18n.collectors.amazon.identifier.placeholder": "Email ou numéro de téléphone"
+	"i18n.collectors.amazon.identifier.placeholder": "Email ou numéro de téléphone",
+
+	"i18n.collectors.leclerc.description": "Leclerc est une enseigne de grande distribution française."
 }
