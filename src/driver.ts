@@ -13,6 +13,12 @@ export class Driver {
         this.collector = collector;
     }
 
+    // GOTO
+
+    async goto(url) {
+        await this.page.goto(url, {waitUntil: 'networkidle0'});
+    }
+
     // WAIT
 
     async wait_for_element(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
@@ -61,9 +67,19 @@ export class Driver {
         //TODO
     }
 
-    //CHECK
+    // CHECK
 
     async check_element_exist(selector) {
         return (await this.page.$$(selector.selector)).length > 0;
+    }
+
+    // PDF
+
+    async pdf() {
+        return await this.page.pdf({
+            scale: 0.5,
+            format: 'A4',
+            printBackground: true,
+        });
     }
 }

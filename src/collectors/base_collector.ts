@@ -109,15 +109,9 @@ export class ScrapperCollector extends AbstractCollector {
         if (!this.driver) {
             throw new Error('Driver is not initialized.');
         }
-        await this.driver.page.goto(invoice.link, {
-            waitUntil: 'networkidle0',
-        });
+        await this.driver.goto(invoice.link);
 
-        invoice.bytes = await this.driver.page.pdf({
-            scale: 0.5,
-            format: 'A4',
-            printBackground: true,
-        });
+        invoice.bytes = await this.driver.pdf();
         await this.download_bytes(invoice);
     }
 
