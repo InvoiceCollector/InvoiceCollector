@@ -42,7 +42,7 @@ export class Driver {
 
     async get_all_elements(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
         await this.wait_for_element(selector, raise_exception, timeout);
-        return this.page.$$(selector);
+        return await this.page.$$(selector.selector);
     }
 
     async get_all_attributes(selector, attributeName, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
@@ -53,13 +53,17 @@ export class Driver {
     }
 
     async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
-        await this.wait_for_element(selector, raise_exception, timeout);
-        await this.page.click(selector.selector);
+        let element = await this.wait_for_element(selector, raise_exception, timeout);
+        if(element != null) {
+            await element.click();
+        }
     }
 
     async input_text(selector, text, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
-        await this.wait_for_element(selector, raise_exception, timeout);
-        await this.page.type(selector.selector, text);
+        let element = await this.wait_for_element(selector, raise_exception, timeout);
+        if(element != null) {
+            await element.type(text);
+        }
     }
 
     async select_dropdown_menu_option(selector, option, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
