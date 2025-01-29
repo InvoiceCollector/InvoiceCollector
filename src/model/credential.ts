@@ -10,6 +10,7 @@ export class IcCredential {
 
     static ONE_DAY_MS: number = 86400000;
     static ONE_WEEK_MS: number = 604800000;
+    static SIXTY_DAYS_MS: number = 2592000000;
 
     static async fromId(id: string): Promise<IcCredential|null> {    
         // Get customer from bearer
@@ -100,8 +101,19 @@ export class IcCredential {
                     }
                     let avg = sum / (invoices.length - 1);
 
+                    // Compute maximum next collect timestamp to 60 days from now
+                    let max_next_collect_timestamp = this.last_collect_timestamp + IcCredential.SIXTY_DAYS_MS;
+
+                    // Compute theoretical next collect timestamp
+                    let theoretical_next_collect_timestamp = invoices[invoices.length - 1].timestamp + avg;
+
+                    // If theoretical next collect timestamp is before last collect timestamp, plan the next collect in one week
+                    if (theoretical_next_collect_timestamp < this.last_collect_timestamp) {
+                        theoretical_next_collect_timestamp = this.last_collect_timestamp + IcCredential.ONE_WEEK_MS;
+                    }
+
                     // Plan the next collect in the average time between invoices
-                    this.next_collect_timestamp = this.last_collect_timestamp + avg;
+                    this.next_collect_timestamp = Math.min(theoretical_next_collect_timestamp, max_next_collect_timestamp);
                 }
             }
         }
