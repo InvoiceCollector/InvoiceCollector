@@ -180,7 +180,7 @@ export class ScrapperCollector extends AbstractCollector {
         throw new Error('`login` is not implemented.');
     }
 
-    async run(driver, params): Promise<any[]> {
+    async run(driver, params): Promise<any[] | void> {
         throw new Error('`run` is not implemented.');
     }
 
