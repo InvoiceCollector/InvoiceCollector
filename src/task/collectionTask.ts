@@ -134,6 +134,12 @@ export class CollectionTask {
 
             // Log success
             this.registry_server.logSuccess(collector.config.key);
+
+            // Update last collect
+            credential.last_collect_timestamp = Date.now();
+
+            // Compute next collect
+            credential.computeNextCollect();
         }
         catch (err) {
             // If error is not LoggableError nor AuthenticationError nor MaintenanceError
@@ -154,22 +160,28 @@ export class CollectionTask {
                     // Update credential
                     credential.state = State.ERROR;
                     credential.error = err.message;
+
+                    // Update last collect
+                    credential.last_collect_timestamp = Date.now();
+
+                    // Cancel next collect
+                    credential.next_collect_timestamp = Number.NaN;
                 }
             }
             else if (err instanceof MaintenanceError) {
-                // Schedule next collect in 12 hour
-                // TODO : Schedule next collect in 12 hour
+                // If credential exists
+                if (credential) {
+                    // Update last collect
+                    credential.last_collect_timestamp = Date.now();
+
+                    // Schedule next collect in 1 day
+                    credential.next_collect_timestamp = credential.last_collect_timestamp + IcCredential.ONE_DAY_MS;
+                }
             }
         }
         finally {
             // If credential exists
             if (credential) {
-                // Update last collect
-                credential.last_collect_timestamp = Date.now();
-
-                // Compute next collect
-                credential.computeNextCollect();
-
                 // Commit credential
                 await credential.commit();
             }
