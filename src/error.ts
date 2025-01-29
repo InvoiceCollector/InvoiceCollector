@@ -45,7 +45,7 @@ export class CollectorError extends Error {
     }
 }
 
-export class InMaintenanceError extends CollectorError {
+export class MaintenanceError extends CollectorError {
     constructor(collector: string, version: string, opts = {}) {
         super(
             `The website is in maintenance. Wait a moment and try again.`,
@@ -57,7 +57,7 @@ export class InMaintenanceError extends CollectorError {
     }
 }
 
-export class NotAuthenticatedError extends CollectorError {
+export class AuthenticationError extends CollectorError {
     constructor(message: string, collector: string, version: string, opts = {}) {
         super(
             message,

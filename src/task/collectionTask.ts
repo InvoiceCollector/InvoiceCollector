@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CronJob } from 'cron';
 import { IcCredential, State } from '../model/credential';
-import { LoggableError, NotAuthenticatedError, InMaintenanceError } from '../error';
+import { LoggableError, AuthenticationError, MaintenanceError } from '../error';
 import { RegistryServer } from '../log_server';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
 import { collectors } from '../collectors/collectors';
@@ -136,8 +136,8 @@ export class CollectionTask {
             this.registry_server.logSuccess(collector.config.key);
         }
         catch (err) {
-            // If error is not LoggableError nor NotAuthenticatedError nor InMaintenanceError
-            if(!(err instanceof LoggableError) && !(err instanceof NotAuthenticatedError) && !(err instanceof InMaintenanceError)) {
+            // If error is not LoggableError nor AuthenticationError nor MaintenanceError
+            if(!(err instanceof LoggableError) && !(err instanceof AuthenticationError) && !(err instanceof MaintenanceError)) {
                 // Throw error higher
                 throw err;
             }
@@ -148,7 +148,7 @@ export class CollectionTask {
                 // Log error
                 this.registry_server.logError(customer.bearer, err);
             }
-            else if (err instanceof NotAuthenticatedError) {
+            else if (err instanceof AuthenticationError) {
                 // If credential exists
                 if (credential) {
                     // Update credential
@@ -156,7 +156,7 @@ export class CollectionTask {
                     credential.error = err.message;
                 }
             }
-            else if (err instanceof InMaintenanceError) {
+            else if (err instanceof MaintenanceError) {
                 // Schedule next collect in 12 hour
                 // TODO : Schedule next collect in 12 hour
             }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import puppeteer, { LaunchOptions } from 'puppeteer';
 import { Driver } from '../driver';
-import { NotAuthenticatedError, InMaintenanceError, UnfinishedCollector } from '../error';
+import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
 import { Server } from "../server"
 
 export class AbstractCollector {
@@ -143,7 +143,7 @@ export class ScrapperCollector extends AbstractCollector {
         const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
         if (is_in_maintenance) {
             await browser.close()
-            throw new InMaintenanceError(this.config.name, this.config.version);
+            throw new MaintenanceError(this.config.name, this.config.version);
         }
 
         // Login
@@ -152,7 +152,7 @@ export class ScrapperCollector extends AbstractCollector {
         // Check if not authenticated
         if (login_error) {
             await browser.close()
-            throw new NotAuthenticatedError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
+            throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
         }
 
         // Collect invoices
