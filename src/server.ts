@@ -219,12 +219,17 @@ export class Server {
             throw new MissingField("params");
         }
 
-        // Check if collector exists
-        this.get_collector(key);
+        // Get collector from key
+        const collector = this.get_collector(key);
 
         // Get credential note
-        const note = params.note;
+        let note = params.note;
         delete params.note;
+
+        // If no note, set it to collector description
+        if(!note) {
+            note = Server.i18n.__({ phrase: collector.CONFIG.description, locale: user.locale });
+        }
 
         // Add credential to Secure Storage
         const secret = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${key}`, params);
