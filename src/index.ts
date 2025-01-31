@@ -160,7 +160,6 @@ function handle_error(e, res){
     else {
         console.error(e);
         status_code = 500;
-        console.log(process.env.DEBUG)
         if (process.env.DEBUG === 'true') {
             reason = e.message;
         }
