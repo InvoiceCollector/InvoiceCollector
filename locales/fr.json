@@ -6,10 +6,13 @@
     
 	"i18n.collectors.all.username": "Utilisateur",
 	"i18n.collectors.all.username.placeholder": "Utilisateur du compte",
+	"i18n.collectors.all.username.error": "Utilisateur incorrect",
 	"i18n.collectors.all.identifier": "Identifiant",
 	"i18n.collectors.all.identifier.placeholder": "Identifiant du compte",
+	"i18n.collectors.all.identifier.error": "Identifiant incorrect",
 	"i18n.collectors.all.email": "Email",
 	"i18n.collectors.all.email.placeholder": "Email du compte",
+	"i18n.collectors.all.email.error": "Email incorrect",
 	"i18n.collectors.all.password": "Mot de passe",
 	"i18n.collectors.all.password.placeholder": "Mot de passe du compte",
 	"i18n.collectors.all.password.error": "Mot de passe incorrect",
