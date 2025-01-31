@@ -1,4 +1,4 @@
-import { ScrapperCollector } from '../base_collector';
+import { ScrapperCollector } from '../scrapperCollector';
 import { LeroyMerlinSelectors } from './selectors';
 import { Driver } from '../../driver';
 import { delay } from '../../utils';

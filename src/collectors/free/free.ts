@@ -1,4 +1,4 @@
-import { ScrapperCollector } from '../base_collector';
+import { ScrapperCollector } from '../scrapperCollector';
 import { FreeSelectors } from './selectors';
 
 export class FreeCollector extends ScrapperCollector {
@@ -45,7 +45,7 @@ export class FreeCollector extends ScrapperCollector {
         await driver.left_click(FreeSelectors.BUTTON_INVOICES);
 
         //Get invoices
-        const links = await driver.get_all_attributes(FreeSelectors.BUTTON_DOWNLOAD, "href");
+        const links = await driver.get_all_attributes(FreeSelectors.BUTTON_DOWNLOAD, "href", false, 5000000);
 
         //Build return array
         return links.map(link => {

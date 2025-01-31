@@ -1,6 +1,5 @@
-import { ScrapperCollector } from '../base_collector';
+import { ScrapperCollector } from '../scrapperCollector';
 import { LeclercSelectors } from './selectors';
-import { delay } from '../../utils';
 
 export class LeclercCollector extends ScrapperCollector {
 

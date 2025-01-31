@@ -1,4 +1,4 @@
-import { ScrapperCollector } from '../base_collector';
+import { ScrapperCollector } from '../scrapperCollector';
 import { AmazonSelectors } from './selectors';
 
 export class FreeCollector extends ScrapperCollector {
