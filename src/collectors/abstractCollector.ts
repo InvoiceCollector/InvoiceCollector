@@ -7,8 +7,7 @@ export class AbstractCollector {
     constructor(config) {
         this.config = config;
         this.downloadMethods = {
-            "link": this.download_direct_link,
-            "bytes": this.download_bytes,
+            "link": this.download_direct_link
         };
     }
 
@@ -28,12 +27,6 @@ export class AbstractCollector {
             responseType: 'arraybuffer',
         });
         invoice.data = response.data.toString("base64");
-        invoice.type = "base64";
-    }
-
-    async download_bytes(invoice): Promise<void> {
-        invoice.data = btoa(String.fromCharCode.apply(null, invoice.bytes));
-        delete invoice.bytes;
         invoice.type = "base64";
     }
 

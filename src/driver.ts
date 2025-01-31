@@ -107,11 +107,12 @@ export class Driver {
 
     // PDF
 
-    async pdf() {
-        return await this.page.pdf({
-            scale: 0.5,
+    async pdf(): Promise<string> {
+        const bytes = await this.page.pdf({
+            scale: 1,
             format: 'A4',
             printBackground: true,
         });
+        return Buffer.from(bytes).toString('base64');
     }
 }

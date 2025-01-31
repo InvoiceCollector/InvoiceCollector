@@ -36,9 +36,8 @@ export class ScrapperCollector extends AbstractCollector {
             throw new Error('Driver is not initialized.');
         }
         await this.driver.goto(invoice.link);
-
-        invoice.bytes = await this.driver.pdf();
-        await this.download_bytes(invoice);
+        invoice.data = await this.driver.pdf();
+        invoice.type = "base64";
     }
 
     async download_from_file(invoice): Promise<void> {
