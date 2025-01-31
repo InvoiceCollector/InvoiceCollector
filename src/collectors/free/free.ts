@@ -1,5 +1,6 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { FreeSelectors } from './selectors';
+import { Driver } from '../../driver';
 
 export class FreeCollector extends ScrapperCollector {
 
@@ -28,7 +29,7 @@ export class FreeCollector extends ScrapperCollector {
         super(FreeCollector.CONFIG);
     }
 
-    async login(driver, params){
+    async login(driver: Driver, params: any): Promise<string | void> {
         await driver.input_text(FreeSelectors.FIELD_USERNAME, params.username);
         await driver.input_text(FreeSelectors.FIELD_PASSWORD, params.password);
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
@@ -36,16 +37,16 @@ export class FreeCollector extends ScrapperCollector {
         // Check if login alert exists
         const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000)
         if (login_alert) {
-            return await login_alert.evaluate(el => el.textContent)
+            return await login_alert.evaluate(el => el.textContent || "i18n.collectors.all.identifier.error");
         }
     }
 
-    async run(driver, params) {
+    async run(driver: Driver, params: any): Promise<any[]> {
         //Go to invoices
         await driver.left_click(FreeSelectors.BUTTON_INVOICES);
 
         //Get invoices
-        const links = await driver.get_all_attributes(FreeSelectors.BUTTON_DOWNLOAD, "href", false, 5000000);
+        const links = await driver.get_all_attributes(FreeSelectors.BUTTON_DOWNLOAD, "href", false, 5000);
 
         //Build return array
         return links.map(link => {
