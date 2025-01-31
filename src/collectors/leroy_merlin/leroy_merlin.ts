@@ -79,6 +79,6 @@ export class LeroyMerlinCollector extends ScrapperCollector {
 
         await this.driver?.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
         await delay(5000);
-        invoice.type = "downloaded";
+        await this.download_from_file(invoice);
     }
 }
