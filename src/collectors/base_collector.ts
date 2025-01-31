@@ -1,8 +1,10 @@
 import axios from 'axios';
-import puppeteer, { LaunchOptions } from 'puppeteer';
+import { ConnectResult, connect } from 'puppeteer-real-browser';
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
 import { Server } from "../server"
+import fs from 'fs';
+import path from 'path';
 
 export class AbstractCollector {
     config: any;
@@ -82,11 +84,11 @@ export class AbstractCollector {
 
 export class ScrapperCollector extends AbstractCollector {
     
-    PUPPETEER_CONFIG: LaunchOptions = {
+    DOWNLOAD_PATH = path.resolve(__dirname, '../../media/download');
+    PUPPETEER_CONFIG = {
         headless: true,
         args:[
             '--start-maximized', // you can also use '--start-fullscreen'
-            '--no-sandbox',
         ]
     };
 
@@ -115,6 +117,21 @@ export class ScrapperCollector extends AbstractCollector {
         await this.download_bytes(invoice);
     }
 
+    async download_from_file(invoice): Promise<void> {
+        const files = fs.readdirSync(this.DOWNLOAD_PATH);
+        if (files.length === 0) {
+            throw new Error('No files found in the download path.');
+        }
+        const filePath = path.join(this.DOWNLOAD_PATH, files[0]);
+        invoice.data = fs.readFileSync(filePath, {encoding: 'base64'});
+        invoice.type = "base64";
+
+        //Delete all file in the download path
+        for (const file of files) {
+            fs.unlinkSync(path.join(this.DOWNLOAD_PATH, file));
+        }
+    }
+
     async collect(params, locale): Promise<any[]> {
         if(!params.username) {
             throw new Error('Field "username" is missing.');
@@ -123,13 +140,16 @@ export class ScrapperCollector extends AbstractCollector {
             throw new Error('Field "password" is missing.');
         }
 
-        // Start browser
-        let browser = await puppeteer.launch(this.PUPPETEER_CONFIG);
-
-        // Open new page
-        let page = await browser.newPage();
+        // Start browser and page
+        let { browser, page }: ConnectResult = await connect(this.PUPPETEER_CONFIG);
         await page.setViewport(this.PAGE_CONFIG);
         await page.goto(this.config.entry_url);
+
+        const client = await page.createCDPSession();
+        await client.send("Page.setDownloadBehavior", {
+            behavior: "allow",
+            downloadPath: this.DOWNLOAD_PATH,
+          });
 
         this.driver = new Driver(page, this);
 
@@ -170,11 +190,11 @@ export class ScrapperCollector extends AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async login(driver, params): Promise<string | null>{
+    async login(driver: Driver, params): Promise<string | void>{
         throw new Error('`login` is not implemented.');
     }
 
-    async run(driver, params): Promise<any[] | void> {
+    async run(driver: Driver, params): Promise<any[] | void> {
         throw new Error('`run` is not implemented.');
     }
 

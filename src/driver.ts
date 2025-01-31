@@ -1,11 +1,11 @@
-import { Page } from 'puppeteer';
+import { PageWithCursor } from 'puppeteer-real-browser';
 import { ElementNotFoundError } from './error';
 
 export class Driver {
 
     static DEFAULT_TIMEOUT = 10000;
 
-    page: Page;
+    page: PageWithCursor;
     collector;
 
     constructor(page, collector) {
@@ -15,8 +15,36 @@ export class Driver {
 
     // GOTO
 
-    async goto(url) {
-        await this.page.goto(url, {waitUntil: 'networkidle0'});
+    async goto(url, network_request: string = ""): Promise<any> {
+        // If must wait for a specific network request
+        if(network_request) {
+            await this.page.setRequestInterception(true);
+            const urlPromise = new Promise<any>((resolve) => {
+                this.page.on('request', request => {
+                    request.continue();
+                });
+
+                this.page.on('response', async (response) => {
+                    if (response.url().includes(network_request) && response.status() === 200) {
+                        const json = await response.json();
+                        resolve(json);
+                    }
+                });
+            });
+
+            // Navigate to the page
+            await this.page.goto(url, {waitUntil: 'networkidle0'});
+
+            // Wait for the network request
+            const response = await urlPromise;
+
+            // Return the response
+            return response;
+        }
+        else {
+            // Navigate to the page
+            await this.page.goto(url, {waitUntil: 'networkidle0'});
+        }
     }
 
     // WAIT
