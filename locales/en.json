@@ -26,5 +26,7 @@
 	"i18n.collectors.amazon.description": "Amazon is an online marketplace.",
 	"i18n.collectors.amazon.identifier.placeholder": "Email of phone number",
 
-	"i18n.collectors.leclerc.description": "Leclerc is a French retail company."
+	"i18n.collectors.leclerc.description": "Leclerc is a French retail company.",
+
+	"i18n.collectors.leroy_merlin.description": "Leroy Merlin is a French DIY store."
 }

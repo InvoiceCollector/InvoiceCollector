@@ -26,5 +26,7 @@
 	"i18n.collectors.amazon.description": "Amazon est un site de commerce en ligne.",
 	"i18n.collectors.amazon.identifier.placeholder": "Email ou numéro de téléphone",
 
-	"i18n.collectors.leclerc.description": "Leclerc est une enseigne de grande distribution française."
+	"i18n.collectors.leclerc.description": "Leclerc est une enseigne de grande distribution française.",
+
+	"i18n.collectors.leroy_merlin.description": "Leroy Merlin est une enseigne de bricolage française."
 }
