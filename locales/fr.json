@@ -28,5 +28,7 @@
 
 	"i18n.collectors.leclerc.description": "Leclerc est une enseigne de grande distribution française.",
 
-	"i18n.collectors.leroy_merlin.description": "Leroy Merlin est une enseigne de bricolage française."
+	"i18n.collectors.leroy_merlin.description": "Leroy Merlin est une enseigne de bricolage française.",
+
+	"i18n.collectors.intermarche.description": "Intermarché est une enseigne de grande distribution française."
 }

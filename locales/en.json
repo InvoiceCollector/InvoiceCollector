@@ -28,5 +28,7 @@
 
 	"i18n.collectors.leclerc.description": "Leclerc is a French retail company.",
 
-	"i18n.collectors.leroy_merlin.description": "Leroy Merlin is a French DIY store."
+	"i18n.collectors.leroy_merlin.description": "Leroy Merlin is a French DIY store.",
+
+	"i18n.collectors.intermarche.description": "Intermarché is a French retail company."
 }
