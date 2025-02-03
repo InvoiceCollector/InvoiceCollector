@@ -22,8 +22,8 @@ export const AmazonSelectors = {
         info: "login alert container"
     },
     CONTAINER_CAPTCHA: {
-        selector: "img[alt='captcha']",
-        info: "captcha image container"
+        selector: "img[alt='captcha'], #captcha-container",
+        info: "captcha container"
     },
 
     //INVOICES PAGE
