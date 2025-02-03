@@ -183,7 +183,10 @@ export class Driver {
         let element = await this.wait_for_element(selector, raise_exception, timeout);
         if(element != null) {
             await element.click();
-            await this.page.waitForNavigation();
+            try {
+                await this.page.waitForNavigation({timeout});
+            }
+            catch {}
         }
     }
 
