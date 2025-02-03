@@ -142,19 +142,22 @@ export class CollectionTask {
             credential.computeNextCollect();
         }
         catch (err) {
-            // If error is not LoggableError nor AuthenticationError nor MaintenanceError
-            if(!(err instanceof LoggableError) && !(err instanceof AuthenticationError) && !(err instanceof MaintenanceError)) {
-                // Throw error higher
-                throw err;
-            }
-            console.warn(`Invoice collection for credential ${credential_id} has failed: ${err.message}`);
-
             // If error is LoggableError
             if(err instanceof LoggableError) {
-                // Log error
+                console.warn(`Invoice collection for credential ${credential_id} has failed: ${err.message}`);
                 this.registry_server.logError(customer.bearer, err);
+
+                // If credential exists
+                if (credential) {
+                    // Update last collect
+                    credential.last_collect_timestamp = Date.now();
+
+                    // Schedule next collect in 1 week
+                    credential.next_collect_timestamp = credential.last_collect_timestamp + IcCredential.ONE_WEEK_MS;
+                }
             }
             else if (err instanceof AuthenticationError) {
+                console.warn(`Invoice collection for credential ${credential_id} has failed: ${err.message}`);
                 // If credential exists
                 if (credential) {
                     // Update credential
@@ -169,6 +172,7 @@ export class CollectionTask {
                 }
             }
             else if (err instanceof MaintenanceError) {
+                console.warn(`Invoice collection for credential ${credential_id} has failed: ${err.message}`);
                 // If credential exists
                 if (credential) {
                     // Update last collect
@@ -177,6 +181,9 @@ export class CollectionTask {
                     // Schedule next collect in 1 day
                     credential.next_collect_timestamp = credential.last_collect_timestamp + IcCredential.ONE_DAY_MS;
                 }
+            }
+            else {
+                console.error(err);
             }
         }
         finally {
