@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { ConnectResult, connect } from 'puppeteer-real-browser';
 import { AbstractCollector } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
@@ -8,32 +7,12 @@ import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 
 export class ScrapperCollector extends AbstractCollector {
-    
-    DOWNLOAD_PATH = path.resolve(__dirname, '../../media/download');
-    PUPPETEER_CONFIG = {
-        args: ["--start-maximized"],
-        turnstile: true,
-        headless: false,
-        // disableXvfb: true,
-        customConfig: {},
-        connectOption: {
-            defaultViewport: null
-        },
-        plugins: []
-    };
-
-    PAGE_CONFIG = {
-        width: 1920,
-        height: 1080,
-    };
 
     driver: Driver | null;
-    authentication_error: string | null;
 
     constructor(config) {
         super(config);
         this.driver = null;
-        this.authentication_error = null;
         this.downloadMethods['webpage'] = this.download_webpage;
     }
 
@@ -47,17 +26,17 @@ export class ScrapperCollector extends AbstractCollector {
     }
 
     async download_from_file(invoice): Promise<void> {
-        const files = fs.readdirSync(this.DOWNLOAD_PATH);
+        const files = fs.readdirSync(Driver.DOWNLOAD_PATH);
         if (files.length === 0) {
             throw new Error('No files found in the download path.');
         }
-        const filePath = path.join(this.DOWNLOAD_PATH, files[0]);
+        const filePath = path.join(Driver.DOWNLOAD_PATH, files[0]);
         invoice.data = fs.readFileSync(filePath, {encoding: 'base64'});
         invoice.type = "base64";
 
         //Delete all file in the download path
         for (const file of files) {
-            fs.unlinkSync(path.join(this.DOWNLOAD_PATH, file));
+            fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
         }
     }
 
@@ -69,32 +48,21 @@ export class ScrapperCollector extends AbstractCollector {
             throw new Error('Field "password" is missing.');
         }
 
-        // If location is provided
-        if(location) {
-            // Get proxy
-            const proxy = await ProxyFactory.getProxy().get(location) || "";
+        // Get proxy
+        const proxy = await ProxyFactory.getProxy().get(location);
 
-            // Set proxy
-            this.PUPPETEER_CONFIG.args.push(`--proxy-server=http=${proxy}`);
-        }
 
         // Start browser and page
-        let { browser, page }: ConnectResult = await connect(this.PUPPETEER_CONFIG);
-        await page.setViewport(this.PAGE_CONFIG);
-        await page.goto(this.config.entry_url);
+        this.driver = new Driver(this);
+        await this.driver.open(proxy);
 
-        const client = await page.createCDPSession();
-        await client.send("Page.setDownloadBehavior", {
-            behavior: "allow",
-            downloadPath: this.DOWNLOAD_PATH,
-          });
-
-        this.driver = new Driver(page, this);
+        // Open entry url
+        await this.driver.goto(this.config.entry_url);
 
         // Check if website is in maintenance
         const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
         if (is_in_maintenance) {
-            await browser.close()
+            await this.driver.close()
             throw new MaintenanceError(this.config.name, this.config.version);
         }
 
@@ -103,27 +71,28 @@ export class ScrapperCollector extends AbstractCollector {
 
         // Check if not authenticated
         if (login_error) {
-            await browser.close()
+            await this.driver.close()
             throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
         }
 
         // Collect invoices
         const invoices = await this.run(this.driver, params)
         if (invoices === undefined) {
-            const url = await page.url();
-            const source_code = await page.content();
-            const source_code_base64 = Buffer.from(source_code).toString('base64')
-            const screenshot = await page.screenshot({encoding: 'base64'});
-            await browser.close()
-            throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code_base64, screenshot);
+            const url = this.driver.url();
+            const source_code = await this.driver.sourceCode();
+            const screenshot = await this.driver.screenshot();
+            await this.driver.close()
+            throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code, screenshot);
         }
 
         return invoices;
     }
 
     async close() {
-        // Close the browser
-        await this.driver?.page.browser().close();
+        if (this.driver != null) {
+            // Close the browser
+            await this.driver.close();
+        }
     }
 
     //NOT IMPLEMENTED
@@ -139,11 +108,5 @@ export class ScrapperCollector extends AbstractCollector {
     async is_in_maintenance(driver, params): Promise<boolean>{
         //Assume the website is not in maintenance
         return false;
-    }
-}
-
-export class ApiCollector extends AbstractCollector {
-    constructor(config) {
-        super(config);
     }
 }
