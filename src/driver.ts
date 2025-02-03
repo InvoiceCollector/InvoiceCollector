@@ -161,9 +161,13 @@ export class Driver {
     }
 
     async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+        if (this.page === null) {
+            throw new Error('Page is not initialized.');
+        }
         let element = await this.wait_for_element(selector, raise_exception, timeout);
         if(element != null) {
             await element.click();
+            await this.page.waitForNavigation();
         }
     }
 
