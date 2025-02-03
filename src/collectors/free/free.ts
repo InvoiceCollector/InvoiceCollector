@@ -33,9 +33,10 @@ export class FreeCollector extends ScrapperCollector {
         await driver.input_text(FreeSelectors.FIELD_USERNAME, params.username);
         await driver.input_text(FreeSelectors.FIELD_PASSWORD, params.password);
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
+        await driver.page?.setViewport(Driver.PAGE_CONFIG); // Workaround to puppeteer/puppeteer#6389
 
         // Check if login alert exists
-        const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000000)
+        const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000)
         if (login_alert) {
             return await login_alert.evaluate(el => el.textContent || "i18n.collectors.all.identifier.error");
         }
