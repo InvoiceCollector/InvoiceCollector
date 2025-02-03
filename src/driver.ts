@@ -62,7 +62,23 @@ export class Driver {
         await client.send("Page.setDownloadBehavior", {
             behavior: "allow",
             downloadPath: Driver.DOWNLOAD_PATH,
-          });
+        });
+
+        // Block images if not in debug
+        if (process.env.ENV != "debug") {
+            await this.page.setRequestInterception(true);
+            this.page.on("request", (request) => {
+                if (request.isInterceptResolutionHandled()) {
+                return;
+                }
+            
+                if (request.resourceType() === "image") {
+                request.abort();
+                } else {
+                request.continue();
+                }
+            });
+        }
     }
 
     async close() {
