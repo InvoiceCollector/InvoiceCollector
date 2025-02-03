@@ -19,6 +19,7 @@ services:
       - SECRET_MANAGER_BITWARDEN_ACCESS_TOKEN=
       - SECRET_MANAGER_BITWARDEN_ORGANIZATION_ID=
       - SECRET_MANAGER_BITWARDEN_PROJECT_ID=
+      - ENV=prod
     command: npm run start
 
   mongodb:
