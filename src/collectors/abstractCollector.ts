@@ -30,8 +30,8 @@ export class AbstractCollector {
         invoice.type = "base64";
     }
 
-    async collect_new_invoices(params, download, previousInvoices, locale): Promise<any[]> {
-            const invoices = await this.collect(params, locale);
+    async collect_new_invoices(params, download, previousInvoices, locale, location): Promise<any[]> {
+            const invoices = await this.collect(params, locale, location);
 
             // Get new invoices
             const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
@@ -60,7 +60,7 @@ export class AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async collect(params, locale): Promise<any[]> {
+    async collect(params, locale, location): Promise<any[]> {
         throw new Error('`collect` is not implemented.');
     }
 

@@ -1,19 +1,25 @@
+import fs from 'fs';
+import path from 'path';
 import { ConnectResult, connect } from 'puppeteer-real-browser';
 import { AbstractCollector } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
 import { Server } from "../server"
-import fs from 'fs';
-import path from 'path';
+import { ProxyFactory } from '../proxy/proxyFactory';
 
 export class ScrapperCollector extends AbstractCollector {
     
     DOWNLOAD_PATH = path.resolve(__dirname, '../../media/download');
     PUPPETEER_CONFIG = {
-        headless: true,
-        args:[
-            '--start-maximized', // you can also use '--start-fullscreen'
-        ]
+        args: ["--start-maximized"],
+        turnstile: true,
+        headless: false,
+        // disableXvfb: true,
+        customConfig: {},
+        connectOption: {
+            defaultViewport: null
+        },
+        plugins: []
     };
 
     PAGE_CONFIG = {
@@ -55,12 +61,21 @@ export class ScrapperCollector extends AbstractCollector {
         }
     }
 
-    async collect(params, locale): Promise<any[]> {
+    async collect(params, locale, location): Promise<any[]> {
         if(!params.username) {
             throw new Error('Field "username" is missing.');
         }
         if(!params.password) {
             throw new Error('Field "password" is missing.');
+        }
+
+        // If location is provided
+        if(location) {
+            // Get proxy
+            const proxy = await ProxyFactory.getProxy().get(location) || "";
+
+            // Set proxy
+            this.PUPPETEER_CONFIG.args.push(`--proxy-server=http=${proxy}`);
         }
 
         // Start browser and page

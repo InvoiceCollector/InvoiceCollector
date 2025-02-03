@@ -35,7 +35,7 @@ export class FreeCollector extends ScrapperCollector {
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
 
         // Check if login alert exists
-        const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000)
+        const login_alert = await driver.wait_for_element(FreeSelectors.CONTAINER_LOGIN_ALERT, false, 2000000)
         if (login_alert) {
             return await login_alert.evaluate(el => el.textContent || "i18n.collectors.all.identifier.error");
         }

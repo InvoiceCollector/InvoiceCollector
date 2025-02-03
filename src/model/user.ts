@@ -5,12 +5,14 @@ export class User {
     id: string;
     customer_id: string;
     remote_id: string;
+    location: string | null;
     locale: string;
 
-    constructor(customer_id, remote_id, locale = "") {
+    constructor(customer_id, remote_id, location = null, locale = "") {
         this.id = "";
         this.customer_id = customer_id;
         this.remote_id = remote_id;
+        this.location = location;
         this.locale = locale;
     }
 

@@ -10,6 +10,7 @@ import { Customer } from './model/customer';
 import { IcCredential } from './model/credential';
 import { CollectionTask } from './task/collectionTask';
 import { I18n } from 'i18n';
+import { ProxyFactory } from './proxy/proxyFactory';
 
 export class Server {
 
@@ -71,7 +72,7 @@ export class Server {
 
         // If user does not exist, create it
         if(!user) {
-            user = new User(customer.id, remote_id, locale);
+            user = new User(customer.id, remote_id, null, locale);
             // Create user in database
             user.commit();
         }
@@ -205,7 +206,7 @@ export class Server {
         });
     }
 
-    async post_credential(token, key, params) {
+    async post_credential(token, key, params, ip) {
         // Get user from token
          const user = this.get_token_mapping(token);
 
@@ -229,6 +230,19 @@ export class Server {
         // If no note, set it to collector description
         if(!note) {
             note = Server.i18n.__({ phrase: collector.CONFIG.description, locale: user.locale });
+        }
+
+        if (user.location === null) {
+            console.log(`User location not found, trying to locate it`);
+
+            // Update user with location
+            user.location = await ProxyFactory.getProxy().locate(ip);
+            console.log(`User location: ${user.location}`);
+
+            if (user.location != null) {
+                // Commit user
+                await user.commit();
+            }
         }
 
         // Add credential to Secure Storage

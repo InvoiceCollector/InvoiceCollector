@@ -106,7 +106,8 @@ app.post('/api/v1/credential', async (req, res) => {
     try {
         // Save credential
         console.log(`POST credential`);
-        await server.post_credential(req.query.token, req.body.key, req.body.params);
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        await server.post_credential(req.query.token, req.body.key, req.body.params, ip);
 
         // Build response
         res.end()
