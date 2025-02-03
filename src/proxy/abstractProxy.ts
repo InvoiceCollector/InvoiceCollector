@@ -1,6 +1,13 @@
+export type Proxy = {
+    uri: string,
+    host: string,
+    port: number,
+    username?: string,
+    password?: string
+}
 
 export class AbstractProxy<L> {
-    async get(location: L): Promise<string | null> {
+    async get(location: L): Promise<Proxy | null> {
         throw new Error("Method 'get()' must be implemented.");
     }
 

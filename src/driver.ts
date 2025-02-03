@@ -2,6 +2,7 @@ import path from 'path';
 import { PageWithCursor, connect } from 'puppeteer-real-browser';
 import { Browser } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
+import { Proxy } from './proxy/abstractProxy';
 
 export class Driver {
 
@@ -35,14 +36,14 @@ export class Driver {
         this.page = null;
     }
 
-    async open(proxy: string | null = null) {
+    async open(proxy: Proxy | null = null) {
         // Clone config static object
-        const puppeteerConfig = { ...Driver.PUPPETEER_CONFIG };
+        let puppeteerConfig = { ...Driver.PUPPETEER_CONFIG };
         // If proxy is provided
         if (proxy != null) {            
             // Set proxy
-            puppeteerConfig.args.push(`--proxy-server=http=${proxy}`);
-            console.log(`Using proxy: ${proxy}`);
+            puppeteerConfig["proxy"] = proxy;
+            console.log(`Using proxy: ${proxy.host}`);
         }
         else {
             console.log(`Do not use proxy`);

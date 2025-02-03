@@ -1,4 +1,4 @@
-import { AbstractProxy } from "./abstractProxy";
+import { AbstractProxy, Proxy } from "./abstractProxy";
 
 type Location = {
     country: string;
@@ -26,8 +26,14 @@ export class OxylabProxy extends AbstractProxy<Location> {
         this.password = process.env.PROXY_OXYLAB_PASSWORD || "";
     }
 
-    async get(location: Location): Promise<string | null> {
-        return `http://customer-${this.username}-cc-${location.country}:${this.password}@pr.oxylabs.io:7777`;
+    async get(location: Location): Promise<Proxy | null> {
+        return {
+            uri: `http://customer-${this.username}-cc-${location.country}:${this.password}@pr.oxylabs.io:7777`,
+            host: "pr.oxylabs.io",
+            port: 7777,
+            username: `customer-${this.username}-cc-${location.country}`,
+            password: this.password
+        };
     }
 
     async locate(ip: string): Promise<Location | null> {

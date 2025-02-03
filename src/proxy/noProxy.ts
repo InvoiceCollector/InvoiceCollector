@@ -1,7 +1,7 @@
-import { AbstractProxy } from "./abstractProxy";
+import { AbstractProxy, Proxy } from "./abstractProxy";
 
 export class NoProxy extends AbstractProxy<any> {
-    async get(location: any): Promise<string | null> {
+    async get(location: any): Promise<Proxy | null> {
         return null;
     }
 
