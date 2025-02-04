@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { AbstractCollector } from "./abstractCollector";
+import { AbstractCollector, Config } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
 import { Server } from "../server"
@@ -10,7 +10,7 @@ export class ScrapperCollector extends AbstractCollector {
 
     driver: Driver | null;
 
-    constructor(config) {
+    constructor(config: Config) {
         super(config);
         this.driver = null;
         this.downloadMethods['webpage'] = this.download_webpage;
@@ -41,16 +41,15 @@ export class ScrapperCollector extends AbstractCollector {
     }
 
     async collect(params, locale, location): Promise<any[]> {
-        if(!params.username) {
-            throw new Error('Field "username" is missing.');
-        }
-        if(!params.password) {
-            throw new Error('Field "password" is missing.');
+        // Check if a mandatory field is missing
+        for (const [key, value] of Object.entries(this.config.params)) {
+            if (value.mandatory && !params[key]) {
+                throw new Error(`Field "${key}" is missing.`);
+            }
         }
 
         // Get proxy
         const proxy = await ProxyFactory.getProxy().get(location);
-
 
         // Start browser and page
         this.driver = new Driver(this);

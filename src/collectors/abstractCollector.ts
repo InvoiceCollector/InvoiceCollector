@@ -1,10 +1,26 @@
 import axios from 'axios';
 
+export type Config = {
+    name: string,
+    description: string,
+    version: string,
+    website: string,
+    logo: string,
+    params: {
+        [key: string]: {
+            name: string,
+            placeholder: string,
+            mandatory: boolean
+        }
+    },
+    entry_url?: string,
+}
+
 export class AbstractCollector {
-    config: any;
+    config: Config;
     downloadMethods: { [key: string]: (invoice: any) => Promise<void> };
 
-    constructor(config) {
+    constructor(config: Config) {
         this.config = config;
         this.downloadMethods = {
             "link": this.download_direct_link
