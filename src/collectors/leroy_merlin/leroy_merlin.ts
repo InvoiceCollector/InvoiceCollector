@@ -10,7 +10,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         description: "i18n.collectors.leroy_merlin.description",
         version: "1",
         website: "https://www.leroymerlin.fr",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Leroy_Merlin.svg/1200px-Leroy_Merlin.svg.png",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Leroy_Merlin.svg",
         params: {
             id: {
                 name: "i18n.collectors.all.email",

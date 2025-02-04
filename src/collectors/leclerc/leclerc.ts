@@ -8,7 +8,7 @@ export class LeclercCollector extends ScrapperCollector {
         description: "i18n.collectors.leclerc.description",
         version: "1",
         website: "https://www.e.leclerc/",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Logo_E.Leclerc_Sans_le_texte.svg/900px-Logo_E.Leclerc_Sans_le_texte.svg.png",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Logo_E.Leclerc_Sans_le_texte.svg",
         params: {
             id: {
                 name: "i18n.collectors.all.email",

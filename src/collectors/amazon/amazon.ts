@@ -8,7 +8,7 @@ export class FreeCollector extends ScrapperCollector {
         description: "i18n.collectors.amazon.description",
         version: "1",
         website: "https://www.amazon.fr",
-        logo: "https://cdn.iconscout.com/icon/free/png-256/free-amazon-43-432492.png",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
         params: {
             id: {
                 type: "string",

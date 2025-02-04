@@ -9,7 +9,7 @@ export class IntermarcheCollector extends ScrapperCollector {
         description: "i18n.collectors.intermarche.description",
         version: "1",
         website: "https://www.intermarche.com",
-        logo: "https://static.apidae-tourisme.com/filestore/objets-touristiques/logos/96/228/14607456/Apidae%20pour%20Philippa%2079.jpg",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Intermarch%C3%A9_logo_2009_classic.svg",
         params: {
             id: {
                 name: "i18n.collectors.all.email",

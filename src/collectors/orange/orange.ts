@@ -9,7 +9,7 @@ export class OrangeCollector extends ScrapperCollector {
         description: "i18n.collectors.orange.description",
         version: "1",
         website: "https://www.orange.fr",
-        logo: "https://cydroit.cyu.fr/medias/photo/logo-orange_1655976053064-jpg",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg",
         params: {
             id: {
                 name: "i18n.collectors.all.email_or_number",
