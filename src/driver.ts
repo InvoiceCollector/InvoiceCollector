@@ -3,10 +3,12 @@ import { PageWithCursor, connect } from 'puppeteer-real-browser';
 import { Browser } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
+import { delay } from './utils';
 
 export class Driver {
 
     static DEFAULT_TIMEOUT = 10000;
+    static DEFAULT_POLLING = 1000;
 
     static DOWNLOAD_PATH = path.resolve(__dirname, '../media/download');
     static PUPPETEER_CONFIG = {
@@ -136,6 +138,28 @@ export class Driver {
 
     // WAIT
 
+    async waitFor(
+        check_condition: Function,
+        error_message: string,
+        raise_exception: boolean = true,
+        timeout: number = Driver.DEFAULT_TIMEOUT,
+        polling: number = Driver.DEFAULT_POLLING
+    ): Promise<any> {
+        let startDate = Date.now()
+        while ((Date.now() - startDate) < timeout) {
+            const result = await check_condition(this)
+            if (result != null) {
+                return result;
+            }
+            await delay(polling);
+        }
+
+        if (raise_exception) {
+            throw new Error(error_message);
+        }
+        return null;
+    }
+
     async wait_for_element(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
         if (this.page === null) {
             throw new Error('Page is not initialized.');
@@ -242,5 +266,18 @@ export class Driver {
             throw new Error('Page is not initialized.');
         }
         return await this.page.screenshot({encoding: 'base64'});
+    }
+
+    // CAPTCHAS
+
+    async waitForCloudflareTurnstile(): Promise<void> {
+        if (this.page === null) {
+            throw new Error('Page is not initialized.');
+        }
+        await this.waitFor(async (driver) => {
+            const token = await driver.page.$eval("input[name='cf-turnstile-response']", (element, attr) => element[attr], "value");
+            return token && token.length > 20000 ? token : null;
+        },
+        "Cloudflare turnstile captcha did not succeed");
     }
 }
