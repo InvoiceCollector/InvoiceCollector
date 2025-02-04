@@ -1,27 +1,35 @@
 # Use the official node image as the base image
 FROM node:22-slim
 
-# Set the working directory in the container
-WORKDIR /usr/app
+# Install necessary dependencies for running Chrome
+RUN apt-get update && apt-get install -y \
+    gnupg \
+    ca-certificates \
+    apt-transport-https \
+    chromium \
+    chromium-driver \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy necessary files and folder to the working directory
-COPY package*.json .
+ENV CHROME_BIN=/usr/bin/chromium
+
+# Set the working directory in the container
+WORKDIR /usr/app/
+
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install Node.js dependencies
+RUN npm update
+RUN npm install
+
+# Copy the rest of the application code
 COPY tsconfig.json ./tsconfig.json
 COPY src/ ./src/
 COPY views/ ./views/
 COPY test/ ./test/
 COPY locales/ ./locales/
 RUN mkdir media/ log/
-
-# Set puppeteer env variables
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium
-
-# Install dependencies
-RUN npm install
-
-# Install Chromium manually
-RUN apt-get update && apt-get install -y chromium
 
 # Expose the port your app runs on
 EXPOSE 8080
