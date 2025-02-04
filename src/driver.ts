@@ -276,7 +276,7 @@ export class Driver {
         }
         await this.waitFor(async (driver) => {
             const token = await driver.page.$eval("input[name='cf-turnstile-response']", (element, attr) => element[attr], "value");
-            return token && token.length > 20000 ? token : null;
+            return token && token.length > 20 ? token : null;
         },
         "Cloudflare turnstile captcha did not succeed");
     }
