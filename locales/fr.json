@@ -13,6 +13,12 @@
 	"i18n.collectors.all.email": "Email",
 	"i18n.collectors.all.email.placeholder": "Email du compte",
 	"i18n.collectors.all.email.error": "Email incorrect",
+	"i18n.collectors.all.number": "Numéro de téléphone",
+	"i18n.collectors.all.number.placeholder": "Numéro de téléphone du compte",
+	"i18n.collectors.all.number.error": "Numéro de téléphone incorrect",
+	"i18n.collectors.all.email_or_number": "Email ou numéro de téléphone",
+	"i18n.collectors.all.email_or_number.placeholder": "Email ou numéro de téléphone du compte",
+	"i18n.collectors.all.email_or_number.error": "Email ou numéro de téléphone incorrect",
 	"i18n.collectors.all.password": "Mot de passe",
 	"i18n.collectors.all.password.placeholder": "Mot de passe du compte",
 	"i18n.collectors.all.password.error": "Mot de passe incorrect",
@@ -24,7 +30,6 @@
     "i18n.collectors.free.identifier.placeholder": "Identifiant du compte (ex: fbx12345670)",
 
 	"i18n.collectors.amazon.description": "Amazon est un site de commerce en ligne.",
-	"i18n.collectors.amazon.identifier.placeholder": "Email ou numéro de téléphone",
 
 	"i18n.collectors.leclerc.description": "Leclerc est une enseigne de grande distribution française.",
 

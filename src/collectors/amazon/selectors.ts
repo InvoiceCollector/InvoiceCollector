@@ -1,7 +1,7 @@
 export const AmazonSelectors = {
     //LOGIN PAGE
 
-    FIELD_USERNAME: {
+    FIELD_EMAIL: {
         selector: "#ap_email",
         info: "login input field"
     },

@@ -11,7 +11,7 @@ export class FreeCollector extends ScrapperCollector {
         website: "https://www.free.fr",
         logo: "https://www.free.fr/assets/img/freebox/home/cards/logos/free-app-logo.svg",
         params: {
-            username: {
+            id: {
                 name: "i18n.collectors.all.identifier",
                 placeholder: "i18n.collectors.free.identifier.placeholder",
                 mandatory: true
@@ -30,7 +30,7 @@ export class FreeCollector extends ScrapperCollector {
     }
 
     async login(driver: Driver, params: any): Promise<string | void> {
-        await driver.input_text(FreeSelectors.FIELD_USERNAME, params.username);
+        await driver.input_text(FreeSelectors.FIELD_USERNAME, params.id);
         await driver.input_text(FreeSelectors.FIELD_PASSWORD, params.password);
         await driver.left_click(FreeSelectors.BUTTON_SUBMIT);
 

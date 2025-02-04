@@ -11,8 +11,8 @@ export class IntermarcheCollector extends ScrapperCollector {
         website: "https://www.intermarche.com",
         logo: "https://static.apidae-tourisme.com/filestore/objets-touristiques/logos/96/228/14607456/Apidae%20pour%20Philippa%2079.jpg",
         params: {
-            username: {
-                name: "i18n.collectors.all.identifier",
+            id: {
+                name: "i18n.collectors.all.email",
                 placeholder: "i18n.collectors.all.email.placeholder",
                 mandatory: true
             },
@@ -30,7 +30,7 @@ export class IntermarcheCollector extends ScrapperCollector {
     }
 
     async login(driver: Driver, params: any): Promise<string | void> {
-        await driver.input_text(IntermarcheSelectors.FIELD_EMAIL, params.username);
+        await driver.input_text(IntermarcheSelectors.FIELD_EMAIL, params.id);
         await driver.input_text(IntermarcheSelectors.FIELD_PASSWORD, params.password);
         
         // Check if email error exists

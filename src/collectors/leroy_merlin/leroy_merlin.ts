@@ -12,7 +12,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         website: "https://www.leroymerlin.fr",
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Leroy_Merlin.svg/1200px-Leroy_Merlin.svg.png",
         params: {
-            username: {
+            id: {
                 name: "i18n.collectors.all.email",
                 placeholder: "i18n.collectors.all.email.placeholder",
                 mandatory: true
@@ -37,8 +37,8 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         // Refuse cookies
         await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
 
-        // Input username
-        await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.username);
+        // Input email
+        await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.id);
         await driver.left_click(LeroyMerlinSelectors.BUTTON_LOGIN_CONTINUE);
             
         // Check if email is incorrect

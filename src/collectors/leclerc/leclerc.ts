@@ -10,7 +10,7 @@ export class LeclercCollector extends ScrapperCollector {
         website: "https://www.e.leclerc/",
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Logo_E.Leclerc_Sans_le_texte.svg/900px-Logo_E.Leclerc_Sans_le_texte.svg.png",
         params: {
-            username: {
+            id: {
                 name: "i18n.collectors.all.email",
                 placeholder: "i18n.collectors.all.email.placeholder",
                 mandatory: true
@@ -32,8 +32,8 @@ export class LeclercCollector extends ScrapperCollector {
             // Refuse cookies
             await driver.left_click(LeclercSelectors.BUTTON_ACCEPT_COOKIES, false, 5000);
 
-            // Input username
-            await driver.input_text(LeclercSelectors.FIELD_EMAIL, params.username);
+            // Input email
+            await driver.input_text(LeclercSelectors.FIELD_EMAIL, params.id);
             await driver.left_click(LeclercSelectors.BUTTON_LOGIN);
     
             // Check if email is incorrect

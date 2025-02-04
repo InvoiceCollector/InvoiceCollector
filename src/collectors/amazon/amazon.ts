@@ -10,10 +10,10 @@ export class FreeCollector extends ScrapperCollector {
         website: "https://www.amazon.fr",
         logo: "https://cdn.iconscout.com/icon/free/png-256/free-amazon-43-432492.png",
         params: {
-            username: {
+            id: {
                 type: "string",
-                name: "i18n.collectors.all.identifier",
-                placeholder: "i18n.collectors.amazon.identifier.placeholder",
+                name: "i18n.collectors.all.email_or_number",
+                placeholder: "i18n.collectors.all.email_or_number.placeholder",
                 mandatory: true
             },
             password: {
@@ -57,14 +57,14 @@ export class FreeCollector extends ScrapperCollector {
 
     async login(driver, params){
 
-        // Input username
-        await driver.input_text(AmazonSelectors.FIELD_USERNAME, params.username);
+        // Input email
+        await driver.input_text(AmazonSelectors.FIELD_EMAIL, params.id);
         await driver.left_click(AmazonSelectors.BUTTON_CONTINUE);
 
-        // Check if username is incorrect
-        const username_alert = await driver.wait_for_element(AmazonSelectors.CONTAINER_LOGIN_ALERT, false, 2000);
-        if (username_alert) {
-            return await username_alert.evaluate(e => e.textContent);
+        // Check if email is incorrect
+        const email_alert = await driver.wait_for_element(AmazonSelectors.CONTAINER_LOGIN_ALERT, false, 2000);
+        if (email_alert) {
+            return await email_alert.evaluate(e => e.textContent);
         }
 
         // Input password
