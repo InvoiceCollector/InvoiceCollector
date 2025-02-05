@@ -7,13 +7,15 @@ body:
   - type: textarea
     id: bug-description
     attributes:
-      label: A clear and concise description of what the bug is.
+      label: Description
+      description: A clear and concise description of what the bug is.
     validations:
       required: true
   - type: textarea
     id: bug-steps
     attributes:
-      label: Steps to reproduce the behavior.
+      label: Steps
+      description: Steps to reproduce the issue.
       value: |
         1. Go to '...'
         2. Click on '....'
@@ -24,21 +26,25 @@ body:
   - type: textarea
     id: bug-excepted
     attributes:
-      label: A clear and concise description of what you expected to happen.
+      label: Expected
+      description: A clear and concise description of what you expected to happen.
     validations:
       required: true
   - type: textarea
     id: bug-configuration
     attributes:
-      label: Configuration (for self-hosted version only)
+      label: Configuration
+      description: The configuration of your machine(for self-hosted version only)
       value: |
        - Docker version:  
        - Image version: 
+       - Npm version: 
     validations:
       required: true
   - type: textarea
     id: bug-additional
     attributes:
-      label: Add any other context about the problem here.
+      label: Additional info
+      description: Add any other context about the problem here.
     validations:
       required: false
