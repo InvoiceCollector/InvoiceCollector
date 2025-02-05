@@ -1,0 +1,21 @@
+name: "\U0001F916 New collector"
+description: Support a new collector
+title: "\U0001F916 [COLLECTOR] Collector name"
+labels: collector
+assignees: LucBerge
+body:
+  - type: input
+    id: collector-name
+    attributes:
+      label: Name
+      description: Name of the new collector
+    validations:
+      required: true
+  - type: input
+    id: collector-website
+    attributes:
+      label: Website
+      description: Link to the website or the API
+      placeholder: https://...
+    validations:
+      required: true
