@@ -1,0 +1,44 @@
+name: "\U0001F41BBug report"
+description: Report a bug
+title: "\U0001F41B[BUG] My bug"
+labels: bug, collector
+assignees: LucBerge
+body:
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: bug-steps
+    attributes:
+      label: Steps to reproduce the behavior:
+      value: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: bug-excepted
+    attributes:
+      label: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: bug-configuration
+    attributes:
+      label: Configuration (for self-hosted version only):
+      value: |
+       - Docker version:  
+       - Image version: 
+    validations:
+      required: true
+  - type: textarea
+    id: bug-additional
+    attributes:
+      label: Add any other context about the problem here.
+    validations:
+      required: false
