@@ -1,6 +1,6 @@
 import path from 'path';
 import { PageWithCursor, connect } from 'puppeteer-real-browser';
-import { Browser } from "rebrowser-puppeteer-core";
+import { Browser, DownloadPolicy } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
 import { delay } from './utils';
@@ -18,6 +18,10 @@ export class Driver {
         // disableXvfb: true,
         customConfig: {},
         connectOption: {
+            downloadBehavior: {
+                policy: 'allow' as DownloadPolicy,
+                downloadPath: Driver.DOWNLOAD_PATH
+            },
             defaultViewport: null
         },
         plugins: []
@@ -58,13 +62,6 @@ export class Driver {
 
         // Set viewport
         await this.page.setViewport(Driver.PAGE_CONFIG);
-
-        // Set download path
-        const client = await this.page.createCDPSession();
-        await client.send("Page.setDownloadBehavior", {
-            behavior: "allow",
-            downloadPath: Driver.DOWNLOAD_PATH,
-        });
 
         // Block images if not in debug
         if (process.env.ENV != "debug") {
