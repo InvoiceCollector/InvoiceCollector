@@ -22,14 +22,12 @@ export class Driver {
                 policy: 'allow' as DownloadPolicy,
                 downloadPath: Driver.DOWNLOAD_PATH
             },
-            defaultViewport: null
+            defaultViewport: {
+                width: 1920,
+                height: 1080,
+            }
         },
         plugins: []
-    };
-
-    static PAGE_CONFIG = {
-        width: 1920,
-        height: 1080,
     };
 
     collector;
@@ -59,9 +57,6 @@ export class Driver {
         const connectResult = await connect(puppeteerConfig);
         this.browser = connectResult.browser;
         this.page = connectResult.page;
-
-        // Set viewport
-        await this.page.setViewport(Driver.PAGE_CONFIG);
 
         // Block images if not in debug
         if (process.env.ENV != "debug") {
