@@ -28,4 +28,23 @@ export const CarrefourSelectors = {
         selector: "#validation-message-0:not([style*='hidden']), #error-message-pwd:not([style*='hidden'])",
         info: "login alert container"
     },
+
+    // ORDERS PAGE
+
+    CONTAINER_ORDER: {
+        selector: ".online-order-item__wrapper",
+        info: "order container"
+    },
+    CONTAINER_LINK: {
+        selector: ".order-item__summary .order-item__footer a",
+        info: "order link container"
+    },
+    CONTAINER_ORDER_DATE: {
+        selector: ".order-item__date",
+        info: "order date container"
+    },
+    CONTAINER_ORDER_AMOUNT: {
+        selector: ".order-item__summary .order-item__footer p",
+        info: "order amount container"
+    },
 }

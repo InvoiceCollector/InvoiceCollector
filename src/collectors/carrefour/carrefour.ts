@@ -5,8 +5,8 @@ import { Driver } from '../../driver';
 export class CarrefourCollector extends ScrapperCollector {
 
     static CONFIG = {
-        name: "Free",
-        description: "i18n.collectors.free.description",
+        name: "Carrefour",
+        description: "i18n.collectors.carrefour.description",
         version: "1",
         website: "https://www.carrefour.fr",
         logo: "https://upload.wikimedia.org/wikipedia/fr/3/3b/Logo_Carrefour.svg",
@@ -22,7 +22,7 @@ export class CarrefourCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://www.carrefour.fr/mon-compte/login"
+        entry_url: "https://www.carrefour.fr/mon-compte/mes-achats/en-ligne"
     }
 
     constructor() {
@@ -45,9 +45,35 @@ export class CarrefourCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver: Driver, params: any): Promise<void> {
+    async run(driver: Driver, params: any): Promise<any[]> {
         // Refuse cookies
         await driver.left_click(CarrefourSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
-        // TODO : Implement the rest of the collector
+
+        // Get invoices
+        const online_orders = await driver.get_all_elements(CarrefourSelectors.CONTAINER_ORDER, false, 5000);
+        
+        // Build return array
+        return await Promise.all(online_orders.map(async invoice => {
+            const order_link = await invoice.get_attribute(CarrefourSelectors.CONTAINER_LINK, "href");
+            const date = await invoice.get_attribute(CarrefourSelectors.CONTAINER_ORDER_DATE, "textContent");
+            const amount = await invoice.get_attribute(CarrefourSelectors.CONTAINER_ORDER_AMOUNT, "textContent");
+    
+            const id = order_link.split("/").pop();
+            const date_part = date.split('/');
+            const year = parseInt(date_part[2]);
+            const month = parseInt(date_part[1]) - 1;
+            const day = parseInt(date_part[0]);
+            const timestamp = Date.UTC(year, month, day);
+            const link = `https://www.carrefour.fr/mon-compte/mes-achats/facture/${id}?invoiceType=Invoice`;
+
+            return {
+                id,
+                type: "link",
+                link,
+                mime: 'application/pdf',
+                timestamp,
+                amount
+            };
+        }));
     }
 }
