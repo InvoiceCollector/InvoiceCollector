@@ -1,5 +1,5 @@
 name: "\U0001F916 New collector"
-about: Support a new collector
+description: Support a new collector
 title: "\U0001F916 [COLLECTOR] Collector name"
 labels: collector
 assignees: LucBerge
