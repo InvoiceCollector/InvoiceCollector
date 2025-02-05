@@ -7,13 +7,15 @@ body:
   - type: input
     id: collector-name
     attributes:
-      label: Collector name
+      label: Name
+      description: Name of the new collector
     validations:
       required: true
   - type: input
     id: collector-website
     attributes:
-      label: Link to the website or the API
+      label: Website
+      description: Link to the website or the API
       placeholder: https://...
     validations:
       required: true
