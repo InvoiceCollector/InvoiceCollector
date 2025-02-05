@@ -1,6 +1,6 @@
 import path from 'path';
 import { PageWithCursor, connect } from 'puppeteer-real-browser';
-import { Browser, DownloadPolicy } from "rebrowser-puppeteer-core";
+import { Browser, DownloadPolicy, ElementHandle } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
 import { delay } from './utils';
@@ -172,12 +172,12 @@ export class Driver {
 
     // ACTIONS
 
-    async get_all_elements(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+    async get_all_elements(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT): Promise<Element[]> {
         if (this.page === null) {
             throw new Error('Page is not initialized.');
         }
         await this.wait_for_element(selector, raise_exception, timeout);
-        return await this.page.$$(selector.selector);
+        return (await this.page.$$(selector.selector)).map(element => new Element(element));
     }
 
     async get_all_attributes(selector, attributeName, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
@@ -304,5 +304,16 @@ export class Driver {
             return token && token.length > 20 ? token : null;
         },
         "Cloudflare turnstile captcha did not succeed");
+    }
+}
+
+export class Element {
+    element: ElementHandle;
+    constructor(element: ElementHandle) {
+        this.element = element;
+    }
+
+    async get_attribute(selector, attribute: string): Promise<string> {
+        return await this.element.$eval(selector.selector, (element, attr) => element[attr], attribute);
     }
 }
