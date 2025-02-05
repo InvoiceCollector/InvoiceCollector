@@ -2,7 +2,7 @@
 name: "\U0001F41BBug report"
 about: Report a bug
 title: "\U0001F41B[BUG] My bug"
-labels: bug
+labels: bug, collector
 assignees: LucBerge
 
 ---
