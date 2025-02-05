@@ -23,7 +23,7 @@ export class AbstractCollector {
     constructor(config: Config) {
         this.config = config;
         this.downloadMethods = {
-            "link": this.download_direct_link
+            "direct_link": this.download_direct_link
         };
     }
 

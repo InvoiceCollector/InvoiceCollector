@@ -13,7 +13,16 @@ export class ScrapperCollector extends AbstractCollector {
     constructor(config: Config) {
         super(config);
         this.driver = null;
+        this.downloadMethods['link'] = this.download_link;
         this.downloadMethods['webpage'] = this.download_webpage;
+    }
+
+    async download_link(invoice): Promise<void> {
+        if (!this.driver) {
+            throw new Error('Driver is not initialized.');
+        }
+        invoice.data = await this.driver.downloadFile(invoice.link);
+        invoice.type = "base64";
     }
 
     async download_webpage(invoice): Promise<void> {

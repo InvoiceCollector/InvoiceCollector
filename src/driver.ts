@@ -70,14 +70,12 @@ export class Driver {
         if (process.env.ENV != "debug") {
             await this.page.setRequestInterception(true);
             this.page.on("request", (request) => {
-                if (request.isInterceptResolutionHandled()) {
-                return;
-                }
-            
-                if (request.resourceType() === "image") {
-                request.abort();
-                } else {
-                request.continue();
+                if (!request.isInterceptResolutionHandled()) {
+                    if (request.resourceType() === "image") {
+                        request.abort();
+                    } else {
+                        request.continue();
+                    }
                 }
             });
         }
@@ -266,6 +264,41 @@ export class Driver {
             throw new Error('Page is not initialized.');
         }
         return await this.page.screenshot({encoding: 'base64'});
+    }
+
+    async downloadFile(url: string) {
+        if (this.page === null) {
+            throw new Error('Page is not initialized.');
+        }
+
+        // Enable request interception
+        await this.page.setRequestInterception(true);
+
+        // Get headers
+        const headerPromise = new Promise<any>((resolve) => {
+            if (this.page === null) {
+                throw new Error('Page is not initialized.');
+            }
+            this.page.on('request', request => {
+                if (request.url() === url) {
+                    resolve(request.headers());
+                }
+                if (!request.isInterceptResolutionHandled()) {
+                    request.continue();
+                }
+            });
+        });
+
+        // Navigate to the page
+        this.page.goto(url);
+
+        // Wait for headers
+        const headers = await headerPromise;
+
+        // Fetch the file
+        const response = await fetch(url, {headers: headers});
+        const buffer = await response.arrayBuffer();
+        return Buffer.from(buffer).toString('base64');
     }
 
     // CAPTCHAS
