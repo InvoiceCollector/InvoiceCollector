@@ -26,9 +26,17 @@ export const FreeSelectors = {
     },
 
     //INVOICES PAGE
-
+    
+    CONTAINER_INVOICE: {
+        selector: ".accordion li",
+        info: "invoice container"
+    },
     BUTTON_DOWNLOAD: {
-        selector: "a[class='btn_download']",
+        selector: ".btn_download",
         info: "download invoice button"
+    },
+    CONTAINER_AMOUNT: {
+        selector: "span:last-of-type",
+        info: "amount button"
     }
 }

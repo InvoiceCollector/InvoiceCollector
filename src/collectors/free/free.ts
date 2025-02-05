@@ -42,31 +42,36 @@ export class FreeCollector extends ScrapperCollector {
     }
 
     async run(driver: Driver, params: any): Promise<any[]> {
-        //Go to invoices
+        // Go to invoices
         await driver.left_click(FreeSelectors.BUTTON_INVOICES);
 
-        //Get invoices
-        const links = await driver.get_all_attributes(FreeSelectors.BUTTON_DOWNLOAD, "href", false, 5000);
+        // Get invoices
+        const invoices = await driver.get_all_elements(FreeSelectors.CONTAINER_INVOICE, false, 5000);
 
-        //Build return array
-        return links.map(link => {
+        // Build return array
+        return await Promise.all(invoices.map(async invoice => {
+            const link = await invoice.get_attribute(FreeSelectors.BUTTON_DOWNLOAD, "href");
+            const amount = await invoice.get_attribute(FreeSelectors.CONTAINER_AMOUNT, "textContent");
+
             let search_params = new URLSearchParams(link);
             const no_facture = search_params.get("no_facture");
             const date_string = search_params.get("mois");
 
-            let timestamp;
+            let timestamp: number | null = null;
             if (date_string) {
                 const year = parseInt(date_string.slice(0, 4));
                 const month = parseInt(date_string.slice(4, 6)) - 1; // Months in JavaScript are indexed from 0 to 11
                 timestamp = Date.UTC(year, month)
             }
+
             return {
                 id: no_facture,
                 type: "link",
                 mime: 'application/pdf',
-                timestamp: timestamp || null,
-                link: link
+                timestamp,
+                link,
+                amount
             };
-        });
+        }));
     }
 }
