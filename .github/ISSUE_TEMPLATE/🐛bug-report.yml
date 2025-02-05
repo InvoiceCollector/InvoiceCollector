@@ -13,7 +13,7 @@ body:
   - type: textarea
     id: bug-steps
     attributes:
-      label: Steps to reproduce the behavior:
+      label: Steps to reproduce the behavior.
       value: |
         1. Go to '...'
         2. Click on '....'
@@ -30,7 +30,7 @@ body:
   - type: textarea
     id: bug-configuration
     attributes:
-      label: Configuration (for self-hosted version only):
+      label: Configuration (for self-hosted version only)
       value: |
        - Docker version:  
        - Image version: 
