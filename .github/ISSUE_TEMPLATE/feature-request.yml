@@ -1,0 +1,35 @@
+name: "\U0001F4A1Feature request"
+description: Suggest a new feature
+title: "\U0001F4A1[FEATURE] My new feature"
+labels: feature
+assignees: LucBerge
+body:
+  - type: textarea
+    id: feature-problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the bug is.
+      placeholder: I'm always frustrated when [...]
+    validations:
+      required: true
+  - type: textarea
+    id: feature-solution
+    attributes:
+      label: Solution
+      description: Describe the solution you'd like.
+    validations:
+      required: true
+  - type: textarea
+    id: feature-alternative
+    attributes:
+      label: Alternatives
+      description: A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: true
+  - type: textarea
+    id: bug-additional
+    attributes:
+      label: Additional info
+      description: Add any other context or screenshots about the feature request here.
+    validations:
+      required: false
