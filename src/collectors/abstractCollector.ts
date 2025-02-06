@@ -3,6 +3,7 @@ import axios from 'axios';
 export type Config = {
     name: string,
     description: string,
+    instructions?: string,
     version: string,
     website: string,
     logo: string,

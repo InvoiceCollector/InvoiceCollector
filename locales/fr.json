@@ -2,6 +2,7 @@
 	"i18n.views.manage.my-collectors": "Mes collecteurs",
 	"i18n.views.manage.select-collectors": "Sélectionner des collecteurs",
 	"i18n.views.manage.add-collectors": "Ajouter un collecteur",
+	"i18n.views.manage.instructions" : "Instructions",
 	"i18n.views.manage.return": "Retour",
     
 	"i18n.collectors.all.username": "Utilisateur",
@@ -39,5 +40,8 @@
 
 	"i18n.collectors.orange.description": "Orange est un opérateur de télécommunications français.",
 
-	"i18n.collectors.carrefour.description": "Carrefour est une enseigne de grande distribution française."
+	"i18n.collectors.carrefour.description": "Carrefour est une enseigne de grande distribution française.",
+
+	"i18n.collectors.ovh.description": "OVH est un hébergeur web français.",
+	"i18n.collectors.ovh.instructions": "Obtenez vos identifiants en cliquant sur <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill' target='_blank'>ce lien</a>."
 }

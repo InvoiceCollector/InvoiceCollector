@@ -2,6 +2,7 @@
     "i18n.views.manage.my-collectors": "My collectors",
     "i18n.views.manage.select-collectors": "Select collectors",
     "i18n.views.manage.add-collectors": "Add collector",
+	"i18n.views.manage.instructions" : "Instructions",
     "i18n.views.manage.return": "Return",
     
 	"i18n.collectors.all.username": "Username",
@@ -39,5 +40,8 @@
 
 	"i18n.collectors.orange.description": "Orange is a French telecommunications company.",
 
-	"i18n.collectors.carrefour.description": "Carrefour is a French retail company."
+	"i18n.collectors.carrefour.description": "Carrefour is a French retail company.",
+
+	"i18n.collectors.ovh.description": "OVH is a French web hosting company.",
+	"i18n.collectors.ovh.instructions": "Get you credentials by clicking on <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill' target='_blank'>this link</a>."
 }

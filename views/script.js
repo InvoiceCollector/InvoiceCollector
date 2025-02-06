@@ -103,6 +103,8 @@ function showForm(company) {
     document.getElementById('company-logo').src = company.logo;
     document.getElementById('company-name').textContent = company.name;
     document.getElementById('company-description').textContent = company.description;
+    document.querySelector('#add-credential-instructions').hidden = !company.instructions;
+    document.querySelector('#add-credential-instructions p').innerHTML = company.instructions;
     document.getElementById('add-credential-form').dataset.key = company.key;
 
     // Add input fields

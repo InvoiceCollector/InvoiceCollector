@@ -303,7 +303,9 @@ export class Server {
 
         console.log(`Listing all collectors`);
         return collectors.map((collector) => {
+            const name = Server.i18n.__({ phrase: collector.CONFIG.name, locale });
             const description = Server.i18n.__({ phrase: collector.CONFIG.description, locale });
+            const instructions = Server.i18n.__({ phrase: collector.CONFIG.instructions, locale });
             const params = Object.keys(collector.CONFIG.params).reduce((acc, key) => {
                 acc[key] = {
                     ...collector.CONFIG.params[key],
@@ -314,7 +316,9 @@ export class Server {
             }, {});
             return {
             ...collector.CONFIG,
+            name,
             description,
+            instructions,
             params
             };
         });
