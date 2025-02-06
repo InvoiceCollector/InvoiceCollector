@@ -28,9 +28,6 @@ export class LeroyMerlinCollector extends ScrapperCollector {
 
     constructor() {
         super(LeroyMerlinCollector.CONFIG);
-        
-        //Bind download method
-        this.downloadMethods['leroy_merlin'] = this.download_leroy_merlin;
     }
 
     async login(driver, params){
@@ -58,7 +55,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver: Driver, params: any) {    
+    async collect(driver: Driver, params: any) {    
         const data = await driver.goto('https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login', 'https://www.leroymerlin.fr/order-followup/backend/v2/orders?');
 
         return data.map(order => { 
@@ -74,11 +71,10 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     }
 
     // Define custom method to download invoice
-    async download_leroy_merlin(invoice: any): Promise<void> {
-        await this.driver?.goto(invoice.link);
-
-        await this.driver?.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
+    async download(driver: Driver, invoice: any): Promise<void> {
+        await driver?.goto(invoice.link);
+        await driver?.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
         await delay(5000);
-        await this.download_from_file(invoice);
+        await this.download_from_file(driver, invoice);
     }
 }

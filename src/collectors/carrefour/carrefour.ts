@@ -45,7 +45,7 @@ export class CarrefourCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver: Driver, params: any): Promise<any[]> {
+    async collect(driver: Driver, params: any): Promise<any[]> {
         // Refuse cookies
         await driver.left_click(CarrefourSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
 
@@ -75,5 +75,9 @@ export class CarrefourCollector extends ScrapperCollector {
                 amount
             };
         }));
+    }
+
+    async download(driver: Driver, invoice: any): Promise<void> {
+        await this.download_link(driver, invoice);
     }
 }

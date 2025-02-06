@@ -6,57 +6,16 @@ import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../e
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 
-export class ScrapperCollector extends AbstractCollector {
+export abstract class ScrapperCollector extends AbstractCollector {
 
     driver: Driver | null;
 
     constructor(config: Config) {
         super(config);
         this.driver = null;
-        this.downloadMethods['link'] = this.download_link;
-        this.downloadMethods['webpage'] = this.download_webpage;
     }
 
-    async download_link(invoice): Promise<void> {
-        if (!this.driver) {
-            throw new Error('Driver is not initialized.');
-        }
-        invoice.data = await this.driver.downloadFile(invoice.link);
-        invoice.type = "base64";
-    }
-
-    async download_webpage(invoice): Promise<void> {
-        if (!this.driver) {
-            throw new Error('Driver is not initialized.');
-        }
-        await this.driver.goto(invoice.link);
-        invoice.data = await this.driver.pdf();
-        invoice.type = "base64";
-    }
-
-    async download_from_file(invoice): Promise<void> {
-        const files = fs.readdirSync(Driver.DOWNLOAD_PATH);
-        if (files.length === 0) {
-            throw new Error('No files found in the download path.');
-        }
-        const filePath = path.join(Driver.DOWNLOAD_PATH, files[0]);
-        invoice.data = fs.readFileSync(filePath, {encoding: 'base64'});
-        invoice.type = "base64";
-
-        //Delete all file in the download path
-        for (const file of files) {
-            fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
-        }
-    }
-
-    async collect(params, locale, location): Promise<any[]> {
-        // Check if a mandatory field is missing
-        for (const [key, value] of Object.entries(this.config.params)) {
-            if (value.mandatory && !params[key]) {
-                throw new Error(`Field "${key}" is missing.`);
-            }
-        }
-
+    async _collect(params: any, locale: string, location: any): Promise<any[]> {
         // Get proxy
         const proxy = await ProxyFactory.getProxy().get(location);
 
@@ -84,7 +43,7 @@ export class ScrapperCollector extends AbstractCollector {
         }
 
         // Collect invoices
-        const invoices = await this.run(this.driver, params)
+        const invoices = await this.collect(this.driver, params)
         if (invoices === undefined) {
             const url = this.driver.url();
             const source_code = await this.driver.sourceCode();
@@ -96,6 +55,13 @@ export class ScrapperCollector extends AbstractCollector {
         return invoices;
     }
 
+    async _download(invoice: any): Promise<void> {
+        if (!this.driver) {
+            throw new Error('Driver is not initialized.');
+        }
+        await this.download(this.driver, invoice);
+    }
+
     async close() {
         if (this.driver != null) {
             // Close the browser
@@ -105,16 +71,42 @@ export class ScrapperCollector extends AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async login(driver: Driver, params): Promise<string | void>{
-        throw new Error('`login` is not implemented.');
-    }
+    abstract login(driver: Driver, params: any): Promise<string | void>;
 
-    async run(driver: Driver, params): Promise<any[] | void> {
-        throw new Error('`run` is not implemented.');
-    }
+    abstract collect(driver: Driver, params: any): Promise<any[] | void>;
 
-    async is_in_maintenance(driver, params): Promise<boolean>{
+    abstract download(driver: Driver, invoice: any): Promise<void>;
+
+    async is_in_maintenance(driver: Driver, params: any): Promise<boolean>{
         //Assume the website is not in maintenance
         return false;
+    }
+
+    // DOWNLOAD METHODS
+
+    async download_link(driver: Driver, invoice: any): Promise<void> {
+        invoice.data = await driver.downloadFile(invoice.link);
+        invoice.type = "base64";
+    }
+
+    async download_webpage(driver: Driver, invoice: any): Promise<void> {
+        await driver.goto(invoice.link);
+        invoice.data = await driver.pdf();
+        invoice.type = "base64";
+    }
+
+    async download_from_file(driver: Driver, invoice: any): Promise<void> {
+        const files = fs.readdirSync(Driver.DOWNLOAD_PATH);
+        if (files.length === 0) {
+            throw new Error('No files found in the download path.');
+        }
+        const filePath = path.join(Driver.DOWNLOAD_PATH, files[0]);
+        invoice.data = fs.readFileSync(filePath, {encoding: 'base64'});
+        invoice.type = "base64";
+
+        //Delete all file in the download path
+        for (const file of files) {
+            fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
+        }
     }
 }

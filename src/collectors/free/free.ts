@@ -41,7 +41,7 @@ export class FreeCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver: Driver, params: any): Promise<any[]> {
+    async collect(driver: Driver, params: any): Promise<any[]> {
         // Go to invoices
         await driver.left_click(FreeSelectors.BUTTON_INVOICES);
 
@@ -73,5 +73,9 @@ export class FreeCollector extends ScrapperCollector {
                 amount
             };
         }));
+    }
+
+    async download(driver: Driver, invoice: any): Promise<void> {
+        await this.download_link(driver, invoice);
     }
 }

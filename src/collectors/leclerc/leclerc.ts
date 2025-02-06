@@ -1,3 +1,4 @@
+import { Driver } from '../../driver';
 import { ScrapperCollector } from '../scrapperCollector';
 import { LeclercSelectors } from './selectors';
 
@@ -59,7 +60,12 @@ export class LeclercCollector extends ScrapperCollector {
             }
     }
 
-    async run(driver, params) {
+    async collect(driver, params) {
         await driver.goto("https://www.e.leclerc/espace-client/commandes/commandes");
+        // TODO : Implement the rest of the collector
+    }
+
+    async download(driver: Driver, invoice: any): Promise<void> {
+        // TODO : Implement the downloader
     }
 }

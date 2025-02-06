@@ -1,3 +1,4 @@
+import { Driver } from '../../driver';
 import { ScrapperCollector } from '../scrapperCollector';
 import { AmazonSelectors } from './selectors';
 
@@ -78,9 +79,9 @@ export class FreeCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver, params) {
+    async collect(driver: Driver, params: any) {
         // Go to order history
-        await driver.page.goto("https://www.amazon.fr/gp/css/order-history");
+        await driver.page?.goto("https://www.amazon.fr/gp/css/order-history");
 
         // Get all order ids
         const order_ids = await driver.get_all_attributes(AmazonSelectors.CONTAINER_ORDERID, "textContent", false, 5000);
@@ -106,5 +107,9 @@ export class FreeCollector extends ScrapperCollector {
             });
         }
         return invoices;
+    }
+
+    async download(driver: Driver, invoice: any): Promise<void> {
+        return await this.download_webpage(driver, invoice);
     }
 }

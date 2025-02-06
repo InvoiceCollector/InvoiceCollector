@@ -54,7 +54,11 @@ export class OrangeCollector extends ScrapperCollector {
         }
     }
 
-    async run(driver: Driver, params: any): Promise<void> {
+    async collect(driver: Driver, params: any): Promise<void> {
         // TODO : Implement the rest of the collector
+    }
+
+    async download(driver: Driver, invoice: any): Promise<void> {
+        // TODO : Implement the downloader
     }
 }

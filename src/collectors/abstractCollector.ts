@@ -14,31 +14,17 @@ export type Config = {
         }
     },
     entry_url?: string,
+    baseUrl?: string,
 }
 
-export class AbstractCollector {
+export abstract class AbstractCollector {
     config: Config;
-    downloadMethods: { [key: string]: (invoice: any) => Promise<void> };
 
     constructor(config: Config) {
         this.config = config;
-        this.downloadMethods = {
-            "direct_link": this.download_direct_link
-        };
     }
 
-    async download(invoices): Promise<void> {
-        for(let invoice of invoices) {
-            if (this.downloadMethods[invoice.type]) {
-                await this.downloadMethods[invoice.type].call(this, invoice);
-            }
-        }
-
-        // Order invoices by timestamp
-        invoices.sort((a, b) => a.timestamp - b.timestamp);
-    }
-
-    async download_direct_link(invoice): Promise<void> {
+    async download_direct_link(invoice: any): Promise<void> {
         const response = await axios.get(invoice.link, {
             responseType: 'arraybuffer',
         });
@@ -46,8 +32,15 @@ export class AbstractCollector {
         invoice.type = "base64";
     }
 
-    async collect_new_invoices(params, download, previousInvoices, locale, location): Promise<any[]> {
-            const invoices = await this.collect(params, locale, location);
+    async collect_new_invoices(params: any, download: boolean, previousInvoices: any[], locale: string, location: any): Promise<any[]> {
+            // Check if a mandatory field is missing
+            for (const [key, value] of Object.entries(this.config.params)) {
+                if (value.mandatory && !params[key]) {
+                    throw new Error(`Field "${key}" is missing.`);
+                }
+            }
+
+            const invoices = await this._collect(params, locale, location);
 
             // Get new invoices
             const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
@@ -58,7 +51,14 @@ export class AbstractCollector {
                 // Download new invoices if needed
                 if(download) {
                     console.log(`Downloading ${newInvoices.length} invoices`);
-                    await this.download(newInvoices);
+
+                    // For each invoice
+                    for(let newInvoice of newInvoices) {
+                        await this._download(newInvoice)
+                    }
+
+                    // Order invoices by timestamp
+                    newInvoices.sort((a, b) => a.timestamp - b.timestamp);
                 }
                 else {
                     console.log(`This is the first collect. Do not download invoices`);
@@ -76,9 +76,9 @@ export class AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    async collect(params, locale, location): Promise<any[]> {
-        throw new Error('`collect` is not implemented.');
-    }
+    abstract _collect(params: any, locale: string, location: any): Promise<any[]>;
+
+    abstract _download(invoice: any): Promise<void>;
 
     async close() {
         // Assume the collector does not need to close anything
