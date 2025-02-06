@@ -13,6 +13,10 @@ export const LeroyMerlinSelectors = {
 
     //LOGIN PAGE
 
+    BUTTON_CLOSE_SHOP_CHOOSER: {
+        selector: ".mc-layer__header button",
+        info: "close shop chooser button"
+    },
     INPUT_EMAIL: {
         selector: "form#js-email-form input",
         info: "login input"

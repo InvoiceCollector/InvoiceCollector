@@ -34,10 +34,13 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         // Refuse cookies
         await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
 
+        // Close shop chooser
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000);
+
         // Input email
         await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.id);
-        await driver.left_click(LeroyMerlinSelectors.BUTTON_LOGIN_CONTINUE);
-            
+        await driver.pressEnter();
+                    
         // Check if email is incorrect
         const email_error = await driver.wait_for_element(LeroyMerlinSelectors.CONTAINER_EMAIL_ERROR, false, 2000);
         if (email_error) {
