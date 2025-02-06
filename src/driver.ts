@@ -216,6 +216,10 @@ export class Driver {
         //TODO
     }
 
+    async pressEnter() {
+        await this.page?.keyboard.press('Enter');
+    }
+
     // CHECK
 
     async check_element_exist(selector) {
