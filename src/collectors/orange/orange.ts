@@ -1,6 +1,7 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { OrangeSelectors } from './selectors';
 import { Driver } from '../../driver';
+import { Invoice } from '../abstractCollector';
 
 export class OrangeCollector extends ScrapperCollector {
 
@@ -22,7 +23,7 @@ export class OrangeCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://espace-client.orange.fr/facture-paiement/historique-des-factures"
+        entryUrl: "https://espace-client.orange.fr/facture-paiement/historique-des-factures"
     }
 
     constructor() {
@@ -58,7 +59,7 @@ export class OrangeCollector extends ScrapperCollector {
         // TODO : Implement the rest of the collector
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
+    async download(driver: Driver, invoice: Invoice): Promise<void> {
         // TODO : Implement the downloader
     }
 }

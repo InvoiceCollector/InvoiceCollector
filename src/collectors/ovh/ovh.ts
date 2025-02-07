@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import { AxiosInstance } from "axios";
 import { ApiCollector } from '../apiCollector';
+import { DownloadedInvoice } from '../abstractCollector';
 
 export class OvhCollector extends ApiCollector {
 
@@ -53,8 +54,6 @@ export class OvhCollector extends ApiCollector {
         // Set default headers
         instance.defaults.headers.common['X-Ovh-Application'] = params.app_key;
         instance.defaults.headers.common['X-Ovh-Consumer'] = params.consumer_key;
-        instance.defaults.headers.common['Content-Type'] = 'application/json';
-        instance.defaults.headers.common['Accept'] = 'application/json';
 
         // Get bill ids
         const bill_ids = await this.request(instance, params, 'GET', '/me/bill');
@@ -74,8 +73,8 @@ export class OvhCollector extends ApiCollector {
     }
     
     // Define custom method to download invoice
-    async download(instance: AxiosInstance, invoice: any): Promise<void> {
-        await this.download_direct_link(invoice);
+    async download(instance: AxiosInstance, invoice: any): Promise<DownloadedInvoice> {
+        return await this.download_direct_link(invoice);
     }
 
     // Make request to OVH API

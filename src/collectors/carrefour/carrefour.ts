@@ -1,6 +1,7 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { CarrefourSelectors } from './selectors';
 import { Driver } from '../../driver';
+import { DownloadedInvoice, Invoice } from '../abstractCollector';
 
 export class CarrefourCollector extends ScrapperCollector {
 
@@ -22,7 +23,7 @@ export class CarrefourCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://www.carrefour.fr/mon-compte/mes-achats/en-ligne"
+        entryUrl: "https://www.carrefour.fr/mon-compte/mes-achats/en-ligne"
     }
 
     constructor() {
@@ -45,7 +46,7 @@ export class CarrefourCollector extends ScrapperCollector {
         }
     }
 
-    async collect(driver: Driver, params: any): Promise<any[]> {
+    async collect(driver: Driver, params: any): Promise<Invoice[]> {
         // Refuse cookies
         await driver.left_click(CarrefourSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
 
@@ -59,6 +60,9 @@ export class CarrefourCollector extends ScrapperCollector {
             const amount = await invoice.get_attribute(CarrefourSelectors.CONTAINER_ORDER_AMOUNT, "textContent");
     
             const id = order_link.split("/").pop();
+            if (!id) {
+                throw new Error(`Cannot extract id from ${order_link}`);
+            }
             const date_part = date.split('/');
             const year = parseInt(date_part[2]);
             const month = parseInt(date_part[1]) - 1;
@@ -77,7 +81,7 @@ export class CarrefourCollector extends ScrapperCollector {
         }));
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
-        await this.download_link(driver, invoice);
+    async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
+        return await this.download_link(driver, invoice);
     }
 }

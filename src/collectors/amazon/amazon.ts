@@ -1,8 +1,9 @@
 import { Driver } from '../../driver';
+import { DownloadedInvoice, Invoice } from '../abstractCollector';
 import { ScrapperCollector } from '../scrapperCollector';
 import { AmazonSelectors } from './selectors';
 
-export class FreeCollector extends ScrapperCollector {
+export class AmazonCollector extends ScrapperCollector {
 
     static CONFIG = {
         name: "Amazon",
@@ -49,14 +50,14 @@ export class FreeCollector extends ScrapperCollector {
                 }
             }*/
         },
-        entry_url: "https://www.amazon.fr/gp/css/order-history"
+        entryUrl: "https://www.amazon.fr/gp/css/order-history"
     }
 
     constructor() {
-        super(FreeCollector.CONFIG);
+        super(AmazonCollector.CONFIG);
     }
 
-    async login(driver, params){
+    async login(driver: Driver, params: any): Promise<string | void> {
 
         // Input email
         await driver.input_text(AmazonSelectors.FIELD_EMAIL, params.id);
@@ -65,7 +66,7 @@ export class FreeCollector extends ScrapperCollector {
         // Check if email is incorrect
         const email_alert = await driver.wait_for_element(AmazonSelectors.CONTAINER_LOGIN_ALERT, false, 2000);
         if (email_alert) {
-            return await email_alert.evaluate(e => e.textContent);
+            return await email_alert.evaluate(e => e.textContent) || "i18n.collectors.all.email.error";
         }
 
         // Input password
@@ -79,7 +80,7 @@ export class FreeCollector extends ScrapperCollector {
         }
     }
 
-    async collect(driver: Driver, params: any) {
+    async collect(driver: Driver, params: any): Promise<Invoice[]> {
         // Go to order history
         await driver.page?.goto("https://www.amazon.fr/gp/css/order-history");
 
@@ -87,21 +88,20 @@ export class FreeCollector extends ScrapperCollector {
         const order_ids = await driver.get_all_attributes(AmazonSelectors.CONTAINER_ORDERID, "textContent", false, 5000);
         
         // Return invoices
-        let invoices: any[] = [];
+        let invoices: Invoice[] = [];
         for (const order_id of order_ids) {
             const link = `https://www.amazon.fr/gp/css/summary/print.html/?ie=UTF8&orderID=${order_id}`;
 
             // Get date
-            const timestamp = "TODO";
+            const timestamp = 0; //TODO
 
             // Get amount
             const amount = "TODO";
 
             invoices.push({
                 id: order_id,
-                type: "webpage",
-                timestamp: timestamp || null,
-                mime: 'application/pdf',
+                timestamp,
+                mimetype: 'application/pdf',
                 amount: amount,
                 link: link
             });
@@ -109,7 +109,7 @@ export class FreeCollector extends ScrapperCollector {
         return invoices;
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
+    async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
         return await this.download_webpage(driver, invoice);
     }
 }

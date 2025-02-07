@@ -1,21 +1,25 @@
 import fs from 'fs';
 import path from 'path';
-import { AbstractCollector, Config } from "./abstractCollector";
+import { AbstractCollector, Config, Invoice, DownloadedInvoice } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from '../error';
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 
+export type ScrapperConfig = Config & {
+    entryUrl: string
+}
+
 export abstract class ScrapperCollector extends AbstractCollector {
 
     driver: Driver | null;
 
-    constructor(config: Config) {
+    constructor(config: ScrapperConfig) {
         super(config);
         this.driver = null;
     }
 
-    async _collect(params: any, locale: string, location: any): Promise<any[]> {
+    async _collect(params: any, locale: string, location: any): Promise<Invoice[]> {
         // Get proxy
         const proxy = await ProxyFactory.getProxy().get(location);
 
@@ -24,7 +28,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
         await this.driver.open(proxy);
 
         // Open entry url
-        await this.driver.goto(this.config.entry_url);
+        await this.driver.goto(this.config.entryUrl);
 
         // Check if website is in maintenance
         const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
@@ -57,20 +61,22 @@ export abstract class ScrapperCollector extends AbstractCollector {
         return invoices;
     }
 
-    async _download(invoice: any): Promise<void> {
+    async _download(invoice: Invoice): Promise<DownloadedInvoice> {
         if (!this.driver) {
             throw new Error('Driver is not initialized.');
         }
-        await this.download(this.driver, invoice);
+        const downloadedInvocie = await this.download(this.driver, invoice);
 
         // If data field is missing, collector is unfinished
-        if (!invoice.data) {
+        if (!downloadedInvocie) {
             const url = this.driver.url();
             const source_code = await this.driver.sourceCode();
             const screenshot = await this.driver.screenshot();
             await this.driver.close()
             throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
         }
+
+        return downloadedInvocie;
     }
 
     async close() {
@@ -84,9 +90,9 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
     abstract login(driver: Driver, params: any): Promise<string | void>;
 
-    abstract collect(driver: Driver, params: any): Promise<any[] | void>;
+    abstract collect(driver: Driver, params: any): Promise<Invoice[] | void>;
 
-    abstract download(driver: Driver, invoice: any): Promise<void>;
+    abstract download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice | void>;
 
     async is_in_maintenance(driver: Driver, params: any): Promise<boolean>{
         //Assume the website is not in maintenance
@@ -95,29 +101,43 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
     // DOWNLOAD METHODS
 
-    async download_link(driver: Driver, invoice: any): Promise<void> {
-        invoice.data = await driver.downloadFile(invoice.link);
-        invoice.type = "base64";
+    async download_link(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
+        if (!invoice.link) {
+            throw new Error('Field `link` is missing in the invoice object.');
+        }
+        return {
+            ...invoice,
+            data: await driver.downloadFile(invoice.link),
+            mimetype: "application/pdf" //TODO : get mimetype from the file
+        }
     }
 
-    async download_webpage(driver: Driver, invoice: any): Promise<void> {
+    async download_webpage(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
         await driver.goto(invoice.link);
-        invoice.data = await driver.pdf();
-        invoice.type = "base64";
+        return {
+            ...invoice,
+            data: await driver.pdf(),
+            mimetype: "application/pdf"
+        }
     }
 
-    async download_from_file(driver: Driver, invoice: any): Promise<void> {
+    async download_from_file(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
         const files = fs.readdirSync(Driver.DOWNLOAD_PATH);
         if (files.length === 0) {
             throw new Error('No files found in the download path.');
         }
         const filePath = path.join(Driver.DOWNLOAD_PATH, files[0]);
-        invoice.data = fs.readFileSync(filePath, {encoding: 'base64'});
-        invoice.type = "base64";
+        const data = fs.readFileSync(filePath, {encoding: 'base64'});
 
         //Delete all file in the download path
         for (const file of files) {
             fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
+        }
+
+        return {
+            ...invoice,
+            data,
+            mimetype: "application/pdf" //TODO : get mimetype from the file
         }
     }
 }

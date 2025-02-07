@@ -1,6 +1,7 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { FreeSelectors } from './selectors';
 import { Driver } from '../../driver';
+import { DownloadedInvoice, Invoice } from '../abstractCollector';
 
 export class FreeCollector extends ScrapperCollector {
 
@@ -22,7 +23,7 @@ export class FreeCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://subscribe.free.fr/login/"
+        entryUrl: "https://subscribe.free.fr/login/"
     }
 
     constructor() {
@@ -41,7 +42,7 @@ export class FreeCollector extends ScrapperCollector {
         }
     }
 
-    async collect(driver: Driver, params: any): Promise<any[]> {
+    async collect(driver: Driver, params: any): Promise<Invoice[]> {
         // Go to invoices
         await driver.left_click(FreeSelectors.BUTTON_INVOICES);
 
@@ -56,13 +57,16 @@ export class FreeCollector extends ScrapperCollector {
             let search_params = new URLSearchParams(link);
             const no_facture = search_params.get("no_facture");
             const date_string = search_params.get("mois");
-
-            let timestamp: number | null = null;
-            if (date_string) {
-                const year = parseInt(date_string.slice(0, 4));
-                const month = parseInt(date_string.slice(4, 6)) - 1; // Months in JavaScript are indexed from 0 to 11
-                timestamp = Date.UTC(year, month)
+            if (!no_facture) {
+                throw new Error(`Field 'no_facture' is missing in the link ${link}`);
             }
+            if (!date_string) {
+                throw new Error(`Field 'no_facture' is missing in the link ${link}`);
+            }
+
+            const year = parseInt(date_string.slice(0, 4));
+            const month = parseInt(date_string.slice(4, 6)) - 1; // Months in JavaScript are indexed from 0 to 11
+            const timestamp = Date.UTC(year, month);
 
             return {
                 id: no_facture,
@@ -75,7 +79,7 @@ export class FreeCollector extends ScrapperCollector {
         }));
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
-        await this.download_link(driver, invoice);
+    async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
+        return await this.download_link(driver, invoice);
     }
 }

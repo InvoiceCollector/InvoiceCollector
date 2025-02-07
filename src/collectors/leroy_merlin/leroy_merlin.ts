@@ -2,6 +2,7 @@ import { ScrapperCollector } from '../scrapperCollector';
 import { LeroyMerlinSelectors } from './selectors';
 import { Driver } from '../../driver';
 import { delay } from '../../utils';
+import { Invoice, DownloadedInvoice } from '../abstractCollector';
 
 export class LeroyMerlinCollector extends ScrapperCollector {
 
@@ -23,14 +24,14 @@ export class LeroyMerlinCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login"
+        entryUrl: "https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login"
     }
 
     constructor() {
         super(LeroyMerlinCollector.CONFIG);
     }
 
-    async login(driver, params){
+    async login(driver: Driver, params: any): Promise<string | void> {
         // Refuse cookies
         await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
 
@@ -44,7 +45,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         // Check if email is incorrect
         const email_error = await driver.wait_for_element(LeroyMerlinSelectors.CONTAINER_EMAIL_ERROR, false, 2000);
         if (email_error) {
-            return await email_error.evaluate(e => e.textContent);
+            return await email_error.evaluate(e => e.textContent) || "i18n.collectors.all.email.error";
         }
 
         // Input password
@@ -54,11 +55,11 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         // Check if password is incorrect
         const password_error = await driver.wait_for_element(LeroyMerlinSelectors.CONTAINER_PASSWORD_ERROR, false, 2000);
         if (password_error) {
-            return await password_error.evaluate(e => e.textContent);
+            return await password_error.evaluate(e => e.textContent) || "i18n.collectors.all.password.error";
         }
     }
 
-    async collect(driver: Driver, params: any) {    
+    async collect(driver: Driver, params: any): Promise<Invoice[]> {    
         const data = await driver.goto('https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login', 'https://www.leroymerlin.fr/order-followup/backend/v2/orders?');
 
         return data.map(order => { 
@@ -74,10 +75,10 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     }
 
     // Define custom method to download invoice
-    async download(driver: Driver, invoice: any): Promise<void> {
+    async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
         await driver?.goto(invoice.link);
         await driver?.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
         await delay(5000);
-        await this.download_from_file(driver, invoice);
+        return await this.download_from_file(driver, invoice);
     }
 }

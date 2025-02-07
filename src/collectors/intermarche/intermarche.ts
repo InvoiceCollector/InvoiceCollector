@@ -1,6 +1,7 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { IntermarcheSelectors } from './selectors';
 import { Driver } from '../../driver';
+import { Invoice } from '../abstractCollector';
 
 export class IntermarcheCollector extends ScrapperCollector {
 
@@ -22,7 +23,7 @@ export class IntermarcheCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://www.intermarche.com/gestion-de-compte/mes-courses?type=commandes"
+        entryUrl: "https://www.intermarche.com/gestion-de-compte/mes-courses?type=commandes"
     }
 
     constructor() {
@@ -59,7 +60,7 @@ export class IntermarcheCollector extends ScrapperCollector {
         // TODO : Implement the rest of the collector
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
+    async download(driver: Driver, invoice: Invoice): Promise<void> {
         // TODO : Implement the downloader
     }
 }

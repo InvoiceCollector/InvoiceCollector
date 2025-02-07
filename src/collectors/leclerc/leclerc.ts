@@ -1,4 +1,5 @@
 import { Driver } from '../../driver';
+import { Invoice } from '../abstractCollector';
 import { ScrapperCollector } from '../scrapperCollector';
 import { LeclercSelectors } from './selectors';
 
@@ -22,14 +23,14 @@ export class LeclercCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entry_url: "https://www.e.leclerc/auth"
+        entryUrl: "https://www.e.leclerc/auth"
     }
 
     constructor() {
         super(LeclercCollector.CONFIG);
     }
 
-    async login(driver, params){
+    async login(driver: Driver, params: any): Promise<string | void> {
             // Accept cookies
             await driver.left_click(LeclercSelectors.BUTTON_ACCEPT_COOKIES, false, 5000);
 
@@ -40,7 +41,7 @@ export class LeclercCollector extends ScrapperCollector {
             // Check if email is incorrect
             const email_error = await driver.wait_for_element(LeclercSelectors.CONTAINER_EMAIL_ERROR, false, 2000);
             if (email_error) {
-                return await email_error.evaluate(e => e.textContent);
+                return await email_error.evaluate(e => e.textContent) || "i18n.collectors.all.email.error";
             }
 
             // Check if email is incorrect
@@ -56,16 +57,16 @@ export class LeclercCollector extends ScrapperCollector {
             // Check if password is incorrect
             const password_error = await driver.wait_for_element(LeclercSelectors.CONTAINER_PASSWORD_ERROR, false, 5000);
             if (password_error) {
-                return await password_error.evaluate(e => e.textContent);
+                return await password_error.evaluate(e => e.textContent) || "i18n.collectors.all.password.error";
             }
     }
 
-    async collect(driver, params) {
+    async collect(driver: Driver, params: any): Promise<void> {
         await driver.goto("https://www.e.leclerc/espace-client/commandes/commandes");
         // TODO : Implement the rest of the collector
     }
 
-    async download(driver: Driver, invoice: any): Promise<void> {
+    async download(driver: Driver, invoice: Invoice): Promise<void> {
         // TODO : Implement the downloader
     }
 }
