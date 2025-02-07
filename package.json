@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "ts-node --transpile-only src/index.ts",
-    "test": "ts-node test/test.js",
+    "test": "ts-node test/test.ts",
     "debug": "nodemon --inspect=0.0.0.0:9229 --signal SIGINT --nolazy -L src/index.ts"
   },
   "dependencies": {

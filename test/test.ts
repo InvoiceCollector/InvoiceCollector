@@ -1,8 +1,9 @@
-const prompt = require('prompt-sync')({sigint: true});
-const fs = require('fs');
-const { Server } = require("../src/server.ts");
-const { collectors } = require('../src/collectors/collectors.ts');
-const dotenv = require('dotenv');
+import promptSync from 'prompt-sync';
+const prompt = promptSync({});
+import fs from 'fs';
+import { Server } from "../src/server";
+import { collectors } from '../src/collectors/collectors';
+import dotenv from 'dotenv';
 dotenv.config();
 
 (async () => {

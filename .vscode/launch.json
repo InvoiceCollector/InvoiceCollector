@@ -5,10 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Test Simple Collector",
+            "name": "Debug Collector",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/test/test.js",
+            "program": "${workspaceFolder}/test/test.ts",
+            "runtimeArgs": ["-r", "ts-node/register"],
+            "preLaunchTask": "tsc: build - tsconfig.json",
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "${workspaceFolder}",
             "console": "integratedTerminal",
