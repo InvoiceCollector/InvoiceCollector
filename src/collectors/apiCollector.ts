@@ -12,16 +12,18 @@ export abstract class ApiCollector extends AbstractCollector {
     }
 
     async _collect(params: any, locale: any, location: any): Promise<any[]> {
+        console.log(`API Collector, do not use proxy`);
+
         // Initialise axios instance
-        const instance = axios.create({
+        this.instance = axios.create({
             baseURL: this.config.baseUrl,
             timeout: 1000
         });
 
         // Collect invoices
-        const invoices = await this.collect(instance, params)
+        const invoices = await this.collect(this.instance, params)
         if (invoices === undefined) {
-            throw new UnfinishedCollector(this.config.name, this.config.version, instance.defaults.baseURL || "", "", "");
+            throw new UnfinishedCollector(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
         }
 
         return invoices;

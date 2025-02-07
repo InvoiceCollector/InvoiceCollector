@@ -43,5 +43,5 @@
 	"i18n.collectors.carrefour.description": "Carrefour is a French retail company.",
 
 	"i18n.collectors.ovh.description": "OVH is a French web hosting company.",
-	"i18n.collectors.ovh.instructions": "Get you credentials by clicking on <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill' target='_blank'>this link</a>."
+	"i18n.collectors.ovh.instructions": "Get you credentials by clicking on <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill' target='_blank'>this link</a>.<ul><li>Enter the name and the description of your choice</li><li>Select an unilimited validity</li><li>The rights must be \"GET /me/bill\"</li><li>Click on the button \"Create\"</li><li>Copy the Application key, Application secret and Consumer key in the form bellow</li></ul>"
 }

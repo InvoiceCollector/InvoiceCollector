@@ -43,5 +43,5 @@
 	"i18n.collectors.carrefour.description": "Carrefour est une enseigne de grande distribution française.",
 
 	"i18n.collectors.ovh.description": "OVH est un hébergeur web français.",
-	"i18n.collectors.ovh.instructions": "Obtenez vos identifiants en cliquant sur <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill' target='_blank'>ce lien</a>."
+	"i18n.collectors.ovh.instructions": "Obtenez vos identifiants en cliquant sur <a href='https://www.ovh.com/auth/api/createToken?GET=/me/bill&GET=/me/bill/*' target='_blank'>ce lien</a>.<ul><li>Entrez le nom et la description de votre choix</li><li>Sélectionnez une validité illimitée (Unlimited)</li><li>Les droits doivent être \"GET /me/bill\"</li><li>Cliquez sur le bouton \"Create\"</li><li>Copiez l'Application key, l'Application secret et la Consumer key dans le formulaire ci-dessous</li></ul>"
 }
