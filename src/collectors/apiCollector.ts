@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { AbstractCollector } from "./abstractCollector";
-import { UnfinishedCollector } from '../error';
+import { UnfinishedCollectorError } from '../error';
 
 export abstract class ApiCollector extends AbstractCollector {
 
@@ -22,8 +22,10 @@ export abstract class ApiCollector extends AbstractCollector {
 
         // Collect invoices
         const invoices = await this.collect(this.instance, params)
+        
+        // If invoices is undefined, collector is unfinished
         if (invoices === undefined) {
-            throw new UnfinishedCollector(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+            throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
         }
 
         return invoices;
@@ -34,6 +36,11 @@ export abstract class ApiCollector extends AbstractCollector {
             throw new Error('Instance is not initialized.');
         }
         await this.download(this.instance, invoice);
+
+        // If data field is missing, collector is unfinished
+        if (!invoice.data) {
+            throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+        }
     }
     
     //NOT IMPLEMENTED

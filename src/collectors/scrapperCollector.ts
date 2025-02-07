@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { AbstractCollector, Config } from "./abstractCollector";
 import { Driver } from '../driver';
-import { AuthenticationError, MaintenanceError, UnfinishedCollector } from '../error';
+import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from '../error';
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 
@@ -44,12 +44,14 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
         // Collect invoices
         const invoices = await this.collect(this.driver, params)
+        
+        // If invoices is undefined, collector is unfinished
         if (invoices === undefined) {
             const url = this.driver.url();
             const source_code = await this.driver.sourceCode();
             const screenshot = await this.driver.screenshot();
             await this.driver.close()
-            throw new UnfinishedCollector(this.config.name, this.config.version, url, source_code, screenshot);
+            throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
         }
 
         return invoices;
@@ -60,6 +62,15 @@ export abstract class ScrapperCollector extends AbstractCollector {
             throw new Error('Driver is not initialized.');
         }
         await this.download(this.driver, invoice);
+
+        // If data field is missing, collector is unfinished
+        if (!invoice.data) {
+            const url = this.driver.url();
+            const source_code = await this.driver.sourceCode();
+            const screenshot = await this.driver.screenshot();
+            await this.driver.close()
+            throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+        }
     }
 
     async close() {

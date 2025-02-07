@@ -106,7 +106,7 @@ export class ElementNotFoundError extends LoggableError {
     }
 }
 
-export class UnfinishedCollector extends LoggableError {
+export class UnfinishedCollectorError extends LoggableError {
     constructor(collector: string, version: string, url: string, source_code: string, screenshot: string, opts = {}) {
         super(
             `The collector is not finished`,
