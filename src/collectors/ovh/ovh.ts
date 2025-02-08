@@ -63,7 +63,6 @@ export class OvhCollector extends ApiCollector {
             const bill = await this.request(instance, params, 'GET', `/me/bill/${id}`);
             return {
                 id,
-                type: "direct_link",
                 timestamp: new Date(bill.date).getTime(),
                 amount: bill.priceWithTax.text,
                 link: bill.pdfUrl

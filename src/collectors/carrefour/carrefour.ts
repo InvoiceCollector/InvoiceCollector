@@ -72,7 +72,6 @@ export class CarrefourCollector extends ScrapperCollector {
 
             return {
                 id,
-                type: "link",
                 link,
                 timestamp,
                 amount

@@ -70,7 +70,6 @@ export class FreeCollector extends ScrapperCollector {
 
             return {
                 id: no_facture,
-                type: "link",
                 timestamp,
                 link,
                 amount

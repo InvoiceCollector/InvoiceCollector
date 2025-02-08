@@ -67,7 +67,6 @@ export class LeroyMerlinCollector extends ScrapperCollector {
                 id: order.orderPartNumber,
                 amount: order.price.totalAmount,
                 timestamp: order.parentOrder.createdAt || null,
-                type: "leroy_merlin",
                 link: `https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?orderId=${order.orderPartNumber}&storeNumber=${order.storeCode}&customerNumber=${order.customer.id}`
             }
         });
