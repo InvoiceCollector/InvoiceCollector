@@ -13,6 +13,8 @@ export type ScrapperConfig = Config & {
 
 export abstract class ScrapperCollector extends AbstractCollector {
 
+    static TYPE: string = 'web';
+
     driver: Driver | null;
 
     constructor(config: ScrapperConfig) {

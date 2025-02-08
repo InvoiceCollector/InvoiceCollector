@@ -9,6 +9,8 @@ export type ApiConfig = Config & {
 
 export abstract class ApiCollector extends AbstractCollector {
 
+    static TYPE: string = 'api';
+
     instance: AxiosInstance | null;
 
     constructor(config: ApiConfig) {

@@ -14,6 +14,7 @@ export type Config = {
             mandatory: boolean
         }
     },
+    type?: "web" | "api",
     entryUrl?: string,
     baseUrl?: string,
 }

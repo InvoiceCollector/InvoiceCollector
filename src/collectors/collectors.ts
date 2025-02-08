@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { ScrapperCollector } from './scrapperCollector';
+import { ApiCollector } from './apiCollector';
 
 export var collectors: any[] = []
 
@@ -32,6 +34,14 @@ for (const folder of folders) {
     for (const classKey of Object.keys(importedModule)) {
         // Set the key of the collector to the folder name
         importedModule[classKey].CONFIG.key = folder.name
+
+        // Define the type depending on the class
+        if (importedModule[classKey].prototype instanceof ScrapperCollector) {
+            importedModule[classKey].CONFIG.type = ScrapperCollector.TYPE;
+        }
+        else if (importedModule[classKey].prototype instanceof ApiCollector) {
+            importedModule[classKey].CONFIG.type = ApiCollector.TYPE;
+        }
         // Check if the class is a collector
         if (typeof importedModule[classKey] === 'function' && classKey.endsWith('Collector')) {
             // Add the collector to the list
