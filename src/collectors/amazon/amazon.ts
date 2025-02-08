@@ -2,6 +2,7 @@ import { Driver } from '../../driver';
 import { DownloadedInvoice, Invoice } from '../abstractCollector';
 import { ScrapperCollector } from '../scrapperCollector';
 import { AmazonSelectors } from './selectors';
+import { timestampFromString } from '../../utils';
 
 export class AmazonCollector extends ScrapperCollector {
 
@@ -85,28 +86,24 @@ export class AmazonCollector extends ScrapperCollector {
         await driver.page?.goto("https://www.amazon.fr/gp/css/order-history");
 
         // Get all order ids
-        const order_ids = await driver.get_all_attributes(AmazonSelectors.CONTAINER_ORDERID, "textContent", false, 5000);
-        
-        // Return invoices
-        let invoices: Invoice[] = [];
-        for (const order_id of order_ids) {
-            const link = `https://www.amazon.fr/gp/css/summary/print.html/?ie=UTF8&orderID=${order_id}`;
+        const orders = await driver.get_all_elements(AmazonSelectors.CONTAINER_ORDER, false, 5000);
 
-            // Get date
-            const timestamp = 0; //TODO
+        // Return orders
+        return Promise.all(orders.map(async (order) => {
+            const id = await order.get_attribute(AmazonSelectors.CONTAINER_ID, "textContent");
+            const amount = await order.get_attribute(AmazonSelectors.CONTAINER_AMOUNT, "textContent");
+            const date = await order.get_attribute(AmazonSelectors.CONTAINER_DATE, "textContent");
+            const link = `https://www.amazon.fr/gp/css/summary/print.html/?ie=UTF8&orderID=${id}`;
+            const timestamp = timestampFromString(date, 'd MMMM yyyy', 'fr');
 
-            // Get amount
-            const amount = "TODO";
-
-            invoices.push({
-                id: order_id,
+            return {
+                id,
                 timestamp,
                 mimetype: 'application/pdf',
-                amount: amount,
-                link: link
-            });
-        }
-        return invoices;
+                amount,
+                link
+            };
+        }));
     }
 
     async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {

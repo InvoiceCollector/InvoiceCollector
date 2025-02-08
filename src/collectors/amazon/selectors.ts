@@ -28,7 +28,19 @@ export const AmazonSelectors = {
 
     //INVOICES PAGE
 
-    CONTAINER_ORDERID: {
+    CONTAINER_ORDER: {
+        selector: ".order-card .order-header",
+        info: "order container"
+    },
+    CONTAINER_DATE: {
+        selector: ".a-span4 div:last-of-type span",
+        info: "order date"
+    },
+    CONTAINER_AMOUNT: {
+        selector: ".a-span2 div:last-of-type span",
+        info: "order date"
+    },
+    CONTAINER_ID: {
         selector: "div.yohtmlc-order-id > span.a-color-secondary:not([class*=' '])",
         info: "download invoice button"
     }
