@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
-import { ScrapperCollector } from './scrapperCollector';
-import { ApiCollector } from './apiCollector';
+import { AbstractCollector } from './abstractCollector';
 
-export var collectors: any[] = []
+export var collectors: AbstractCollector[] = [];
+let collectorKeys: string[] = [];
 
 // Dynamically import all collectors
 const folders = fs.readdirSync(__dirname, { withFileTypes: true });
+
+console.log(`Loading collectors from ${__dirname}`);
 // List all folders in the directory
 for (const folder of folders) {
     // Skip if not a directory
@@ -29,25 +31,22 @@ for (const folder of folders) {
         continue;
     }
 
-    //Import file
+    // Load file
     const importedModule = require(file);
+    // For each class in the file
     for (const classKey of Object.keys(importedModule)) {
-        // Set the key of the collector to the folder name
-        importedModule[classKey].CONFIG.key = folder.name
-
-        // Define the type depending on the class
-        if (importedModule[classKey].prototype instanceof ScrapperCollector) {
-            importedModule[classKey].CONFIG.type = ScrapperCollector.TYPE;
-        }
-        else if (importedModule[classKey].prototype instanceof ApiCollector) {
-            importedModule[classKey].CONFIG.type = ApiCollector.TYPE;
-        }
         // Check if the class is a collector
         if (typeof importedModule[classKey] === 'function' && classKey.endsWith('Collector')) {
-            // Add the collector to the list
-            collectors.push(importedModule[classKey]);
+            // Instanciate the collector
+            let collector = new importedModule[classKey]();
+            // Set the key of the collector to the folder name
+            collector.config.key = folder.name;
+            // Add it to the list
+            collectors.push(collector);
+            // Add the class name to the list of collector names
+            collectorKeys.push(folder.name);
         }
     }
 }
 
-console.log(`${collectors.length} collectors loaded`);
+console.log(`${collectors.length} collectors loaded: ${collectorKeys.join(', ')}`);

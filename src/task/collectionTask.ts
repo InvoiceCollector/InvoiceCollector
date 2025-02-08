@@ -80,9 +80,8 @@ export class CollectionTask {
             // Get secret from secret_manager_id
             const secret = await this.secret_manager.getSecret(credential.secret_manager_id);
 
-            // Get collector from key and instantiate it
-            const collector_class = this.get_collector(credential.key);
-            const collector = new collector_class();
+            // Get collector from key
+            const collector = this.get_collector(credential.key);
 
             // Compute if this is the first collect
             const first_collect = !credential.last_collect_timestamp;
@@ -196,13 +195,13 @@ export class CollectionTask {
     }
     
     get_collector(key) {
-        const collector_pointers = collectors.filter((collector) => collector.CONFIG.key.toLowerCase() == key.toLowerCase())
+        const collector_pointers = collectors.filter((collector) => collector.config.key.toLowerCase() == key.toLowerCase())
         if(collector_pointers.length == 0) {
             throw new Error(`No collector with key "${key}" found.`);
         }
         if(collector_pointers.length > 1) {
             throw new Error(`Found ${collector_pointers.length} collectors with key "${key}".`);
         }
-         return collector_pointers[0]
+        return collector_pointers[0]
     }
 }

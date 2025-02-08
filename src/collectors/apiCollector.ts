@@ -3,18 +3,35 @@ import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice 
 import { UnfinishedCollectorError } from '../error';
 import { mimetypeFromBase64 } from '../utils';
 
-export type ApiConfig = Config & {
-    baseUrl: string
+export type ApiConfig = {
+    name: string,
+    description: string,
+    instructions?: string,
+    version: string,
+    website: string,
+    logo: string,
+    params: {
+        [key: string]: {
+            name: string,
+            placeholder: string,
+            mandatory: boolean
+        }
+    },
+    baseUrl: string,
 }
 
 export abstract class ApiCollector extends AbstractCollector {
 
-    static TYPE: string = 'api';
+    static TYPE: "api" = 'api';
 
     instance: AxiosInstance | null;
 
     constructor(config: ApiConfig) {
-        super(config);
+        super({
+            ...config,
+            key: '',
+            type: ApiCollector.TYPE
+    });
         this.instance = null;
     }
 

@@ -7,18 +7,35 @@ import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 import { mimetypeFromBase64 } from '../utils';
 
-export type ScrapperConfig = Config & {
-    entryUrl: string
+export type ScrapperConfig = {
+    name: string,
+    description: string,
+    instructions?: string,
+    version: string,
+    website: string,
+    logo: string,
+    params: {
+        [key: string]: {
+            name: string,
+            placeholder: string,
+            mandatory: boolean
+        }
+    },
+    entryUrl: string,
 }
 
 export abstract class ScrapperCollector extends AbstractCollector {
 
-    static TYPE: string = 'web';
+    static TYPE: "web" = 'web';
 
     driver: Driver | null;
 
     constructor(config: ScrapperConfig) {
-        super(config);
+        super({
+            ...config,
+            key: '',
+            type: ScrapperCollector.TYPE,
+        });
         this.driver = null;
     }
 

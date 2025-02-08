@@ -18,21 +18,16 @@ dotenv.config();
     }
 
     // Get collectors
-    const collector_pointers = collectors.filter((collector) => collector.CONFIG.key == key.toLowerCase())
-    if(collector_pointers.length == 0) {
-        throw new Error(`No collector named "${key}" found.`);
+    const matching_collectors = collectors.filter((collector) => collector.config.key == key.toLowerCase())
+    if(matching_collectors.length == 0) {
+        throw new Error(`No collector with key "${key}" found.`);
     }
-    if(collector_pointers.length > 1) {
-        throw new Error(`Found ${collector_pointers.length} collectors named "${key}".`);
+    if(matching_collectors.length > 1) {
+        throw new Error(`Found ${matching_collectors.length} collectors with key "${key}".`);
     }
 
     // Get collectors
-    const collector = new collector_pointers[0]();
-
-    // Update puppeteer config
-    if (collector.PUPPETEER_CONFIG) {
-      collector.PUPPETEER_CONFIG.headless = false;
-    }
+    const collector = matching_collectors[0];
 
     let params = {}
     let argv_index = 3;

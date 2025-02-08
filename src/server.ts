@@ -11,6 +11,7 @@ import { IcCredential } from './model/credential';
 import { CollectionTask } from './task/collectionTask';
 import { I18n } from 'i18n';
 import { ProxyFactory } from './proxy/proxyFactory';
+import { AbstractCollector } from './collectors/abstractCollector';
 
 export class Server {
 
@@ -197,7 +198,7 @@ export class Server {
         return credentials.map((credential) => {
             const collector = this.get_collector(credential.key);
             return {
-                collector: collector.CONFIG,
+                collector: collector.config,
                 note: credential.note,
                 credential_id: credential.id,
                 state: credential.state,
@@ -229,7 +230,7 @@ export class Server {
 
         // If no note, set it to collector description
         if(!note) {
-            note = Server.i18n.__({ phrase: collector.CONFIG.description, locale: user.locale });
+            note = Server.i18n.__({ phrase: collector.config.description, locale: user.locale });
         }
 
         if (user.location === null) {
@@ -303,19 +304,19 @@ export class Server {
 
         console.log(`Listing all collectors`);
         return collectors.map((collector) => {
-            const name = Server.i18n.__({ phrase: collector.CONFIG.name, locale });
-            const description = Server.i18n.__({ phrase: collector.CONFIG.description, locale });
-            const instructions = Server.i18n.__({ phrase: collector.CONFIG.instructions, locale });
-            const params = Object.keys(collector.CONFIG.params).reduce((acc, key) => {
+            const name = Server.i18n.__({ phrase: collector.config.name, locale });
+            const description = Server.i18n.__({ phrase: collector.config.description, locale });
+            const instructions = Server.i18n.__({ phrase: collector.config.instructions, locale });
+            const params = Object.keys(collector.config.params).reduce((acc, key) => {
                 acc[key] = {
-                    ...collector.CONFIG.params[key],
-                    name: Server.i18n.__({ phrase: collector.CONFIG.params[key].name, locale }),
-                    placeholder: Server.i18n.__({ phrase: collector.CONFIG.params[key].placeholder, locale })
+                    ...collector.config.params[key],
+                    name: Server.i18n.__({ phrase: collector.config.params[key].name, locale }),
+                    placeholder: Server.i18n.__({ phrase: collector.config.params[key].placeholder, locale })
                 };
                 return acc;
             }, {});
             return {
-            ...collector.CONFIG,
+            ...collector.config,
             name,
             description,
             instructions,
@@ -324,14 +325,14 @@ export class Server {
         });
     }
 
-    get_collector(key) {
-        const collector_pointers = collectors.filter((collector) => collector.CONFIG.key.toLowerCase() == key.toLowerCase())
-        if(collector_pointers.length == 0) {
+    get_collector(key): AbstractCollector {
+        const matching_collectors = collectors.filter((collector) => collector.config.key.toLowerCase() == key.toLowerCase())
+        if(matching_collectors.length == 0) {
             throw new Error(`No collector with key "${key}" found.`);
         }
-        if(collector_pointers.length > 1) {
-            throw new Error(`Found ${collector_pointers.length} collectors with key "${key}".`);
+        if(matching_collectors.length > 1) {
+            throw new Error(`Found ${matching_collectors.length} collectors with key "${key}".`);
         }
-        return collector_pointers[0]
+        return matching_collectors[0]
     }
 }
