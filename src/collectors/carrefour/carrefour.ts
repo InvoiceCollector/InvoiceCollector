@@ -74,7 +74,6 @@ export class CarrefourCollector extends ScrapperCollector {
                 id,
                 type: "link",
                 link,
-                mime: 'application/pdf',
                 timestamp,
                 amount
             };

@@ -71,7 +71,6 @@ export class FreeCollector extends ScrapperCollector {
             return {
                 id: no_facture,
                 type: "link",
-                mime: 'application/pdf',
                 timestamp,
                 link,
                 amount

@@ -66,8 +66,7 @@ export class OvhCollector extends ApiCollector {
                 type: "direct_link",
                 timestamp: new Date(bill.date).getTime(),
                 amount: bill.priceWithTax.text,
-                link: bill.pdfUrl,
-                mimetype: "application/pdf"
+                link: bill.pdfUrl
             }
         }));
     }

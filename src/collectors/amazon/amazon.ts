@@ -99,7 +99,6 @@ export class AmazonCollector extends ScrapperCollector {
             return {
                 id,
                 timestamp,
-                mimetype: 'application/pdf',
                 amount,
                 link
             };

@@ -22,13 +22,15 @@ export type Invoice = {
     id: string,
     timestamp: number,
     amount?: string,
-    link?: string,
-    mimetype?: string
+    link?: string
 }
 
 export type DownloadedInvoice = Invoice & {
-    mimetype: string,
     data: string
+}
+
+export type CompleteInvoice = DownloadedInvoice & {
+    mimetype: string
 }
 
 export abstract class AbstractCollector {
@@ -47,12 +49,11 @@ export abstract class AbstractCollector {
         });
         return {
             ...invoice,
-            data: response.data.toString("base64"),
-            mimetype: response.headers['content-type'] || "application/octet-stream"
+            data: response.data.toString("base64")
         };
     }
 
-    async collect_new_invoices(params: any, download: boolean, previousInvoices: any[], locale: string, location: any): Promise<DownloadedInvoice[]> {
+    async collect_new_invoices(params: any, download: boolean, previousInvoices: any[], locale: string, location: any): Promise<CompleteInvoice[]> {
             // Check if a mandatory field is missing
             for (const [key, value] of Object.entries(this.config.params)) {
                 if (value.mandatory && !params[key]) {
@@ -64,7 +65,7 @@ export abstract class AbstractCollector {
 
             // Get new invoices
             const newInvoices = invoices.filter((inv) => !previousInvoices.includes(inv.id));
-            let downloadedInvoices: DownloadedInvoice[] = [];
+            let completeInvoices: CompleteInvoice[] = [];
 
             if(newInvoices.length > 0) {
                 console.log(`Found ${invoices.length} invoices but only ${newInvoices.length} are new`);
@@ -75,11 +76,11 @@ export abstract class AbstractCollector {
 
                     // For each invoice
                     for(let newInvoice of newInvoices) {
-                        downloadedInvoices.push(await this._download(newInvoice));
+                        completeInvoices.push(await this._download(newInvoice));
                     }
 
                     // Order invoices by timestamp
-                    downloadedInvoices.sort((a, b) => a.timestamp - b.timestamp);
+                    completeInvoices.sort((a, b) => a.timestamp - b.timestamp);
                 }
                 else {
                     console.log(`This is the first collect. Do not download invoices`);
@@ -92,16 +93,16 @@ export abstract class AbstractCollector {
             // Close the collector resources
             this.close();
 
-            return downloadedInvoices;
+            return completeInvoices;
     }
 
     //NOT IMPLEMENTED
 
     abstract _collect(params: any, locale: string, location: any): Promise<Invoice[]>;
 
-    abstract _download(invoice: Invoice): Promise<DownloadedInvoice>;
+    abstract _download(invoice: Invoice): Promise<CompleteInvoice>;
 
-    async close() {
+    async close(): Promise<void> {
         // Assume the collector does not need to close anything
     }
 }

@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
-import { AbstractCollector, Config, Invoice, DownloadedInvoice } from "./abstractCollector";
+import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
 import { UnfinishedCollectorError } from '../error';
+import { mimetypeFromBase64 } from '../utils';
 
 export type ApiConfig = Config & {
     baseUrl: string
@@ -35,18 +36,21 @@ export abstract class ApiCollector extends AbstractCollector {
         return invoices;
     }
 
-    async _download(invoice: Invoice): Promise<DownloadedInvoice> {
+    async _download(invoice: Invoice): Promise<CompleteInvoice> {
         if (!this.instance) {
             throw new Error('Instance is not initialized.');
         }
-        const downloadedInvoice = await this.download(this.instance, invoice);
+        let downloadedInvoice = await this.download(this.instance, invoice);
 
         // If data field is missing, collector is unfinished
         if (!downloadedInvoice) {
             throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
         }
 
-        return downloadedInvoice;
+        return {
+            ...downloadedInvoice,
+            mimetype: mimetypeFromBase64(downloadedInvoice.data)
+        };
     }
     
     //NOT IMPLEMENTED

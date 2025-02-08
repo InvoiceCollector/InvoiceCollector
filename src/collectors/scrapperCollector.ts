@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { AbstractCollector, Config, Invoice, DownloadedInvoice } from "./abstractCollector";
+import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from '../error';
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
+import { mimetypeFromBase64 } from '../utils';
 
 export type ScrapperConfig = Config & {
     entryUrl: string
@@ -61,14 +62,14 @@ export abstract class ScrapperCollector extends AbstractCollector {
         return invoices;
     }
 
-    async _download(invoice: Invoice): Promise<DownloadedInvoice> {
+    async _download(invoice: Invoice): Promise<CompleteInvoice> {
         if (!this.driver) {
             throw new Error('Driver is not initialized.');
         }
-        const downloadedInvocie = await this.download(this.driver, invoice);
+        let downloadedInvoice = await this.download(this.driver, invoice);
 
-        // If data field is missing, collector is unfinished
-        if (!downloadedInvocie) {
+        // If downloadedInvoice is undefined, collector is unfinished
+        if (!downloadedInvoice) {
             const url = this.driver.url();
             const source_code = await this.driver.sourceCode();
             const screenshot = await this.driver.screenshot();
@@ -76,7 +77,10 @@ export abstract class ScrapperCollector extends AbstractCollector {
             throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
         }
 
-        return downloadedInvocie;
+        return {
+            ...downloadedInvoice,
+            mimetype: mimetypeFromBase64(downloadedInvoice.data)
+        };
     }
 
     async close() {
@@ -107,8 +111,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
         }
         return {
             ...invoice,
-            data: await driver.downloadFile(invoice.link),
-            mimetype: "application/pdf" //TODO : get mimetype from the file
+            data: await driver.downloadFile(invoice.link)
         }
     }
 
@@ -116,8 +119,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
         await driver.goto(invoice.link);
         return {
             ...invoice,
-            data: await driver.pdf(),
-            mimetype: "application/pdf"
+            data: await driver.pdf()
         }
     }
 
@@ -136,8 +138,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
         return {
             ...invoice,
-            data,
-            mimetype: "application/pdf" //TODO : get mimetype from the file
+            data
         }
     }
 }

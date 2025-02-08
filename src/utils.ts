@@ -26,3 +26,19 @@ export function timestampFromString(date: string, format: string, locale: string
     const parsedDate = date_fns.parse(date, format, new Date(Date.UTC(1970, 0, 1)), { locale: dateFnsLocale });
     return parsedDate.setUTCMilliseconds(0);
 }
+
+export function mimetypeFromBase64(base64: string): string {
+    var signatures = {
+        JVBERi0: "application/pdf",
+        iVBORw0KGgo: "image/png",
+        "/9j/": "image/jpg"
+      };
+
+      for (var s in signatures) {
+        if (base64.startsWith(s)) {
+            return signatures[s];
+        }
+    }
+    console.warn(`Unknown mimetype for base64 string starting with ${base64.slice(0, 10)}`);
+    return 'application/octet-stream';
+}
