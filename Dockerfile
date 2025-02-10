@@ -1,8 +1,9 @@
 # Use the official node image as the base image
-FROM node:22-slim
+FROM node:22
 
 # Install necessary dependencies for running Chrome
 RUN apt-get update && apt-get install -y \
+    wget \
     gnupg \
     ca-certificates \
     apt-transport-https \
