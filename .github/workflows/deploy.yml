@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Kubernetes
 
 on:
   push:
@@ -6,46 +6,23 @@ on:
       - master
     paths:
       - 'src/**'
+      - 'views/**'
+      - 'locales/**'
   workflow_dispatch:
-    inputs:
-      package_version:
-        description: 'Package version'
-        required: true
+
+env:
+  TAG: master
+  IMAGE_NAME: ghcr.io/invoice-collector/invoice-collector
+  DEPLOYMENT_NAME_DEMO: invoice-collector-demo
+  CONTAINER_NAME_DEMO: invoice-collector-demo
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Get package version
-      id: get_version
-      run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          VERSION="${{ github.event.inputs.package_version }}"
-        else
-          VERSION=$(jq -r '.version' package.json)
-        fi
-        echo "Package version is $VERSION"
-        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-    - name: Create release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        prerelease: ${{ github.event_name == 'workflow_dispatch' }}
-
   publish-image:
     runs-on: ubuntu-latest
-    needs: create-release
 
     steps:
     - name: Checkout
@@ -55,8 +32,8 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{github.actor}}
-        password: ${{secrets.GITHUB_TOKEN}}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup QEMU
       uses: docker/setup-qemu-action@v3
@@ -72,5 +49,21 @@ jobs:
         push: true
         provenance: false
         tags: |
-          ghcr.io/invoice-collector/invoice-collector:${{ needs.create-release.outputs.version }}
-          ghcr.io/invoice-collector/invoice-collector:${{ github.event_name == 'workflow_dispatch' && 'pre-release' || 'latest' }}
+            ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+  push-to-kubernetes:
+    runs-on: ubuntu-latest
+    needs: publish-image
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Kubectl
+      uses: actions-hub/kubectl@master
+      env:
+        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl set image deployment/${{ env.DEPLOYMENT_NAME_DEMO }} ${{ env.CONTAINER_NAME_DEMO }}=${{ env.IMAGE_NAME }}:${{ env.TAG }}
