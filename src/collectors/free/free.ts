@@ -23,7 +23,8 @@ export class FreeCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entryUrl: "https://subscribe.free.fr/login/"
+        entryUrl: "https://subscribe.free.fr/login/",
+        useProxy: false, // TODO: Proxy is not compatible with Free
     }
 
     constructor() {

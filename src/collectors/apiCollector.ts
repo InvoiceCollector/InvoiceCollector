@@ -18,6 +18,7 @@ export type ApiConfig = {
         }
     },
     baseUrl: string,
+    useProxy?: boolean,
 }
 
 export abstract class ApiCollector extends AbstractCollector {
@@ -30,7 +31,8 @@ export abstract class ApiCollector extends AbstractCollector {
         super({
             ...config,
             key: '',
-            type: ApiCollector.TYPE
+            type: ApiCollector.TYPE,
+            useProxy: config.useProxy === undefined ? false : config.useProxy,
     });
         this.instance = null;
     }

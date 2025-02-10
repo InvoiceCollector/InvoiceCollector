@@ -22,6 +22,7 @@ export type ScrapperConfig = {
         }
     },
     entryUrl: string,
+    useProxy?: boolean,
 }
 
 export abstract class ScrapperCollector extends AbstractCollector {
@@ -35,13 +36,14 @@ export abstract class ScrapperCollector extends AbstractCollector {
             ...config,
             key: '',
             type: ScrapperCollector.TYPE,
+            useProxy: config.useProxy === undefined ? true : config.useProxy,
         });
         this.driver = null;
     }
 
     async _collect(params: any, locale: string, location: any): Promise<Invoice[]> {
         // Get proxy
-        const proxy = await ProxyFactory.getProxy().get(location);
+        const proxy = this.config.useProxy ? await ProxyFactory.getProxy().get(location) : null;
 
         // Start browser and page
         this.driver = new Driver(this);
