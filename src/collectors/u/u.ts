@@ -7,7 +7,7 @@ export class TotalEnergiesCollector extends ScrapperCollector {
 
     static CONFIG = {
         name: "U Courses",
-        description: "i18n.collectors.total_energies.description",
+        description: "i18n.collectors.u.description",
         version: "1",
         website: "https://www.coursesu.com",
         logo: "https://upload.wikimedia.org/wikipedia/fr/1/13/U_commer%C3%A7ants_logo_2018.svg",
