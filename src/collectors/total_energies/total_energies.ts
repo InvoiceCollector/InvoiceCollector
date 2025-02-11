@@ -6,7 +6,7 @@ import { Invoice } from '../abstractCollector';
 export class TotalEnergiesCollector extends ScrapperCollector {
 
     static CONFIG = {
-        name: "Total Energies (Electricité & Gaz)",
+        name: "i18n.collectors.total_energies.name",
         description: "i18n.collectors.total_energies.description",
         version: "1",
         website: "https://www.totalenergies.fr",

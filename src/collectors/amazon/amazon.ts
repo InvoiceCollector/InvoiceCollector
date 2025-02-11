@@ -7,7 +7,7 @@ import { timestampFromString } from '../../utils';
 export class AmazonCollector extends ScrapperCollector {
 
     static CONFIG = {
-        name: "Amazon",
+        name: "Amazon FR",
         description: "i18n.collectors.amazon.description",
         version: "1",
         website: "https://www.amazon.fr",
