@@ -2,7 +2,7 @@ import path from 'path';
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
-import { AuthenticationBearerError, OauthError, MissingField } from './error';
+import { AuthenticationBearerError, OauthError, MissingField, MissingParams } from './error';
 import { generate_token } from './utils';
 import { collectors } from './collectors/collectors';
 import { User } from './model/user';
@@ -265,6 +265,12 @@ export class Server {
         // Get credential note
         let note = params.note;
         delete params.note;
+
+        // Check if all mandatory params are present
+        const missing_params = Object.keys(collector.config.params).filter((param) => collector.config.params[param].mandatory && !params.hasOwnProperty(param));
+        if(missing_params.length > 0) {
+            throw new MissingParams(missing_params);
+        }
 
         // If no note, set it to collector description
         if(!note) {

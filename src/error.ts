@@ -31,6 +31,20 @@ export class MissingField extends StatusError {
     }
 }
 
+
+export class MissingParams extends StatusError {
+    constructor(field_name: string[], opts = {}) {
+        let message;
+        if (field_name.length === 1) {
+            message = `The param "${field_name[0]}" is missing`;
+        } else {
+            message = `The params "${field_name.join('", "')}" are missing`;
+        }
+        super(message, 400, opts);
+        this.name = this.constructor.name;
+    }
+}
+
 // COLLECTOR ERRORS
 
 export class CollectorError extends Error {
