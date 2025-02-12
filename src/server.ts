@@ -201,13 +201,7 @@ export class Server {
         else if((!token || !this.tokens.hasOwnProperty(token)) && !raise_error) {
             throw new OauthError();
         }
-
-        const user = this.tokens[token];
-
-        // Check if terms and conditions have been accepted
-       user.checkTermsConditions();
-
-        return user;
+        return this.tokens[token];
     }
 
     async get_user(token, verificationCode): Promise<any> {
@@ -222,12 +216,18 @@ export class Server {
             await user.commit();
         }
 
+        // Check if terms and conditions have been accepted
+       user.checkTermsConditions();
+
         return { locale: user.locale }
     }
 
     async get_credentials(token) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+        user.checkTermsConditions();
 
         // Get credentials from user
         let credentials = await user.getCredentials();
@@ -248,6 +248,9 @@ export class Server {
     async post_credential(token, key, params, ip) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+        user.checkTermsConditions();
 
         //Check if key field is missing
         if(!key) {
@@ -311,6 +314,9 @@ export class Server {
     async delete_credential(token, credential_id) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+        user.checkTermsConditions();
 
         // Get credential from credential_id
         const credential = await user.getCredential(credential_id);
