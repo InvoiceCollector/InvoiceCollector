@@ -33,7 +33,7 @@ export type DownloadedInvoice = Invoice & {
 }
 
 export type CompleteInvoice = DownloadedInvoice & {
-    mimetype: string
+    mimetype: string | null
 }
 
 export abstract class AbstractCollector {
@@ -92,6 +92,15 @@ export abstract class AbstractCollector {
                 }
                 else {
                     console.log(`This is the first collect. Do not download invoices`);
+
+                    // Add not downloaded invoice to the list
+                    for(let newInvoice of newInvoices) {
+                        completeInvoices.push({
+                            ...newInvoice,
+                            data: null,
+                            mimetype: null
+                        });
+                    }
                 }
             }
             else {
