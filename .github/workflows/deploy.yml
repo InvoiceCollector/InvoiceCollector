@@ -59,11 +59,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Kubectl
+    - name: Deploy to Kubernetes
       uses: actions-hub/kubectl@master
       env:
         KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl set image deployment/${{ env.DEPLOYMENT_NAME_DEMO }} ${{ env.CONTAINER_NAME_DEMO }}=${{ env.IMAGE_NAME }}:${{ env.TAG }}
+      with:
+        args: set image deployment/${{ env.DEPLOYMENT_NAME_DEMO }} ${{ env.CONTAINER_NAME_DEMO }}=${{ env.IMAGE_NAME }}:${{ env.TAG }}
