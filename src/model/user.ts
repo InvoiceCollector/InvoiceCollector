@@ -1,5 +1,7 @@
 import { DatabaseFactory } from "../database/databaseFactory";
 import { TermsConditionsError } from "../error";
+import { SecretManagerFactory } from "../secret_manager/secretManagerFactory";
+import { IcCredential } from "./credential";
 
 export type TermsConditions = {
     verificationCode: string,
@@ -49,6 +51,13 @@ export class User {
     }
 
     async delete() {
+        // Get all credentials
+        const credentials: IcCredential[] = await this.getCredentials();
+
+        // Delete all secrets in secret manager
+        const secret_manager_ids: string[] = credentials.map(credential => credential.secret_manager_id);
+        await SecretManagerFactory.getSecretManager().deleteSecrets(secret_manager_ids);
+
         // Delete all credentials
         await DatabaseFactory.getDatabase().deleteCredentials(this.id);
 

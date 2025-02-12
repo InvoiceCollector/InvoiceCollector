@@ -41,7 +41,7 @@ export class Bitwarden extends AbstractSecretManager {
         this.connect();
     }
 
-    async connect() {
+    async connect(): Promise<void> {
         try {
             await this.client.auth().loginAccessToken(this.accessToken, Bitwarden.stateFile);
             console.log("Connected successfully to Bitwarden");
@@ -53,7 +53,7 @@ export class Bitwarden extends AbstractSecretManager {
 
     // SECRETS
 
-    async addSecret(key: string, params: object) {
+    async addSecret(key: string, params: any) {
         //JSON param before sending
         const stringParams: string = JSON.stringify(params);
         return await this.client.secrets().create(this.organizationId, key, stringParams, "", [this.projectId]);
@@ -66,6 +66,10 @@ export class Bitwarden extends AbstractSecretManager {
     }
 
     async deleteSecret(id: string) {
-        return await this.client.secrets().delete([id]);
+        return await this.deleteSecrets([id]);
+    }
+
+    async deleteSecrets(ids: string[]) {
+        return await this.client.secrets().delete(ids);
     }
 }
