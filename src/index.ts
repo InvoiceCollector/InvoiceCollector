@@ -1,5 +1,5 @@
-import express from 'express';
 import path from 'path';
+import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -82,6 +82,7 @@ app.get('/api/v1/user', async (req, res) => {
         const context = await server.get_user(req.query.token, req.query.verificationCode);
 
         // Render user.ejs
+        req.setLocale(context.locale);
         res.render('user/user', context);
     } catch (e) {
         handle_error(e, req, res);
@@ -158,6 +159,7 @@ function handle_error(e, req, res){
     }
     else if (e instanceof TermsConditionsError) {
         console.error(e.message);
+        req.setLocale(e.locale);
         res.render('terms_conditions/terms_conditions', {token: req.query.token});
     }
     else {

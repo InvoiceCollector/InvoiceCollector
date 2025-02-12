@@ -1,4 +1,5 @@
 import { DatabaseFactory } from "../database/databaseFactory";
+import { TermsConditionsError } from "../error";
 
 export type TermsConditions = {
     verificationCode: string,
@@ -55,7 +56,9 @@ export class User {
         await DatabaseFactory.getDatabase().deleteUser(this.id);
     }
 
-    termsConditionsAccepted(): boolean {
-        return this.termsConditions.validTimestamp !== undefined && this.termsConditions.validTimestamp > 0;
+    checkTermsConditions(): void {
+        if (this.termsConditions.validTimestamp == undefined) {
+            throw new TermsConditionsError(this.locale);
+        }
     }
 }

@@ -124,8 +124,11 @@ export class UnfinishedCollectorError extends LoggableError {
 // OTHER ERRORS
 
 export class TermsConditionsError extends Error {
-    constructor(opts = {}) {
+    locale: string;
+
+    constructor(locale: string, opts = {}) {
         super("The user did not accept the terms and conditions.", opts);
         this.name = this.constructor.name;
+        this.locale = locale;
     }
 }
