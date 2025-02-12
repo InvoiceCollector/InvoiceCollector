@@ -1,11 +1,23 @@
 import axios, { AxiosInstance } from 'axios';
 import { LoggableError } from './error'
+import * as utils from './utils'
+import { TermsConditions } from './model/user';
 
 export class RegistryServer {
+
+    static instance: RegistryServer;
     static VERSION = "v1"
+
+    static getInstance(): RegistryServer {
+        if (!RegistryServer.instance) {
+            RegistryServer.instance = new RegistryServer();
+        }
+        return RegistryServer.instance;
+    }
+
     private client: AxiosInstance;
 
-    constructor() {
+    private constructor() {
         if (!process.env.REGISTRY_SERVER_ENDPOINT) {
             throw new Error("REGISTRY_SERVER_ENDPOINT environment variable is required");
         }
@@ -47,5 +59,34 @@ export class RegistryServer {
         .catch(error => {
             console.error(`Could not reach Invoice-Collector server at ${error.request.res.responseUrl}. Status code: ${error.response.status}`);
         });
+    }
+
+    async sendTermsConditionsEmail(bearer: string, email: string, locale: string): Promise<TermsConditions> {    
+        // Get hash from bearer
+        const hashed_bearer = utils.hash_string(bearer.split(' ')[1]);
+        // Generate verification code
+        const verificationCode: string = utils.generateVerificationCode();
+        // Send email
+        console.log("Sending terms and conditions email to", email);
+        const response = await this.client.post("/email/terms_conditions", {
+            email,
+            locale,
+            verificationCode,
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${hashed_bearer}`
+            }
+        });
+
+        // Check response status
+        if (response.status !== 200) {
+            throw new Error(`Failed to send email to ${email}`);
+        }
+
+        return {
+            verificationCode,
+            sentTimestamp: Date.now(),
+        };
     }
 }

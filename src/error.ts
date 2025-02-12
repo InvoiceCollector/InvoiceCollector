@@ -120,3 +120,12 @@ export class UnfinishedCollectorError extends LoggableError {
         this.name = this.constructor.name;
     }
 }
+
+// OTHER ERRORS
+
+export class TermsConditionsError extends Error {
+    constructor(opts = {}) {
+        super("The user did not accept the terms and conditions.", opts);
+        this.name = this.constructor.name;
+    }
+}

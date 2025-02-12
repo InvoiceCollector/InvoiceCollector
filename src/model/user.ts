@@ -1,5 +1,11 @@
 import { DatabaseFactory } from "../database/databaseFactory";
 
+export type TermsConditions = {
+    verificationCode: string,
+    sentTimestamp: number,
+    validTimestamp?: number;
+}
+
 export class User {
 
     id: string;
@@ -7,13 +13,15 @@ export class User {
     remote_id: string;
     location: string | null;
     locale: string;
+    termsConditions: TermsConditions;
 
-    constructor(customer_id, remote_id, location = null, locale = "") {
+    constructor(customer_id: string, remote_id: string, location: string | null, locale: string, termsConditions: TermsConditions) {
         this.id = "";
         this.customer_id = customer_id;
         this.remote_id = remote_id;
         this.location = location;
         this.locale = locale;
+        this.termsConditions = termsConditions;
     }
 
     async getCustomer() {
@@ -45,5 +53,9 @@ export class User {
 
         // Delete the user
         await DatabaseFactory.getDatabase().deleteUser(this.id);
+    }
+
+    termsConditionsAccepted(): boolean {
+        return this.termsConditions.validTimestamp !== undefined && this.termsConditions.validTimestamp > 0;
     }
 }

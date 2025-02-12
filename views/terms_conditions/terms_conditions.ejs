@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice-Collector - <%= __('i18n.views.manage.terms-conditions') %></title>
+    <link rel="stylesheet" href="/views/styles.css">
+    <link rel="icon" href="/views/icons/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <script src="/views/terms_conditions/script.js"></script>
+
+    <!-- TERMS & CONDITIONS CONTAINER -->
+
+    <div id="terms-conditions-container" class="container">
+        <!-- TITLE -->
+        <h1><%= __('i18n.views.manage.terms-conditions') %></h1>
+        <!-- FORM -->
+        <form id="terms-conditions-form">
+            <!-- TOKEN -->
+            <input type="text" name="token" value="<%= token %>" required hidden>
+            <!-- CHECBOX -->
+            <div style="flex-direction: row;">
+                <input type="checkbox" name="acceptTerms" required>
+                <label for="accept-terms">
+                    <%= __('i18n.views.manage.read-terms-conditions') %>  
+                    <a href="https://invoice-collector.com/terms_conditions" target="_blank"><%= __('i18n.views.manage.terms-conditions') %></a>
+                </label>
+            </div>
+            <!-- VERFIICATION CODE -->
+            <label><%= __('i18n.views.manage.verification-code') %></label>
+            <input type="text" name="verificationCode" placeholder="<%= __('i18n.views.manage.verification-code.placeholder') %>" required>
+            <!-- ERROR -->
+            <p id="verificationCode-error" style="color: red;" hidden><%= __('i18n.views.manage.verification-code.error') %></p>
+            <button type="submit" class="button action-button"><%= __('i18n.views.manage.continue') %></button>
+        </form>
+    </div>
+</body>
+</html>

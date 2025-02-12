@@ -42,3 +42,7 @@ export function mimetypeFromBase64(base64: string): string {
     console.warn(`Unknown mimetype for base64 string starting with ${base64.slice(0, 10)}`);
     return 'application/octet-stream';
 }
+
+export function generateVerificationCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString().padStart(6, '0');
+}

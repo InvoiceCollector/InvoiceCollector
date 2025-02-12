@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { StatusError } from "./error"
+import { StatusError, TermsConditionsError } from "./error"
 import { Server } from "./server"
 
 // Configure express
@@ -36,13 +36,13 @@ app.post('/api/v1/authorize', async (req, res) => {
     try {
         // Perform authorization
         console.log('POST authorize');
-        const response = await server.post_authorize(req.headers.authorization, req.body.remote_id, req.body.locale);
+        const response = await server.post_authorize(req.headers.authorization, req.body.remote_id, req.body.locale, req.body.email);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -55,7 +55,7 @@ app.delete('/api/v1/user', async (req, res) => {
         // Build response
         res.end()
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -69,22 +69,22 @@ app.post('/api/v1/collect', async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
 // ---------- OAUTH TOKEN NEEDED ----------
 
-app.get('/api/v1/user', (req, res) => {
+app.get('/api/v1/user', async (req, res) => {
     try {
-        // Get locale from token
-        const locale = server.get_token_mapping(req.query.token).locale;
+        // Check user has accepted terms and conditions
+        console.log(`GET user`);
+        const context = await server.get_user(req.query.token, req.query.verificationCode);
 
         // Render user.ejs
-        req.setLocale(locale);
-        res.render('user', { locale });
+        res.render('user/user', context);
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -98,7 +98,7 @@ app.get('/api/v1/credentials', async (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(credentials));
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -112,7 +112,7 @@ app.post('/api/v1/credential', async (req, res) => {
         // Build response
         res.end()
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -125,7 +125,7 @@ app.delete('/api/v1/credential/:id', async (req, res) => {
         // Build response
         res.end()
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -141,7 +141,7 @@ app.get('/api/v1/collectors', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(response));
     } catch (e) {
-        handle_error(e, res);
+        handle_error(e, req, res);
     }
 });
 
@@ -151,24 +151,27 @@ app.use((req, res, next) => {
     res.status(404).end(JSON.stringify({type: "error", reason: "Endpoint not found"}));
 });
 
-function handle_error(e, res){
-    res.setHeader('Content-Type', 'application/json');
-    let status_code, reason;
+function handle_error(e, req, res){
     if(e instanceof StatusError) {
-        status_code = e.status_code;
-        reason = e.message;
+        res.setHeader('Content-Type', 'application/json');
+        res.status(e.status_code).end(JSON.stringify({type: "error", message: e.message}));
+    }
+    else if (e instanceof TermsConditionsError) {
+        console.error(e.message);
+        res.render('terms_conditions/terms_conditions', {token: req.query.token});
     }
     else {
         console.error(e);
-        status_code = 500;
+        let reason;
         if (process.env.ENV === 'debug') {
             reason = e.message;
         }
         else {
             reason = "Internal server error"
         }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(500).end(JSON.stringify({type: "error", reason}));
     }
-    res.status(status_code).end(JSON.stringify({type: "error", reason}));
 }
 
 function has_env_variables(){

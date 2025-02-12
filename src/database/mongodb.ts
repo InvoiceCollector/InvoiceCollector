@@ -107,7 +107,9 @@ export class MongoDB extends AbstractDatabase {
         let user = new User(
             document.customer_id.toString(),
             document.remote_id,
-            document.location
+            document.location,
+            document.locale,
+            document.termsConditions
         );
         user.id = document._id.toString();
         return user;
@@ -127,7 +129,9 @@ export class MongoDB extends AbstractDatabase {
         let user = new User(
             document.customer_id.toString(),
             document.remote_id,
-            document.location
+            document.location,
+            document.locale,
+            document.termsConditions
         );
         user.id = document._id.toString();
         return user;
@@ -140,7 +144,9 @@ export class MongoDB extends AbstractDatabase {
         const document = await this.db.collection(MongoDB.USER_COLLECTION).insertOne({
             customer_id: new ObjectId(user.customer_id),
             remote_id: user.remote_id,
-            location: user.location
+            location: user.location,
+            locale: user.locale,
+            termsConditions: user.termsConditions
         });
         user.id = document.insertedId.toString();
         return user;
@@ -155,7 +161,9 @@ export class MongoDB extends AbstractDatabase {
             { $set: {
                 customer_id: new ObjectId(user.customer_id),
                 remote_id: user.remote_id,
-                location: user.location
+                location: user.location,
+                locale: user.locale,
+                termsConditions: user.termsConditions
             }}
         );
     }

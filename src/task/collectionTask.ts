@@ -13,7 +13,7 @@ export class CollectionTask {
 
     constructor(secret_manager: AbstractSecretManager) {
         this.secret_manager = secret_manager;
-        this.registry_server = new RegistryServer()
+        this.registry_server = RegistryServer.getInstance();
 
         const onTick = async () => {
             console.log('Collection Task wakes up!');

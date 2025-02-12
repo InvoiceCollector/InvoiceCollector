@@ -3,7 +3,13 @@
 	"i18n.views.manage.select-collectors": "Sélectionner des collecteurs",
 	"i18n.views.manage.add-collectors": "Ajouter un collecteur",
 	"i18n.views.manage.instructions" : "Instructions",
+    "i18n.views.manage.continue": "Continuer",
 	"i18n.views.manage.return": "Retour",
+    "i18n.views.manage.read-terms-conditions": "Je reconnais avoir pris connaissance et accepter les",
+    "i18n.views.manage.terms-conditions": "Conditions générales d'utilisation",
+    "i18n.views.manage.verification-code": "Code de vérification",
+	"i18n.views.manage.verification-code.placeholder": "Code de vérification à 6 chiffres reçu par email",
+	"i18n.views.manage.verification-code.error": "Code de vérification incorrect",
     
 	"i18n.collectors.all.username": "Utilisateur",
 	"i18n.collectors.all.username.placeholder": "Utilisateur du compte",

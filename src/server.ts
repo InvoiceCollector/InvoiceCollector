@@ -2,7 +2,7 @@ import path from 'path';
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
-import { AuthenticationBearerError, OauthError, MissingField } from './error';
+import { AuthenticationBearerError, OauthError, MissingField, TermsConditionsError } from './error';
 import { generate_token } from './utils';
 import { collectors } from './collectors/collectors';
 import { User } from './model/user';
@@ -12,6 +12,7 @@ import { CollectionTask } from './task/collectionTask';
 import { I18n } from 'i18n';
 import { ProxyFactory } from './proxy/proxyFactory';
 import { AbstractCollector } from './collectors/abstractCollector';
+import { RegistryServer } from './log_server';
 
 export class Server {
 
@@ -44,7 +45,7 @@ export class Server {
 
     // ---------- BEARER TOKEN NEEDED ----------
 
-    async post_authorize(bearer, remote_id: string, locale: string) {
+    async post_authorize(bearer, remote_id: string, locale: string, email: string) {
         // Get user from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -63,6 +64,11 @@ export class Server {
             throw new MissingField("locale");
         }
 
+        //Check if email field is missing
+        if(!email) {
+            throw new MissingField("email");
+        }
+
         //Check if locale is supported
         if(locale && !Server.LOCALES.includes(locale)) {
             throw new Error(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`);
@@ -73,14 +79,26 @@ export class Server {
 
         // If user does not exist, create it
         if(!user) {
-            user = new User(customer.id, remote_id, null, locale);
-            // Create user in database
-            user.commit();
+            // Send terms and conditions email
+            const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(bearer, email, locale);
+            // Create user
+            user = new User(customer.id, remote_id, null, locale, termsConditions);
         }
         else {
             // Update user locale
             user.locale = locale;
+
+            // Check if user has accepted terms and conditions
+            if (!user.termsConditions.validTimestamp) {
+                // Send terms and conditions email
+                const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(bearer, email, locale);
+                // Update terms and conditions
+                user.termsConditions = termsConditions;
+            }
         }
+
+        // Commit changes in database
+        user.commit();
 
         // Generate oauth token
         const token = generate_token();
@@ -187,9 +205,34 @@ export class Server {
         return this.tokens[token];
     }
 
+    async get_user(token, verificationCode): Promise<any> {
+        // Get user from token
+        const user = this.get_token_mapping(token);
+
+        // Check if verificationCode is valid
+        if (verificationCode && user.termsConditions.verificationCode === verificationCode) {
+            // Validate terms and conditions by setting validTimestamp to now
+            user.termsConditions.validTimestamp = Date.now();
+            // Commit changes
+            await user.commit();
+        }
+
+        // Check if terms and conditions have been accepted
+        if (!user.termsConditionsAccepted()) {
+            throw new TermsConditionsError();
+        }
+
+        return { locale: user.locale }
+    }
+
     async get_credentials(token) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+         if (!user.termsConditionsAccepted()) {
+             throw new TermsConditionsError();
+         }
 
         // Get credentials from user
         let credentials = await user.getCredentials();
@@ -210,6 +253,11 @@ export class Server {
     async post_credential(token, key, params, ip) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+         if (!user.termsConditionsAccepted()) {
+             throw new TermsConditionsError();
+         }
 
         //Check if key field is missing
         if(!key) {
@@ -267,6 +315,11 @@ export class Server {
     async delete_credential(token, credential_id) {
         // Get user from token
          const user = this.get_token_mapping(token);
+
+         // Check if terms and conditions have been accepted
+         if (!user.termsConditionsAccepted()) {
+             throw new TermsConditionsError();
+         }
 
         // Get credential from credential_id
         const credential = await user.getCredential(credential_id);
