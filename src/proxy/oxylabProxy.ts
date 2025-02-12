@@ -1,12 +1,6 @@
-import { AbstractProxy, Proxy } from "./abstractProxy";
+import { AbstractProxy, Proxy, Location } from "./abstractProxy";
 
-type Location = {
-    country: string;
-    lat: string;
-    lon: string;
-};
-
-export class OxylabProxy extends AbstractProxy<Location> {
+export class OxylabProxy extends AbstractProxy {
 
     static RADIUS_ACCURACIES = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 
@@ -34,17 +28,5 @@ export class OxylabProxy extends AbstractProxy<Location> {
             username: `customer-${this.username}-cc-${location.country}`,
             password: this.password
         };
-    }
-
-    async locate(ip: string): Promise<Location | null> {
-        const location = await super._locate(ip);
-        if (!location) {
-            return null;
-        }
-        return {
-            country: location.countryCode,
-            lat: location.lat,
-            lon: location.lon
-        }
     }
 }

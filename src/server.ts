@@ -282,7 +282,7 @@ export class Server {
 
             // Update user with location
             user.location = await ProxyFactory.getProxy().locate(ip);
-            console.log(`User location: ${user.location}`);
+            console.log('User location found');
 
             if (user.location != null) {
                 // Commit user

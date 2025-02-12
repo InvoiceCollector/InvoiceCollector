@@ -3,7 +3,7 @@ import { NoProxy } from "./noProxy";
 import { OxylabProxy } from "./oxylabProxy";
 
 export class ProxyFactory {
-    static getProxy(): AbstractProxy<any> {
+    static getProxy(): AbstractProxy {
         const type = process.env.PROXY_TYPE;
         switch(type) {
             case 'oxylab':

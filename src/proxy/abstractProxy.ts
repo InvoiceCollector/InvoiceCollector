@@ -6,12 +6,16 @@ export type Proxy = {
     password?: string
 }
 
-export class AbstractProxy<L> {
-    async get(location: L): Promise<Proxy | null> {
-        throw new Error("Method 'get()' must be implemented.");
-    }
+export type Location = {
+    country: string;
+    lat: string;
+    lon: string;
+};
 
-    protected async _locate(ip: string): Promise<any | null> {
+export abstract class AbstractProxy {
+    abstract get(location: Location): Promise<Proxy | null>;
+
+    async locate(ip: string): Promise<any | null> {
         const response = await fetch(`http://ip-api.com/json/${ip}`);
         if (!response.ok) {
             return null;
@@ -20,10 +24,10 @@ export class AbstractProxy<L> {
         if(json.status === "fail") {
             return null;
         }
-        return json;
-    }
-
-    async locate(ip: string): Promise<L | null> {
-        throw new Error("Method 'locate()' must be implemented.");
+        return {
+            country: json.countryCode,
+            lat: json.lat,
+            lon: json.lon
+        }
     }
 }
