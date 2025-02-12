@@ -74,9 +74,11 @@ export class LeroyMerlinCollector extends ScrapperCollector {
 
     // Define custom method to download invoice
     async download(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
-        await driver?.goto(invoice.link);
-        await driver?.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
-        await delay(5000);
+        await driver.goto(invoice.link);
+        // If the order is from a third party provider, clicking on the button will ask leroy merlin to request the invoice from the provider.
+        // It can take few hours for the invoice to be available.
+        // Next time the button will be clicked, the invoice will be effectively downloaded.
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_DOWNLOAD);
         return await this.download_from_file(driver, invoice);
     }
 }

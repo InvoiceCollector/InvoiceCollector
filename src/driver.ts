@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import { PageWithCursor, connect } from 'puppeteer-real-browser';
 import { Browser, DownloadPolicy, ElementHandle } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
@@ -16,7 +17,17 @@ export class Driver {
         turnstile: true,
         headless: false,
         // disableXvfb: true,
-        customConfig: {},
+        customConfig: {
+            prefs: {
+                download: {
+                    open_pdf_in_system_reader: false,
+                    prompt_for_download: false
+                },
+                plugins: {
+                    always_open_pdf_externally: true
+                }
+            }
+        },
         connectOption: {
             downloadBehavior: {
                 policy: 'allow' as DownloadPolicy,
@@ -44,7 +55,7 @@ export class Driver {
         // Clone config static object
         let puppeteerConfig = { ...Driver.PUPPETEER_CONFIG };
         // If proxy is provided
-        if (proxy != null) {            
+        if (proxy != null) {
             // Set proxy
             puppeteerConfig["proxy"] = proxy;
             console.log(`Using proxy: ${proxy.host}`);
@@ -71,6 +82,14 @@ export class Driver {
                 }
             });
         }
+
+        // Create download folder if not exists
+        if (!fs.existsSync(Driver.DOWNLOAD_PATH)) {
+            fs.mkdirSync(Driver.DOWNLOAD_PATH);
+        }
+
+        // Clear download folder
+        this.clearDownloadFolder();
     }
 
     async close() {
@@ -262,39 +281,50 @@ export class Driver {
         return await this.page.screenshot({encoding: 'base64'});
     }
 
-    async downloadFile(url: string) {
+    async downloadFile(url: string): Promise<string | null> {
         if (this.page === null) {
             throw new Error('Page is not initialized.');
         }
 
-        // Enable request interception
-        await this.page.setRequestInterception(true);
-
-        // Get headers
-        const headerPromise = new Promise<any>((resolve) => {
-            if (this.page === null) {
-                throw new Error('Page is not initialized.');
-            }
-            this.page.on('request', request => {
-                if (request.url() === url) {
-                    resolve(request.headers());
-                }
-                if (!request.isInterceptResolutionHandled()) {
-                    request.continue();
-                }
-            });
-        });
+        // Remove all files in the download folder
+        this.clearDownloadFolder();
 
         // Navigate to the page
-        this.page.goto(url);
+        await this.page.evaluate((url) => {
+            location.href = url;
+        }, url);
 
-        // Wait for headers
-        const headers = await headerPromise;
+        // Wait for file to download
+        return await this.waitForFileToDownload();
+    }
 
-        // Fetch the file
-        const response = await fetch(url, {headers: headers});
-        const buffer = await response.arrayBuffer();
-        return Buffer.from(buffer).toString('base64');
+    async waitForFileToDownload(raise_exception: boolean = true): Promise<string | null> {
+        // Wait for file to download
+        const file = await this.waitFor(async (driver) => {
+            const files = fs.readdirSync(Driver.DOWNLOAD_PATH).filter(file => !file.endsWith('.crdownload'));
+            return files.length > 0 ? files[0] : null;
+        }, `No file downloaded after ${Driver.DEFAULT_TIMEOUT}ms`,
+        raise_exception);
+
+        // Check if no file found
+        if (file === null) {
+            return null;
+        }
+
+        // Read the file
+        const data = fs.readFileSync(path.join(Driver.DOWNLOAD_PATH, file), {encoding: 'base64'});
+
+        // Clear download folder
+        this.clearDownloadFolder();
+
+        return data;
+    }
+
+    clearDownloadFolder(): void {
+        // Remove all files in the download folder
+        fs.readdirSync(Driver.DOWNLOAD_PATH).forEach(file => {
+            fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
+        });
     }
 
     // CAPTCHAS

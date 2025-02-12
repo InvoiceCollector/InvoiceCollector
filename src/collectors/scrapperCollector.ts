@@ -1,6 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
+import { AbstractCollector, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
 import { Driver } from '../driver';
 import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from '../error';
 import { Server } from "../server"
@@ -145,21 +143,9 @@ export abstract class ScrapperCollector extends AbstractCollector {
     }
 
     async download_from_file(driver: Driver, invoice: Invoice): Promise<DownloadedInvoice> {
-        const files = fs.readdirSync(Driver.DOWNLOAD_PATH);
-        if (files.length === 0) {
-            throw new Error('No files found in the download path.');
-        }
-        const filePath = path.join(Driver.DOWNLOAD_PATH, files[0]);
-        const data = fs.readFileSync(filePath, {encoding: 'base64'});
-
-        //Delete all file in the download path
-        for (const file of files) {
-            fs.unlinkSync(path.join(Driver.DOWNLOAD_PATH, file));
-        }
-
         return {
             ...invoice,
-            data
+            data: await driver.waitForFileToDownload(false)
         }
     }
 }

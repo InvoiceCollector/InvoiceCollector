@@ -56,10 +56,16 @@ dotenv.config();
 
     // Collect invoices
     const invoices = await collector.collect_new_invoices(params, true, [], Server.DEFAULT_LOCALE, {country: "FR"});
-    console.log(invoices);
+    console.log(`${invoices.length} invoices downloaded`);
 
     for (const invoice of invoices) {
-        // Save data to file
-        fs.writeFileSync(`./media/${key}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
+        // If data is not null
+        if (invoice.data) {
+            // Save data to file
+            fs.writeFileSync(`./media/${key}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
+        }
+        else {
+            console.warn(`Invoice ${invoice.id} was not downloaded`);
+        }
     }
 })();

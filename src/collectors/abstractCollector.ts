@@ -29,7 +29,7 @@ export type Invoice = {
 }
 
 export type DownloadedInvoice = Invoice & {
-    data: string
+    data: string | null
 }
 
 export type CompleteInvoice = DownloadedInvoice & {
@@ -79,7 +79,12 @@ export abstract class AbstractCollector {
 
                     // For each invoice
                     for(let newInvoice of newInvoices) {
-                        completeInvoices.push(await this._download(newInvoice));
+                        const completeInvoice = await this._download(newInvoice);
+
+                        // If data is not null, the invoice is ready
+                        if(completeInvoice.data != null && completeInvoice.data.length > 0) {
+                            completeInvoices.push(completeInvoice);
+                        }
                     }
 
                     // Order invoices by timestamp

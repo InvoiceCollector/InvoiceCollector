@@ -27,7 +27,11 @@ export function timestampFromString(date: string, format: string, locale: string
     return parsedDate.setUTCMilliseconds(0);
 }
 
-export function mimetypeFromBase64(base64: string): string {
+export function mimetypeFromBase64(base64: string | null): string {
+    if(base64 == null) {
+        return 'application/octet-stream';
+    }
+
     var signatures = {
         JVBERi0: "application/pdf",
         iVBORw0KGgo: "image/png",
