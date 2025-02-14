@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { CronJob } from 'cron';
 import { IcCredential, State } from '../model/credential';
-import { LoggableError, AuthenticationError, MaintenanceError } from '../error';
+import { LoggableError, AuthenticationError, MaintenanceError, DesynchronizationError } from '../error';
 import { RegistryServer } from '../log_server';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
 import { collectors } from '../collectors/collectors';
@@ -83,6 +83,11 @@ export class CollectionTask {
             // Get collector from key
             const collector = this.get_collector(credential.key);
 
+            // Check if secret not found
+            if (!secret) {
+                throw new DesynchronizationError(credential.id, collector.config.name, collector.config.version);
+            }
+
             // Compute if this is the first collect
             const first_collect = !credential.last_collect_timestamp;
 
@@ -90,7 +95,7 @@ export class CollectionTask {
             const previousInvoices = credential.invoices.map((inv) => inv.id);
 
             // Collect invoices
-            const newInvoices = await collector.collect_new_invoices(secret.value, !first_collect, previousInvoices, user.locale, user.location);
+            const newInvoices = await collector.collect_new_invoices(secret, !first_collect, previousInvoices, user.locale, user.location);
                     
             console.log(`Invoice collection for credential ${credential_id} succeed`);
 

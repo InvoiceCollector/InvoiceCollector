@@ -53,31 +53,37 @@ export class Bitwarden extends AbstractSecretManager {
 
     // SECRETS
 
-    async addSecret(key: string, params: any) {
+    async addSecret(key: string, params: any): Promise<string> {
         //JSON param before sending
         const stringParams: string = JSON.stringify(params);
-        return await this.client.secrets().create(this.organizationId, key, stringParams, "", [this.projectId]);
+        return (await this.client.secrets().create(this.organizationId, key, stringParams, "", [this.projectId])).id;
     }
 
-    async getSecret(id: string) {
-        const secret = await this.client.secrets().get(id);
-        secret.value = JSON.parse(secret.value);
-        return secret
-    }
-
-    async deleteSecret(id: string) {
-        return await this.deleteSecrets([id]);
-    }
-
-    async deleteSecrets(ids: string[]) {
+    async getSecret(id: string): Promise<any | null> {
         try {
-            return await this.client.secrets().delete(ids);
+            const secret = await this.client.secrets().get(id);
+            return JSON.parse(secret.value);
         }
         catch (err) {
             if (err instanceof Error && err.message.includes("[404 Not Found]")) {
-                return undefined
+                return null;
             }
             throw err;
+        }
+    }
+
+    async deleteSecret(id: string): Promise<void> {
+        await this.deleteSecrets([id]);
+    }
+
+    async deleteSecrets(ids: string[]): Promise<void> {
+        try {
+            await this.client.secrets().delete(ids);
+        }
+        catch (err) {
+            if (!(err instanceof Error && err.message.includes("[404 Not Found]"))) {
+                throw err;
+            }
         }
     }
 }

@@ -11,11 +11,11 @@ export abstract class AbstractSecretManager {
 
     // SECRETS
 
-    abstract addSecret(key: string, params: any): Promise<any>;
+    abstract addSecret(key: string, params: any): Promise<string>;
 
-    abstract getSecret(id: string): Promise<any>;
+    abstract getSecret(id: string): Promise<any | null>;
 
-    abstract deleteSecret(id: string): Promise<any>;
+    abstract deleteSecret(id: string): Promise<void>;
 
-    abstract deleteSecrets(ids: string[]): Promise<any>;
+    abstract deleteSecrets(ids: string[]): Promise<void>;
 }

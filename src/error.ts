@@ -74,7 +74,7 @@ export class MaintenanceError extends CollectorError {
 export class AuthenticationError extends CollectorError {
     constructor(message: string, collector: string, version: string, opts = {}) {
         super(
-            message,
+            message.trim(),
             collector,
             version,
             opts
@@ -131,6 +131,13 @@ export class UnfinishedCollectorError extends LoggableError {
             screenshot,
             opts
         );
+        this.name = this.constructor.name;
+    }
+}
+
+export class DesynchronizationError extends AuthenticationError {
+    constructor(credential_id: string, collector: string, version: string, opts = {}) {
+        super(`Desynchronization Error - We are sorry but something went wrong with the collector. Please remove it and add it again. (${credential_id})`, collector, version, opts);
         this.name = this.constructor.name;
     }
 }

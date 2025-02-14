@@ -297,14 +297,14 @@ export class Server {
         }
 
         // Add credential to Secure Storage
-        const secret = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${key}`, params);
+        const secret_manager_id = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${key}`, params);
 
         // Create credential
         let credential = new IcCredential(
             user.id,
             key,
             note,
-            secret.id
+            secret_manager_id
         );
 
         // Compute next collect
