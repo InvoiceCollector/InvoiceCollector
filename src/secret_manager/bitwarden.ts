@@ -70,6 +70,14 @@ export class Bitwarden extends AbstractSecretManager {
     }
 
     async deleteSecrets(ids: string[]) {
-        return await this.client.secrets().delete(ids);
+        try {
+            return await this.client.secrets().delete(ids);
+        }
+        catch (err) {
+            if (err instanceof Error && err.message.includes("[404 Not Found]")) {
+                return undefined
+            }
+            throw err;
+        }
     }
 }
