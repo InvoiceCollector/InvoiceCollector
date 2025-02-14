@@ -32,6 +32,20 @@ const ENV_VARIABLES = [
 
 // ---------- BEARER TOKEN NEEDED ----------
 
+app.get('/api/v1/customer', async (req, res) => {
+    try {
+        // Get customer
+        console.log(`GET customer`);
+        const response = await server.get_customer(req.headers.authorization);
+
+        // Build response
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(response));
+    } catch (e) {
+        handle_error(e, req, res);
+    }
+});
+
 app.post('/api/v1/authorize', async (req, res) => {
     try {
         // Perform authorization

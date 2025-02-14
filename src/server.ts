@@ -45,6 +45,18 @@ export class Server {
 
     // ---------- BEARER TOKEN NEEDED ----------
 
+    async get_customer(bearer: string | undefined): Promise<any> {
+        // Get customer from bearer
+        const customer = await Customer.fromBearer(bearer);
+
+        // Check if customer exists
+        if(!customer) {
+            throw new AuthenticationBearerError();
+        }
+
+        return { callback: customer.callback }
+    }
+
     async post_authorize(bearer, remote_id: string, locale: string, email: string) {
         // Get user from bearer
         const customer = await Customer.fromBearer(bearer);
