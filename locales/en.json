@@ -6,7 +6,7 @@
     "i18n.views.manage.continue": "Continue",
     "i18n.views.manage.return": "Return",
     "i18n.views.manage.read-terms-conditions": "I acknowledge that I have read and accept the",
-    "i18n.views.manage.terms-conditions": "Terms & Conditions",
+    "i18n.views.manage.terms-conditions": "Terms of Use",
     "i18n.views.manage.verification-code": "Verification code",
 	"i18n.views.manage.verification-code.placeholder": "6 digits verification code received by email",
 	"i18n.views.manage.verification-code.error": "Incorrect verification code",
