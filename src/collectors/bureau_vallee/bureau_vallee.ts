@@ -13,8 +13,8 @@ export class BureauValleeCollector extends ScrapperCollector {
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Logo-bureau-vallee-2021.png/320px-Logo-bureau-vallee-2021.png",
         params: {
             id: {
-                name: "i18n.collectors.all.email_or_number",
-                placeholder: "i18n.collectors.all.email_or_number.placeholder",
+                name: "i18n.collectors.all.email",
+                placeholder: "i18n.collectors.all.email.placeholder",
                 mandatory: true
             },
             password: {
