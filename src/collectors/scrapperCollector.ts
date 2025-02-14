@@ -4,6 +4,7 @@ import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from 
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 import { mimetypeFromBase64 } from '../utils';
+import { Location } from "../proxy/abstractProxy";
 
 export type ScrapperConfig = {
     name: string,
@@ -39,7 +40,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
         this.driver = null;
     }
 
-    async _collect(params: any, locale: string, location: any): Promise<Invoice[]> {
+    async _collect(params: any, locale: string, location: Location | null): Promise<Invoice[]> {
         // Get proxy
         const proxy = this.config.useProxy ? await ProxyFactory.getProxy().get(location) : null;
 

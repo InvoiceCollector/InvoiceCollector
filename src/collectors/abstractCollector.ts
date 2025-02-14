@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Location } from '../proxy/abstractProxy';
 
 export type Config = {
     key: string,
@@ -56,7 +57,7 @@ export abstract class AbstractCollector {
         };
     }
 
-    async collect_new_invoices(params: any, download: boolean, previousInvoices: any[], locale: string, location: any): Promise<CompleteInvoice[]> {
+    async collect_new_invoices(params: any, download: boolean, previousInvoices: any[], locale: string, location: Location | null): Promise<CompleteInvoice[]> {
             // Check if a mandatory field is missing
             for (const [key, value] of Object.entries(this.config.params)) {
                 if (value.mandatory && !params[key]) {
@@ -115,7 +116,7 @@ export abstract class AbstractCollector {
 
     //NOT IMPLEMENTED
 
-    abstract _collect(params: any, locale: string, location: any): Promise<Invoice[]>;
+    abstract _collect(params: any, locale: string, location: Location | null): Promise<Invoice[]>;
 
     abstract _download(invoice: Invoice): Promise<CompleteInvoice>;
 

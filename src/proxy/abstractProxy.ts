@@ -13,9 +13,9 @@ export type Location = {
 };
 
 export abstract class AbstractProxy {
-    abstract get(location: Location): Promise<Proxy | null>;
+    abstract get(location: Location | null): Promise<Proxy | null>;
 
-    async locate(ip: string): Promise<any | null> {
+    async locate(ip: string): Promise<Location | null> {
         const response = await fetch(`http://ip-api.com/json/${ip}`);
         if (!response.ok) {
             return null;

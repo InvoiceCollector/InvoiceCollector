@@ -20,7 +20,11 @@ export class OxylabProxy extends AbstractProxy {
         this.password = process.env.PROXY_OXYLAB_PASSWORD || "";
     }
 
-    async get(location: Location): Promise<Proxy | null> {
+    async get(location: Location | null): Promise<Proxy | null> {
+        if(location == null) {
+            return null;
+        }
+
         return {
             uri: `http://customer-${this.username}-cc-${location.country}:${this.password}@pr.oxylabs.io:7777`,
             host: "pr.oxylabs.io",

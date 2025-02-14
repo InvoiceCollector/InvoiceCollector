@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
 import { UnfinishedCollectorError } from '../error';
 import { mimetypeFromBase64 } from '../utils';
+import { Location } from "../proxy/abstractProxy";
 
 export type ApiConfig = {
     name: string,
@@ -37,7 +38,7 @@ export abstract class ApiCollector extends AbstractCollector {
         this.instance = null;
     }
 
-    async _collect(params: any, locale: any, location: any): Promise<Invoice[]> {
+    async _collect(params: any, locale: any, location: Location | null): Promise<Invoice[]> {
         console.log(`API Collector, do not use proxy`);
 
         // Initialise axios instance

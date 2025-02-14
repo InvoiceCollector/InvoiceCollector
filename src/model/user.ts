@@ -1,5 +1,6 @@
 import { DatabaseFactory } from "../database/databaseFactory";
 import { TermsConditionsError } from "../error";
+import { Location } from "../proxy/abstractProxy";
 import { SecretManagerFactory } from "../secret_manager/secretManagerFactory";
 import { IcCredential } from "./credential";
 
@@ -14,11 +15,11 @@ export class User {
     id: string;
     customer_id: string;
     remote_id: string;
-    location: string | null;
+    location: Location | null;
     locale: string;
     termsConditions: TermsConditions;
 
-    constructor(customer_id: string, remote_id: string, location: string | null, locale: string, termsConditions: TermsConditions) {
+    constructor(customer_id: string, remote_id: string, location: Location | null, locale: string, termsConditions: TermsConditions) {
         this.id = "";
         this.customer_id = customer_id;
         this.remote_id = remote_id;

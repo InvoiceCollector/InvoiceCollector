@@ -285,11 +285,14 @@ export class Server {
 
             // Update user with location
             user.location = await ProxyFactory.getProxy().locate(ip);
-            console.log('User location found');
 
             if (user.location != null) {
+                console.log('User location found');
                 // Commit user
                 await user.commit();
+            }
+            else {
+                console.log('Could not find user location');
             }
         }
 
