@@ -54,7 +54,7 @@ export class Server {
             throw new AuthenticationBearerError();
         }
 
-        return { callback: customer.callback }
+        return { name: customer.name, callback: customer.callback }
     }
 
     async post_authorize(bearer: string | undefined, remote_id: string | undefined, locale: string | undefined, email: string | undefined): Promise<{token: string}> {

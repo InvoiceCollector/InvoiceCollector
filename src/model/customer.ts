@@ -18,11 +18,13 @@ export class Customer {
     }
 
     id: string;
+    name: string;
     callback: string;
     bearer: string;
 
-    constructor(callback: string, bearer: string) {
+    constructor(name: string, callback: string, bearer: string) {
         this.id = "";
+        this.name = name;
         this.callback = callback;
         this.bearer = bearer;
     }

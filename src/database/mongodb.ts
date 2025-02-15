@@ -60,7 +60,7 @@ export class MongoDB extends AbstractDatabase {
         if (!document) {
             return null;
         }
-        let customer = new Customer(document.callback, document.bearer);
+        let customer = new Customer(document.name, document.callback, document.bearer);
         customer.id = document._id.toString();
         return customer;
     }
@@ -75,7 +75,7 @@ export class MongoDB extends AbstractDatabase {
         if (!document) {
             return null;
         }
-        let customer = new Customer(document.callback, document.bearer);
+        let customer = new Customer(document.name, document.callback, document.bearer);
         customer.id = document._id.toString();
         return customer;
     }
@@ -87,6 +87,7 @@ export class MongoDB extends AbstractDatabase {
         await this.db.collection(MongoDB.CUSTOMER_COLLECTION).updateOne(
             { _id: new ObjectId(customer.id) },
             { $set: {
+                name: customer.name,
                 callback: customer.callback
             }}
         );
