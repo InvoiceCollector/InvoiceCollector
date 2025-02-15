@@ -62,7 +62,7 @@ async function showCredentials() {
             <h3>${credential.collector.name}</h3>
             <p>${credential.note}</p>
             </div>
-            <button class="button delete-button" onclick="deleteCredential('${credential.credential_id}')">
+            <button class="button delete-button" onclick="deleteCredential('${credential.id}')">
                 <img src="/views/icons/delete.png" alt="Delete"/>
             </button>
             ${buildCredentialFooter(credential)}

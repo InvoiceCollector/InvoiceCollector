@@ -161,7 +161,7 @@ export class Server {
         }
     }
 
-    async post_collect(bearer, credential_id) {
+    async post_collect(bearer, id) {
         // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -170,17 +170,17 @@ export class Server {
             throw new AuthenticationBearerError();
         }
 
-        // Check if credential_id field is missing
-        if(!credential_id) {
-            throw new MissingField("credential_id");
+        // Check if id field is missing
+        if(!id) {
+            throw new MissingField("id");
         }
 
-        // Get credential from credential_id
-        const credential = await IcCredential.fromId(credential_id);
+        // Get credential from id
+        const credential = await IcCredential.fromId(id);
 
         // Check if credential exists
         if (!credential) {
-            throw new StatusError(`Credential with id "${credential_id}" not found.`, 400);
+            throw new StatusError(`Credential with id "${id}" not found.`, 400);
         }
 
         // Get user from credential
@@ -250,7 +250,7 @@ export class Server {
             return {
                 collector: collector.config,
                 note: credential.note,
-                credential_id: credential.id,
+                id: credential.id,
                 state: credential.state,
                 error: credential.error
             }
@@ -326,24 +326,24 @@ export class Server {
         await credential.commit();
     }
 
-    async delete_credential(token, credential_id) {
+    async delete_credential(token, id: string) {
         // Get user from token
          const user = this.get_token_mapping(token);
 
          // Check if terms and conditions have been accepted
         user.checkTermsConditions();
 
-        // Get credential from credential_id
-        const credential = await user.getCredential(credential_id);
+        // Get credential from id
+        const credential = await user.getCredential(id);
 
         // Check if credential exists
         if (!credential) {
-            throw new StatusError(`Credential with id "${credential_id}" not found.`, 400);
+            throw new StatusError(`Credential with id "${id}" not found.`, 400);
         }
 
         // Check if credential belongs to user
         if (credential.user_id != user.id) {
-            throw new StatusError(`Credential with id "${credential_id}" does not belong to user.`, 403);
+            throw new StatusError(`Credential with id "${id}" does not belong to user.`, 403);
         }
 
         // Delete credential from Secure Storage

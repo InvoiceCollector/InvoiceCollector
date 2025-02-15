@@ -76,8 +76,8 @@ app.delete('/api/v1/user', async (req, res) => {
 app.post('/api/v1/collect', async (req, res) => {
     try {
         // Collect invoices
-        console.log(`POST collect ${req.body.credential_id}`);
-        const response = await server.post_collect(req.headers.authorization, req.body.credential_id);
+        console.log(`POST collect ${req.body.id}`);
+        const response = await server.post_collect(req.headers.authorization, req.body.id);
 
         // Build response
         res.setHeader('Content-Type', 'application/json');
