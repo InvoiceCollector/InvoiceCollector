@@ -3,7 +3,6 @@ import path from 'path';
 import { AbstractCollector } from './abstractCollector';
 
 export var collectors: AbstractCollector[] = [];
-let collectorKeys: string[] = [];
 
 // Dynamically import all collectors
 const folders = fs.readdirSync(__dirname, { withFileTypes: true });
@@ -39,14 +38,12 @@ for (const folder of folders) {
         if (typeof importedModule[classKey] === 'function' && classKey.endsWith('Collector')) {
             // Instanciate the collector
             let collector = new importedModule[classKey]();
-            // Set the key of the collector to the folder name
-            collector.config.key = folder.name;
+            // Set the id of the collector to the folder name
+            collector.config.id = folder.name;
             // Add it to the list
             collectors.push(collector);
-            // Add the class name to the list of collector names
-            collectorKeys.push(folder.name);
         }
     }
 }
 
-console.log(`${collectors.length} collectors loaded: ${collectorKeys.join(', ')}`);
+console.log(`${collectors.length} collectors loaded: ${collectors.map(c => c.config.id).join(', ')}`);

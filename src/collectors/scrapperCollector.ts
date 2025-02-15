@@ -33,7 +33,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
     constructor(config: ScrapperConfig) {
         super({
             ...config,
-            key: '',
+            id: '',
             type: ScrapperCollector.TYPE,
             useProxy: config.useProxy === undefined ? true : config.useProxy,
         });

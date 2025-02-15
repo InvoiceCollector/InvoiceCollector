@@ -7,23 +7,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 (async () => {
-    // Get collector key
-    let key;
+    // Get collector
+    let id;
     if(process.argv[2]) {
-        key = process.argv[2]
-        console.log(`collector: ${key}`)
+        id = process.argv[2]
+        console.log(`collector: ${id}`)
     }
     else {
-        key = prompt('collector: ');
+        id = prompt('collector: ');
     }
 
     // Get collectors
-    const matching_collectors = collectors.filter((collector) => collector.config.key == key.toLowerCase())
+    const matching_collectors = collectors.filter((collector) => collector.config.id == id.toLowerCase())
     if(matching_collectors.length == 0) {
-        throw new Error(`No collector with key "${key}" found.`);
+        throw new Error(`No collector with id "${id}" found.`);
     }
     if(matching_collectors.length > 1) {
-        throw new Error(`Found ${matching_collectors.length} collectors with key "${key}".`);
+        throw new Error(`Found ${matching_collectors.length} collectors with id "${id}".`);
     }
 
     // Get collectors
@@ -55,14 +55,14 @@ dotenv.config();
     }
 
     // Collect invoices
-    const invoices = await collector.collect_new_invoices(params, true, [], Server.DEFAULT_LOCALE, {country: "FR"});
+    const invoices = await collector.collect_new_invoices(params, true, [], Server.DEFAULT_LOCALE, {country: "FR", lat: '', lon: ''});
     console.log(`${invoices.length} invoices downloaded`);
 
     for (const invoice of invoices) {
         // If data is not null
         if (invoice.data) {
             // Save data to file
-            fs.writeFileSync(`./media/${key}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
+            fs.writeFileSync(`./media/${id}_${invoice.id}.pdf`, Buffer.from(invoice.data, 'base64'));
         }
         else {
             console.warn(`Invoice ${invoice.id} was not downloaded`);

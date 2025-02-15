@@ -246,7 +246,7 @@ export class Server {
 
         // Build response 
         return credentials.map((credential) => {
-            const collector = this.get_collector(credential.key);
+            const collector = this.get_collector(credential.collector_id);
             return {
                 collector: collector.config,
                 note: credential.note,
@@ -257,16 +257,16 @@ export class Server {
         });
     }
 
-    async post_credential(token, key, params, ip) {
+    async post_credential(token, collector_id, params, ip) {
         // Get user from token
          const user = this.get_token_mapping(token);
 
          // Check if terms and conditions have been accepted
         user.checkTermsConditions();
 
-        //Check if key field is missing
-        if(!key) {
-            throw new MissingField("key");
+        //Check if id field is missing
+        if(!collector_id) {
+            throw new MissingField("collector");
         }
 
         //Check if params field is missing
@@ -274,8 +274,8 @@ export class Server {
             throw new MissingField("params");
         }
 
-        // Get collector from key
-        const collector = this.get_collector(key);
+        // Get collector from id
+        const collector = this.get_collector(collector_id);
 
         // Get credential note
         let note = params.note;
@@ -309,12 +309,12 @@ export class Server {
         }
 
         // Add credential to Secure Storage
-        const secret_manager_id = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${key}`, params);
+        const secret_manager_id = await this.secret_manager.addSecret(`${user.customer_id}_${user.id}_${collector_id}`, params);
 
         // Create credential
         let credential = new IcCredential(
             user.id,
-            key,
+            collector_id,
             note,
             secret_manager_id
         );
@@ -390,13 +390,13 @@ export class Server {
         });
     }
 
-    get_collector(key): AbstractCollector {
-        const matching_collectors = collectors.filter((collector) => collector.config.key.toLowerCase() == key.toLowerCase())
+    get_collector(id): AbstractCollector {
+        const matching_collectors = collectors.filter((collector) => collector.config.id.toLowerCase() == id.toLowerCase())
         if(matching_collectors.length == 0) {
-            throw new StatusError(`No collector with key "${key}" found.`, 400);
+            throw new StatusError(`No collector with id "${id}" found.`, 400);
         }
         if(matching_collectors.length > 1) {
-            throw new Error(`Found ${matching_collectors.length} collectors with key "${key}".`);
+            throw new Error(`Found ${matching_collectors.length} collectors with id "${id}".`);
         }
         return matching_collectors[0]
     }

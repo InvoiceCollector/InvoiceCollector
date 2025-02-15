@@ -31,7 +31,7 @@ export abstract class ApiCollector extends AbstractCollector {
     constructor(config: ApiConfig) {
         super({
             ...config,
-            key: '',
+            id: '',
             type: ApiCollector.TYPE,
             useProxy: config.useProxy === undefined ? false : config.useProxy,
     });

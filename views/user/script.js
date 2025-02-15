@@ -105,7 +105,7 @@ function showForm(company) {
     document.getElementById('company-description').textContent = company.description;
     document.querySelector('#add-credential-instructions').hidden = !company.instructions;
     document.querySelector('#add-credential-instructions p').innerHTML = company.instructions;
-    document.getElementById('add-credential-form').dataset.key = company.key;
+    document.getElementById('add-credential-form').dataset.collector = company.id;
 
     // Add input fields
     const form = document.getElementById('add-credential-form-params');
@@ -155,7 +155,7 @@ async function addCredential(event) {
     await fetch(`credential?token=${token}`, {
         method: 'POST',
         body: JSON.stringify({
-            key: event.target.dataset.key,
+            collector: event.target.dataset.collector,
             params
         }),
         headers: {

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Location } from '../proxy/abstractProxy';
 
 export type Config = {
-    key: string,
+    id: string,
     type: "web" | "api",
     name: string,
     description: string,

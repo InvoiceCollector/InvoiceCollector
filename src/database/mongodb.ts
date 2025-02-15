@@ -208,7 +208,7 @@ export class MongoDB extends AbstractDatabase {
         return documents.map(document => {
             let credential = new IcCredential(
                 document.user_id.toString(),
-                document.key,
+                document.collector_id,
                 document.note,
                 document.secret_manager_id,
                 document.create_timestamp,
@@ -235,7 +235,7 @@ export class MongoDB extends AbstractDatabase {
         }
         let credential = new IcCredential(
             document.user_id.toString(),
-            document.key,
+            document.collector_id,
             document.note,
             document.secret_manager_id,
             document.create_timestamp,
@@ -255,7 +255,7 @@ export class MongoDB extends AbstractDatabase {
         }
         const document = await this.db.collection(MongoDB.CREDENTIAL_COLLECTION).insertOne({
             user_id: new ObjectId(credential.user_id),
-            key: credential.key,
+            collector_id: credential.collector_id,
             note: credential.note,
             secret_manager_id: credential.secret_manager_id,
             create_timestamp: credential.create_timestamp,
@@ -277,7 +277,7 @@ export class MongoDB extends AbstractDatabase {
             { _id: new ObjectId(credential.id) },
             { $set: {
                 user_id: new ObjectId(credential.user_id),
-                key: credential.key,
+                collector_id: credential.collector_id,
                 note: credential.note,
                 secret_manager_id: credential.secret_manager_id,
                 create_timestamp: credential.create_timestamp,

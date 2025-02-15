@@ -23,7 +23,7 @@ export class IcCredential {
 
     id: string;
     user_id: string;
-    key: string;
+    collector_id: string;
     note: string;
     secret_manager_id: string;
     create_timestamp: number;
@@ -35,7 +35,7 @@ export class IcCredential {
 
     constructor(
         user_id: string,
-        key: string,
+        collector_id: string,
         note: string,
         secret_manager_id: string,
         create_timestamp: number = Date.now(),
@@ -47,7 +47,7 @@ export class IcCredential {
     ) {
         this.id = "";
         this.user_id = user_id;
-        this.key = key;
+        this.collector_id = collector_id;
         this.note = note;
         this.secret_manager_id = secret_manager_id;
         this.create_timestamp = create_timestamp;

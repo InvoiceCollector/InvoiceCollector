@@ -80,8 +80,8 @@ export class CollectionTask {
             // Get secret from secret_manager_id
             const secret = await this.secret_manager.getSecret(credential.secret_manager_id);
 
-            // Get collector from key
-            const collector = this.get_collector(credential.key);
+            // Get collector from collector_id
+            const collector = this.get_collector(credential.collector_id);
 
             // Check if secret not found
             if (!secret) {
@@ -110,7 +110,7 @@ export class CollectionTask {
                         try {
                             await axios.post(customer.callback, {
                                 type: "invoice",
-                                collector: credential.key,
+                                collector: credential.collector_id,
                                 remote_id: user.remote_id,
                                 invoice
                             });
@@ -137,7 +137,7 @@ export class CollectionTask {
             credential.state = State.SUCCESS;
 
             // Log success
-            this.registry_server.logSuccess(collector.config.key);
+            this.registry_server.logSuccess(collector.config.id);
 
             // Update last collect
             credential.last_collect_timestamp = Date.now();
@@ -199,13 +199,13 @@ export class CollectionTask {
         }
     }
     
-    get_collector(key) {
-        const collector_pointers = collectors.filter((collector) => collector.config.key.toLowerCase() == key.toLowerCase())
+    get_collector(id: string) {
+        const collector_pointers = collectors.filter((collector) => collector.config.id.toLowerCase() == id.toLowerCase())
         if(collector_pointers.length == 0) {
-            throw new Error(`No collector with key "${key}" found.`);
+            throw new Error(`No collector with id "${id}" found.`);
         }
         if(collector_pointers.length > 1) {
-            throw new Error(`Found ${collector_pointers.length} collectors with key "${key}".`);
+            throw new Error(`Found ${collector_pointers.length} collectors with id "${id}".`);
         }
         return collector_pointers[0]
     }
