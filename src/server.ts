@@ -12,7 +12,7 @@ import { CollectionTask } from './task/collectionTask';
 import { I18n } from 'i18n';
 import { ProxyFactory } from './proxy/proxyFactory';
 import { AbstractCollector, Config } from './collectors/abstractCollector';
-import { RegistryServer } from './log_server';
+import { RegistryServer } from './registryServer';
 
 export class Server {
 

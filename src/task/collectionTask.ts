@@ -2,7 +2,7 @@ import axios from 'axios';
 import { CronJob } from 'cron';
 import { IcCredential, State } from '../model/credential';
 import { LoggableError, AuthenticationError, MaintenanceError, DesynchronizationError } from '../error';
-import { RegistryServer } from '../log_server';
+import { RegistryServer } from '../registryServer';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
 import { collectors } from '../collectors/collectors';
 
