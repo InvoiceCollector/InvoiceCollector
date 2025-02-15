@@ -7,11 +7,11 @@ import { generate_token } from './utils';
 import { collectors } from './collectors/collectors';
 import { User } from './model/user';
 import { Customer } from './model/customer';
-import { IcCredential } from './model/credential';
+import { IcCredential, State } from './model/credential';
 import { CollectionTask } from './task/collectionTask';
 import { I18n } from 'i18n';
 import { ProxyFactory } from './proxy/proxyFactory';
-import { AbstractCollector } from './collectors/abstractCollector';
+import { AbstractCollector, Config } from './collectors/abstractCollector';
 import { RegistryServer } from './log_server';
 
 export class Server {
@@ -57,7 +57,7 @@ export class Server {
         return { callback: customer.callback }
     }
 
-    async post_authorize(bearer, remote_id: string, locale: string, email: string) {
+    async post_authorize(bearer: string | undefined, remote_id: string | undefined, locale: string | undefined, email: string | undefined): Promise<{token: string}> {
         // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -92,7 +92,7 @@ export class Server {
         // If user does not exist, create it
         if(!user) {
             // Send terms and conditions email
-            const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(bearer, email, locale);
+            const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(customer.bearer, email, locale);
             // Create user
             user = new User(customer.id, remote_id, null, locale, termsConditions);
         }
@@ -103,7 +103,7 @@ export class Server {
             // Check if user has accepted terms and conditions
             if (!user.termsConditions.validTimestamp) {
                 // Send terms and conditions email
-                const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(bearer, email, locale);
+                const termsConditions = await RegistryServer.getInstance().sendTermsConditionsEmail(customer.bearer, email, locale);
                 // Update terms and conditions
                 user.termsConditions = termsConditions;
             }
@@ -127,7 +127,7 @@ export class Server {
         return { token }
     }
 
-    async delete_user(bearer: string|undefined, remote_id: string) {
+    async delete_user(bearer: string |  undefined, remote_id: string |  undefined) {
         // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -161,7 +161,7 @@ export class Server {
         }
     }
 
-    async post_collect(bearer, id) {
+    async post_collect(bearer: string |  undefined, id: string |  undefined) {
         // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);
 
@@ -205,18 +205,15 @@ export class Server {
 
     // ---------- OAUTH TOKEN NEEDED ----------
 
-    get_token_mapping(token, raise_error: boolean = true): User {
+    get_token_mapping(token: any): User {
         // Check if token is missing or incorrect
-        if((!token || !this.tokens.hasOwnProperty(token)) && raise_error ) {
-            throw new OauthError();
-        }
-        else if((!token || !this.tokens.hasOwnProperty(token)) && !raise_error) {
+        if(!token || !this.tokens.hasOwnProperty(token) || typeof token !== 'string') {
             throw new OauthError();
         }
         return this.tokens[token];
     }
 
-    async get_user(token, verificationCode): Promise<any> {
+    async get_user(token: any, verificationCode: any): Promise<{locale: string}> {
         // Get user from token
         const user = this.get_token_mapping(token);
 
@@ -234,7 +231,7 @@ export class Server {
         return { locale: user.locale }
     }
 
-    async get_credentials(token) {
+    async get_credentials(token: any): Promise<{collector: Config, id: string, note: string, state: State, error: string}[]> {
         // Get user from token
          const user = this.get_token_mapping(token);
 
@@ -257,7 +254,7 @@ export class Server {
         });
     }
 
-    async post_credential(token, collector_id, params, ip) {
+    async post_credential(token: any, collector_id: string | undefined, params: any | undefined, ip: string | string[] | undefined): Promise<void> {
         // Get user from token
          const user = this.get_token_mapping(token);
 
@@ -326,7 +323,7 @@ export class Server {
         await credential.commit();
     }
 
-    async delete_credential(token, id: string) {
+    async delete_credential(token: any, id: string): Promise<void> {
         // Get user from token
          const user = this.get_token_mapping(token);
 
@@ -355,9 +352,9 @@ export class Server {
 
     // ---------- NO OAUTH TOKEN NEEDED ----------
 
-    get_collectors(locale): object {
+    get_collectors(locale: any): Config[] {
         //Check if locale field is missing
-        if(!locale) {
+        if(!locale || typeof locale !== 'string') {
             //Set default locale
             locale = Server.DEFAULT_LOCALE;
         }
@@ -368,10 +365,10 @@ export class Server {
         }
 
         console.log(`Listing all collectors`);
-        return collectors.map((collector) => {
-            const name = Server.i18n.__({ phrase: collector.config.name, locale });
-            const description = Server.i18n.__({ phrase: collector.config.description, locale });
-            const instructions = Server.i18n.__({ phrase: collector.config.instructions, locale });
+        return collectors.map((collector): Config => {
+            const name: string = Server.i18n.__({ phrase: collector.config.name, locale });
+            const description: string = Server.i18n.__({ phrase: collector.config.description, locale });
+            const instructions: string = Server.i18n.__({ phrase: collector.config.instructions, locale });
             const params = Object.keys(collector.config.params).reduce((acc, key) => {
                 acc[key] = {
                     ...collector.config.params[key],
@@ -381,16 +378,16 @@ export class Server {
                 return acc;
             }, {});
             return {
-            ...collector.config,
-            name,
-            description,
-            instructions,
-            params
+                ...collector.config,
+                name,
+                description,
+                instructions,
+                params
             };
         });
     }
 
-    get_collector(id): AbstractCollector {
+    get_collector(id: string): AbstractCollector {
         const matching_collectors = collectors.filter((collector) => collector.config.id.toLowerCase() == id.toLowerCase())
         if(matching_collectors.length == 0) {
             throw new StatusError(`No collector with id "${id}" found.`, 400);

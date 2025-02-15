@@ -61,9 +61,7 @@ export class RegistryServer {
         });
     }
 
-    async sendTermsConditionsEmail(bearer: string, email: string, locale: string): Promise<TermsConditions> {    
-        // Get hash from bearer
-        const hashed_bearer = utils.hash_string(bearer.split(' ')[1]);
+    async sendTermsConditionsEmail(bearer: string, email: string, locale: string): Promise<TermsConditions> {
         // Generate verification code
         const verificationCode: string = utils.generateVerificationCode();
         // Send email
@@ -75,7 +73,7 @@ export class RegistryServer {
         },
         {
             headers: {
-                'Authorization': `Bearer ${hashed_bearer}`
+                'Authorization': `Bearer ${bearer}`
             }
         });
 

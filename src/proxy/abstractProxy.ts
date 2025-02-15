@@ -15,7 +15,23 @@ export type Location = {
 export abstract class AbstractProxy {
     abstract get(location: Location | null): Promise<Proxy | null>;
 
-    async locate(ip: string): Promise<Location | null> {
+    async locate(ip: string | string[] | undefined): Promise<Location | null> {
+        // Check if ip is an array
+        if (Array.isArray(ip)) {
+            for (const i of ip) {
+                const location = await this._locate(i);
+                if (location) {
+                    return location;
+                }
+            }
+        }
+        else if (typeof ip === 'string') {
+            return this._locate(ip);
+        }
+        return null;
+    }
+
+    private async _locate(ip: string): Promise<Location | null> {
         const response = await fetch(`http://ip-api.com/json/${ip}`);
         if (!response.ok) {
             return null;
