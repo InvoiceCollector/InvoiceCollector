@@ -113,8 +113,8 @@ export class CollectionTask {
                                 collector: credential.key,
                                 remote_id: user.remote_id,
                                 invoice
-                            })
-                        console.log("Callback succesfully reached");
+                            });
+                            console.log("Callback succesfully reached");
 
                             // Add invoice to credential only if callback successfully reached
                             credential.addInvoice(invoice);
