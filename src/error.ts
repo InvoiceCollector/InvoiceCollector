@@ -3,7 +3,7 @@
 export class StatusError extends Error {
     status_code: number;
 
-    constructor(message: string, status_code: number, opts) {
+    constructor(message: string, status_code: number, opts: any = {}) {
         super(message, opts);
         this.name = this.constructor.name;
         this.status_code = status_code;

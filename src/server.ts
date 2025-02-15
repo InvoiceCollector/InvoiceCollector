@@ -2,7 +2,7 @@ import path from 'path';
 import { DatabaseFactory } from './database/databaseFactory';
 import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
-import { AuthenticationBearerError, OauthError, MissingField, MissingParams } from './error';
+import { AuthenticationBearerError, OauthError, MissingField, MissingParams, StatusError } from './error';
 import { generate_token } from './utils';
 import { collectors } from './collectors/collectors';
 import { User } from './model/user';
@@ -58,7 +58,7 @@ export class Server {
     }
 
     async post_authorize(bearer, remote_id: string, locale: string, email: string) {
-        // Get user from bearer
+        // Get customer from bearer
         const customer = await Customer.fromBearer(bearer);
 
         // Check if customer exists
@@ -83,7 +83,7 @@ export class Server {
 
         //Check if locale is supported
         if(locale && !Server.LOCALES.includes(locale)) {
-            throw new Error(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`);
+            throw new StatusError(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`, 400);
         }
 
         // Get user from remote_id
@@ -146,7 +146,7 @@ export class Server {
 
         // Check if user exists
         if (!user) {
-            throw new Error(`User with remote_id "${remote_id}" not found.`);
+            throw new StatusError(`User with remote_id "${remote_id}" not found.`, 400);
         }
 
         // Delete user and all its credentials
@@ -180,7 +180,7 @@ export class Server {
 
         // Check if credential exists
         if (!credential) {
-            throw new Error(`Credential with id "${credential_id}" not found.`);
+            throw new StatusError(`Credential with id "${credential_id}" not found.`, 400);
         }
 
         // Get user from credential
@@ -188,12 +188,12 @@ export class Server {
 
         // Check if user exists
         if (!user) {
-            throw new Error(`Could not find user for credential with id "${credential.id}".`);
+            throw new StatusError(`Could not find user for credential with id "${credential.id}".`, 401);
         }
 
         // Check if user belongs to customer
         if (user.customer_id != customer.id) {
-            throw new Error(`User with id "${user.id}" does not belong to customer with id "${customer.id}".`);
+            throw new StatusError(`User with id "${user.id}" does not belong to customer with id "${customer.id}".`, 403);
         }
 
         // Schedule next collect now
@@ -338,12 +338,12 @@ export class Server {
 
         // Check if credential exists
         if (!credential) {
-            throw new Error(`Credential with id "${credential_id}" not found.`);
+            throw new StatusError(`Credential with id "${credential_id}" not found.`, 400);
         }
 
         // Check if credential belongs to user
         if (credential.user_id != user.id) {
-            throw new Error(`Credential with id "${credential_id}" does not belong to user.`);
+            throw new StatusError(`Credential with id "${credential_id}" does not belong to user.`, 403);
         }
 
         // Delete credential from Secure Storage
@@ -364,7 +364,7 @@ export class Server {
 
         //Check if locale is supported
         if(locale && !Server.LOCALES.includes(locale)) {
-            throw new Error(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`);
+            throw new StatusError(`Locale "${locale}" not supported. Available locales are: ${Server.LOCALES.join(", ")}.`, 400);
         }
 
         console.log(`Listing all collectors`);
@@ -393,7 +393,7 @@ export class Server {
     get_collector(key): AbstractCollector {
         const matching_collectors = collectors.filter((collector) => collector.config.key.toLowerCase() == key.toLowerCase())
         if(matching_collectors.length == 0) {
-            throw new Error(`No collector with key "${key}" found.`);
+            throw new StatusError(`No collector with key "${key}" found.`, 400);
         }
         if(matching_collectors.length > 1) {
             throw new Error(`Found ${matching_collectors.length} collectors with key "${key}".`);
