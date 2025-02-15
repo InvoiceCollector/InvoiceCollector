@@ -10,6 +10,7 @@ export type Config = {
     version: string,
     website: string,
     logo: string,
+    useProxy: boolean,
     params: {
         [key: string]: {
             name: string,
@@ -17,7 +18,6 @@ export type Config = {
             mandatory: boolean
         }
     },
-    useProxy: boolean,
     entryUrl?: string,
     baseUrl?: string,
 }
