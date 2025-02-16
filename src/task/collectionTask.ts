@@ -51,10 +51,10 @@ export class CollectionTask {
         let credential: IcCredential|null = null;
         let customer;
         try {
-            console.log(`Collecting invoices for ${credential_id}`);
-
             // Get credential from credential_id
             credential = await IcCredential.fromId(credential_id);
+
+            console.log(`Collecting invoices for ${credential_id} (${credential?.collector_id})`);
 
             // Check if credential exists
             if (!credential) {
