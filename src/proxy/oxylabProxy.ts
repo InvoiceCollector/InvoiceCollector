@@ -22,7 +22,8 @@ export class OxylabProxy extends AbstractProxy {
 
     async get(location: Location | null): Promise<Proxy | null> {
         if(location == null) {
-            return null;
+            console.log("Location is unknown, using default location");
+            location = AbstractProxy.DEFAULT_LOCATION
         }
 
         return {

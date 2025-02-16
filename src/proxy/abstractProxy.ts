@@ -13,6 +13,13 @@ export type Location = {
 };
 
 export abstract class AbstractProxy {
+
+    static DEFAULT_LOCATION: Location = {
+        country: 'FR',
+        lat: '48.853264',
+        lon: '2.348993'
+    }
+
     abstract get(location: Location | null): Promise<Proxy | null>;
 
     async locate(ip: string | string[] | undefined): Promise<Location | null> {
