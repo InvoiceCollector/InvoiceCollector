@@ -1,6 +1,6 @@
 import { AbstractCollector, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
 import { Driver } from '../driver';
-import { AuthenticationError, MaintenanceError, UnfinishedCollectorError } from '../error';
+import { AuthenticationError, CollectorError, LoggableError, MaintenanceError, UnfinishedCollectorError } from '../error';
 import { Server } from "../server"
 import { ProxyFactory } from '../proxy/proxyFactory';
 import { mimetypeFromBase64 } from '../utils';
@@ -46,61 +46,107 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
         // Start browser and page
         this.driver = new Driver(this);
-        await this.driver.open(proxy);
 
-        // Open entry url
-        await this.driver.goto(this.config.entryUrl);
+        try {
+            await this.driver.open(proxy);
 
-        // Check if website is in maintenance
-        const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
-        if (is_in_maintenance) {
-            await this.driver.close()
-            throw new MaintenanceError(this.config.name, this.config.version);
-        }
+            // Open entry url
+            await this.driver.goto(this.config.entryUrl);
 
-        // Login
-        const login_error = await this.login(this.driver, params)
+            // Check if website is in maintenance
+            const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
+            if (is_in_maintenance) {
+                await this.driver.close()
+                throw new MaintenanceError(this.config.name, this.config.version);
+            }
 
-        // Check if not authenticated
-        if (login_error) {
-            await this.driver.close()
-            throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
-        }
+            // Login
+            const login_error = await this.login(this.driver, params)
 
-        // Collect invoices
-        const invoices = await this.collect(this.driver, params)
-        
-        // If invoices is undefined, collector is unfinished
-        if (invoices === undefined) {
+            // Check if not authenticated
+            if (login_error) {
+                await this.driver.close()
+                throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
+            }
+
+            // Collect invoices
+            const invoices = await this.collect(this.driver, params)
+            
+            // If invoices is undefined, collector is unfinished
+            if (invoices === undefined) {
+                const url = this.driver.url();
+                const source_code = await this.driver.sourceCode();
+                const screenshot = await this.driver.screenshot();
+                await this.driver.close()
+                throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+            }
+
+            return invoices;
+        } catch (error) {
+            if (error instanceof CollectorError) {
+                throw error;
+            }
+
+            // For unexpected error happening during the collection
             const url = this.driver.url();
             const source_code = await this.driver.sourceCode();
             const screenshot = await this.driver.screenshot();
-            await this.driver.close()
-            throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+            await this.driver.close();
+            // Log the error
+            throw new LoggableError(
+                "An error occured while collecting invoices from web",
+                this.config.name,
+                this.config.version,
+                url,
+                source_code,
+                screenshot,
+                { cause: error }
+            );
         }
-
-        return invoices;
     }
 
     async _download(invoice: Invoice): Promise<CompleteInvoice> {
         if (!this.driver) {
             throw new Error('Driver is not initialized.');
         }
-        let downloadedInvoice = await this.download(this.driver, invoice);
 
-        // If downloadedInvoice is undefined, collector is unfinished
-        if (!downloadedInvoice) {
-            const url = this.driver.url();
+        try {
+            let downloadedInvoice = await this.download(this.driver, invoice);
+
+            // If downloadedInvoice is undefined, collector is unfinished
+            if (!downloadedInvoice) {
+                const url = this.driver.url();
+                const source_code = await this.driver.sourceCode();
+                const screenshot = await this.driver.screenshot();
+                await this.driver.close()
+                throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+            }
+
+            return {
+                ...downloadedInvoice,
+                mimetype: mimetypeFromBase64(downloadedInvoice.data)
+            };
+        } catch (error) {
+            if (error instanceof CollectorError) {
+                throw error;
+            }
+
+            // For unexpected error happening during the download
+            const url = invoice.link || this.driver.url();
             const source_code = await this.driver.sourceCode();
             const screenshot = await this.driver.screenshot();
-            await this.driver.close()
-            throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+            await this.driver.close();
+            // Log the error
+            throw new LoggableError(
+                "An error occured while downloading invoice from web",
+                this.config.name,
+                this.config.version,
+                url,
+                source_code,
+                screenshot,
+                { cause: error }
+            );
         }
-
-        return {
-            ...downloadedInvoice,
-            mimetype: mimetypeFromBase64(downloadedInvoice.data)
-        };
     }
 
     async close() {

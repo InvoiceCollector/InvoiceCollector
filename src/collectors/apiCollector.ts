@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
-import { AbstractCollector, Config, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
-import { UnfinishedCollectorError } from '../error';
+import { AbstractCollector, Invoice, DownloadedInvoice, CompleteInvoice } from "./abstractCollector";
+import { CollectorError, LoggableError, UnfinishedCollectorError } from '../error';
 import { mimetypeFromBase64 } from '../utils';
 import { Location } from "../proxy/abstractProxy";
 
@@ -47,32 +47,67 @@ export abstract class ApiCollector extends AbstractCollector {
             timeout: 1000
         });
 
-        // Collect invoices
-        const invoices = await this.collect(this.instance, params)
-        
-        // If invoices is undefined, collector is unfinished
-        if (invoices === undefined) {
-            throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
-        }
+        try {
+            // Collect invoices
+            const invoices = await this.collect(this.instance, params)
+            
+            // If invoices is undefined, collector is unfinished
+            if (invoices === undefined) {
+                throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+            }
 
-        return invoices;
+            return invoices;
+        } catch (error) {
+            if (error instanceof CollectorError) {
+                throw error;
+            }
+
+            // For unexpected error happening during the collection, log the error
+            throw new LoggableError(
+                "An error occured while collecting invoices from API",
+                this.config.name,
+                this.config.version,
+                '',
+                '',
+                '',
+                { cause: error }
+            );
+        }
     }
 
     async _download(invoice: Invoice): Promise<CompleteInvoice> {
         if (!this.instance) {
             throw new Error('Instance is not initialized.');
         }
-        let downloadedInvoice = await this.download(this.instance, invoice);
 
-        // If data field is missing, collector is unfinished
-        if (!downloadedInvoice) {
-            throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+        try {
+            let downloadedInvoice = await this.download(this.instance, invoice);
+
+            // If data field is missing, collector is unfinished
+            if (!downloadedInvoice) {
+                throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+            }
+
+            return {
+                ...downloadedInvoice,
+                mimetype: mimetypeFromBase64(downloadedInvoice.data)
+            };
+        } catch (error) {
+            if (error instanceof CollectorError) {
+                throw error;
+            }
+
+            // For unexpected error happening during the download, log the error
+            throw new LoggableError(
+                "An error occured while downloading invoices from API",
+                this.config.name,
+                this.config.version,
+                invoice.link || '',
+                '',
+                '',
+                { cause: error }
+            );
         }
-
-        return {
-            ...downloadedInvoice,
-            mimetype: mimetypeFromBase64(downloadedInvoice.data)
-        };
     }
     
     //NOT IMPLEMENTED
