@@ -1,14 +1,28 @@
 const token = new URLSearchParams(window.location.search).get('token');
 let companies = [];
+let ip = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    companies = await getCollectors();
-
     showCredentials(); 
     document.getElementById('add-credential-button').addEventListener('click', showCompanies);
     document.getElementById('return-to-credentials-button').addEventListener('click', showCredentials);
     document.getElementById('return-to-companies-button').addEventListener('click', showCompanies);
     document.getElementById('add-credential-form').addEventListener('submit', addCredential);
+
+    getCollectors()
+        .then(c => {
+            console.log(c.length, 'companies loaded');
+            companies = c;
+        }).catch(error => {
+            console.error('Error getting the companies:', error);
+        });
+
+    getIp()
+        .then(i => {
+            ip = i;
+        }).catch(error => {
+            console.error('Error getting the IP address:', error);
+        });
 });
 
 async function getCollectors() {
@@ -16,8 +30,12 @@ async function getCollectors() {
     return await response.json();
 }
 
+async function getIp() {
+    const response = await fetch("https://api.ipify.org?format=json")
+    return (await response.json()).ip;
+}
+
 function buildCredentialFooter(credential) {
-    console.log(credential);
     if (credential.state == "ERROR") {
         return `
             <div class="credential-footer credential-error">
@@ -159,7 +177,8 @@ async function addCredential(event) {
             params
         }),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-User-Ip': ip
         }
     });
 

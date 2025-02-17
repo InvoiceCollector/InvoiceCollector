@@ -121,11 +121,7 @@ app.post('/api/v1/credential', async (req, res) => {
     try {
         // Save credential
         console.log(`POST credential`);
-        console.log('x-forwarded-for =', req.headers['x-forwarded-for']);
-        console.log('x-real-ip =', req.headers['x-real-ip']);
-        console.log('req.socket.remoteAddress =', req.socket.remoteAddress);
-        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        await server.post_credential(req.query.token, req.body.collector, req.body.params, ip);
+        await server.post_credential(req.query.token, req.body.collector, req.body.params, req.headers['x-user-ip']);
 
         // Build response
         res.end()
