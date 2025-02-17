@@ -53,7 +53,7 @@ export abstract class ApiCollector extends AbstractCollector {
             
             // If invoices is undefined, collector is unfinished
             if (invoices === undefined) {
-                throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+                throw new UnfinishedCollectorError(this.config.id, this.config.version, this.instance.defaults.baseURL || "", "", "");
             }
 
             return invoices;
@@ -65,7 +65,7 @@ export abstract class ApiCollector extends AbstractCollector {
             // For unexpected error happening during the collection, log the error
             throw new LoggableError(
                 "An error occured while collecting invoices from API",
-                this.config.name,
+                this.config.id,
                 this.config.version,
                 '',
                 '',
@@ -85,7 +85,7 @@ export abstract class ApiCollector extends AbstractCollector {
 
             // If data field is missing, collector is unfinished
             if (!downloadedInvoice) {
-                throw new UnfinishedCollectorError(this.config.name, this.config.version, this.instance.defaults.baseURL || "", "", "");
+                throw new UnfinishedCollectorError(this.config.id, this.config.version, this.instance.defaults.baseURL || "", "", "");
             }
 
             return {
@@ -100,7 +100,7 @@ export abstract class ApiCollector extends AbstractCollector {
             // For unexpected error happening during the download, log the error
             throw new LoggableError(
                 "An error occured while downloading invoices from API",
-                this.config.name,
+                this.config.id,
                 this.config.version,
                 invoice.link || '',
                 '',

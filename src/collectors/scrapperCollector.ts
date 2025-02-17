@@ -57,7 +57,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
             const is_in_maintenance = await this.is_in_maintenance(this.driver, params)
             if (is_in_maintenance) {
                 await this.driver.close()
-                throw new MaintenanceError(this.config.name, this.config.version);
+                throw new MaintenanceError(this.config.id, this.config.version);
             }
 
             // Login
@@ -66,7 +66,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
             // Check if not authenticated
             if (login_error) {
                 await this.driver.close()
-                throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.name, this.config.version);
+                throw new AuthenticationError(Server.i18n.__({ phrase: login_error, locale }), this.config.id, this.config.version);
             }
 
             // Collect invoices
@@ -78,7 +78,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
                 const source_code = await this.driver.sourceCode();
                 const screenshot = await this.driver.screenshot();
                 await this.driver.close()
-                throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+                throw new UnfinishedCollectorError(this.config.id, this.config.version, url, source_code, screenshot);
             }
 
             return invoices;
@@ -95,7 +95,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
             // Log the error
             throw new LoggableError(
                 "An error occured while collecting invoices from web",
-                this.config.name,
+                this.config.id,
                 this.config.version,
                 url,
                 source_code,
@@ -119,7 +119,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
                 const source_code = await this.driver.sourceCode();
                 const screenshot = await this.driver.screenshot();
                 await this.driver.close()
-                throw new UnfinishedCollectorError(this.config.name, this.config.version, url, source_code, screenshot);
+                throw new UnfinishedCollectorError(this.config.id, this.config.version, url, source_code, screenshot);
             }
 
             return {
@@ -139,7 +139,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
             // Log the error
             throw new LoggableError(
                 "An error occured while downloading invoice from web",
-                this.config.name,
+                this.config.id,
                 this.config.version,
                 url,
                 source_code,

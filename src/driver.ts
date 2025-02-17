@@ -5,6 +5,7 @@ import { Browser, DownloadPolicy, ElementHandle } from "rebrowser-puppeteer-core
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
 import { delay } from './utils';
+import { AbstractCollector } from './collectors/abstractCollector';
 
 export class Driver {
 
@@ -41,11 +42,11 @@ export class Driver {
         plugins: []
     };
 
-    collector;
+    collector: AbstractCollector;
     browser: Browser | null;
     page: PageWithCursor | null;
 
-    constructor(collector) {
+    constructor(collector: AbstractCollector) {
         this.collector = collector;
         this.browser = null;
         this.page = null;
@@ -183,7 +184,7 @@ export class Driver {
                 const source_code = await this.page.content();
                 const source_code_base64 = Buffer.from(source_code).toString('base64')
                 const screenshot = await this.page.screenshot({encoding: 'base64'});
-                throw new ElementNotFoundError(this.collector.config.key, this.collector.config.version, url, source_code_base64, screenshot, selector, { cause: err })
+                throw new ElementNotFoundError(this.collector.config.id, this.collector.config.version, url, source_code_base64, screenshot, selector, { cause: err })
             }
             return null;
         }
