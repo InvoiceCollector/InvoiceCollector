@@ -8,7 +8,7 @@ export class CarrefourCollector extends ScrapperCollector {
     static CONFIG = {
         name: "Carrefour",
         description: "i18n.collectors.carrefour.description",
-        version: "1",
+        version: "2",
         website: "https://www.carrefour.fr",
         logo: "https://upload.wikimedia.org/wikipedia/fr/3/3b/Logo_Carrefour.svg",
         params: {
@@ -31,12 +31,14 @@ export class CarrefourCollector extends ScrapperCollector {
     }
 
     async login(driver: Driver, params: any): Promise<string | void> {
-        // Wait for captcha to be successful
-        await driver.waitForCloudflareTurnstile()
-
         // Input email and password
         await driver.input_text(CarrefourSelectors.FIELD_EMAIL, params.id);
         await driver.input_text(CarrefourSelectors.FIELD_PASSWORD, params.password);
+
+        // Wait for captcha to be successful
+        await driver.waitForCloudflareTurnstile()
+
+        // Click on submit button
         await driver.left_click(CarrefourSelectors.BUTTON_SUBMIT);
 
         // Check if login alert exists
