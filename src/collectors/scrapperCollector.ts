@@ -42,7 +42,7 @@ export abstract class ScrapperCollector extends AbstractCollector {
 
     async _collect(params: any, locale: string, location: Location | null): Promise<Invoice[]> {
         // Get proxy
-        const proxy = this.config.useProxy ? await ProxyFactory.getProxy().get(location) : null;
+        const proxy = this.config.useProxy ? ProxyFactory.getProxy().get(location) : null;
 
         // Start browser and page
         this.driver = new Driver(this);

@@ -20,7 +20,7 @@ export class OxylabProxy extends AbstractProxy {
         this.password = process.env.PROXY_OXYLAB_PASSWORD || "";
     }
 
-    async get(location: Location | null): Promise<Proxy | null> {
+    get(location: Location | null): Proxy | null {
         if(location == null) {
             console.log("Location is unknown, using default location");
             location = AbstractProxy.DEFAULT_LOCATION
