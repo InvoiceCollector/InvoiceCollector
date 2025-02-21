@@ -9,7 +9,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     static CONFIG = {
         name: "Leroy Merlin",
         description: "i18n.collectors.leroy_merlin.description",
-        version: "1",
+        version: "2",
         website: "https://www.leroymerlin.fr",
         logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Leroy_Merlin.svg",
         params: {
@@ -33,15 +33,15 @@ export class LeroyMerlinCollector extends ScrapperCollector {
 
     async login(driver: Driver, params: any): Promise<string | void> {
         // Refuse cookies
-        await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 15000, 1000);
 
         // Close shop chooser
-        await driver.left_click(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000);
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000, 1000);
 
         // Input email
         await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.id);
         await driver.pressEnter();
-                    
+
         // Check if email is incorrect
         const email_error = await driver.wait_for_element(LeroyMerlinSelectors.CONTAINER_EMAIL_ERROR, false, 2000);
         if (email_error) {
