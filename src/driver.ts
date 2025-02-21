@@ -4,13 +4,18 @@ import { PageWithCursor, connect } from 'puppeteer-real-browser';
 import { Browser, DownloadPolicy, ElementHandle } from "rebrowser-puppeteer-core";
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
-import { delay } from './utils';
+import * as utils from './utils';
 import { AbstractCollector } from './collectors/abstractCollector';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
+const stealth = StealthPlugin();
+stealth.enabledEvasions.delete('user-agent-override');
 
 export class Driver {
 
     static DEFAULT_TIMEOUT = 10000;
     static DEFAULT_POLLING = 1000;
+    static DEFAULT_DELAY = 0;
 
     static DOWNLOAD_PATH = path.resolve(__dirname, '../media/download');
     static PUPPETEER_CONFIG = {
@@ -39,7 +44,7 @@ export class Driver {
                 height: 1080,
             }
         },
-        plugins: []
+        plugins: [stealth],
     };
 
     collector: AbstractCollector;
@@ -120,7 +125,9 @@ export class Driver {
                     throw new Error('Page is not initialized.');
                 }
                 this.page.on('request', request => {
-                    request.continue();
+                    if (!request.isInterceptResolutionHandled()) {
+                        request.continue();
+                    }
                 });
 
                 this.page.on('response', async (response) => {
@@ -161,7 +168,7 @@ export class Driver {
             if (result != null) {
                 return result;
             }
-            await delay(polling);
+            await utils.delay(polling);
         }
 
         if (raise_exception) {
@@ -210,12 +217,13 @@ export class Driver {
         }, attributeName);
     }
 
-    async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+    async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT, delay = Driver.DEFAULT_DELAY) {
         if (this.page === null) {
             throw new Error('Page is not initialized.');
         }
         let element = await this.wait_for_element(selector, raise_exception, timeout);
         if(element != null) {
+            await utils.delay(delay);
             await element.click();
             try {
                 await this.page.waitForNavigation({timeout});
@@ -224,16 +232,18 @@ export class Driver {
         }
     }
 
-    async input_text(selector, text, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+    async input_text(selector, text, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT, delay = Driver.DEFAULT_DELAY) {
         let element = await this.wait_for_element(selector, raise_exception, timeout);
         if(element != null) {
+            await utils.delay(delay);
             await element.type(text);
         }
     }
 
-    async select_dropdown_menu_option(selector, option, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT) {
+    async select_dropdown_menu_option(selector, option, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT, delay = Driver.DEFAULT_DELAY) {
         await this.wait_for_element(selector, raise_exception, timeout);
         //TODO
+        throw new Error("Not implemented");
     }
 
     async pressEnter() {
