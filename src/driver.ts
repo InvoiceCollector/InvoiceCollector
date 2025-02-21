@@ -44,7 +44,7 @@ export class Driver {
                 height: 1080,
             }
         },
-        plugins: [stealth],
+        plugins: [/*stealth*/],
     };
 
     collector: AbstractCollector;
