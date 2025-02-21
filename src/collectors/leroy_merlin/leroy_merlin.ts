@@ -1,7 +1,7 @@
 import { ScrapperCollector } from '../scrapperCollector';
 import { LeroyMerlinSelectors } from './selectors';
 import { Driver } from '../../driver';
-import { delay } from '../../utils';
+import * as utils from '../../utils';
 import { Invoice, DownloadedInvoice } from '../abstractCollector';
 
 export class LeroyMerlinCollector extends ScrapperCollector {
@@ -9,7 +9,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     static CONFIG = {
         name: "Leroy Merlin",
         description: "i18n.collectors.leroy_merlin.description",
-        version: "2",
+        version: "3",
         website: "https://www.leroymerlin.fr",
         logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Leroy_Merlin.svg",
         params: {
@@ -36,10 +36,15 @@ export class LeroyMerlinCollector extends ScrapperCollector {
         await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 15000, 1000);
 
         // Close shop chooser
-        await driver.left_click(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000, 1000);
+        const closeShopChooser = await driver.wait_for_element(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000);
+        if(closeShopChooser) {
+            await driver.pressEnter();
+            await utils.delay(1000);
+        }
 
         // Input email
         await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.id);
+        await utils.delay(1000);
         await driver.pressEnter();
 
         // Check if email is incorrect
@@ -50,6 +55,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
 
         // Input password
         await driver.input_text(LeroyMerlinSelectors.INPUT_PASSWORD, params.password);
+        await utils.delay(1000);
         await driver.left_click(LeroyMerlinSelectors.BUTTON_PASSWORD_CONTINUE);
             
         // Check if password is incorrect

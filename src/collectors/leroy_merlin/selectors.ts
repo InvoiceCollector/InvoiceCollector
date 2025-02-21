@@ -1,6 +1,6 @@
 export const LeroyMerlinSelectors = {
     
-    // COOKIES
+    // MAIN PAGE
 
     BUTTON_REFUSE_COOKIES: {
         selector: "div.is-open button.alt-modal__close",
@@ -10,13 +10,13 @@ export const LeroyMerlinSelectors = {
         selector: "div.is-open button.js-modal-privacy-button-accept",
         info: "accept cookies button"
     },
-
-    //LOGIN PAGE
-
     BUTTON_CLOSE_SHOP_CHOOSER: {
-        selector: ".mc-layer__header button",
+        selector: "div.is-open .mc-layer__header button",
         info: "close shop chooser button"
     },
+
+    //LOGIN PAGE
+    
     INPUT_EMAIL: {
         selector: "form#js-email-form input",
         info: "login input"
