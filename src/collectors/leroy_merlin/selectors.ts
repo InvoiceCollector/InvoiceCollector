@@ -14,6 +14,10 @@ export const LeroyMerlinSelectors = {
         selector: "div.is-open .mc-layer__header button",
         info: "close shop chooser button"
     },
+    BUTTON_LOGIN_PAGE: {
+        selector: "#component-customerheadermodule",
+        info: "login page button"
+    },
 
     //LOGIN PAGE
     

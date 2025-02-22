@@ -9,7 +9,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     static CONFIG = {
         name: "Leroy Merlin",
         description: "i18n.collectors.leroy_merlin.description",
-        version: "3",
+        version: "4",
         website: "https://www.leroymerlin.fr",
         logo: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Leroy_Merlin.svg",
         params: {
@@ -24,7 +24,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entryUrl: "https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login"
+        entryUrl: "https://www.leroymerlin.fr"
     }
 
     constructor() {
@@ -32,15 +32,17 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     }
 
     async login(driver: Driver, params: any): Promise<string | void> {
+        // Wait for Datadome captcha
+        await driver.waitForDatadomeCaptcha();
+
         // Refuse cookies
-        await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, false, 15000, 1000);
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, delay: 1000, navigation: false });
 
         // Close shop chooser
-        const closeShopChooser = await driver.wait_for_element(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, false, 10000);
-        if(closeShopChooser) {
-            await driver.pressEnter();
-            await utils.delay(1000);
-        }
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_CLOSE_SHOP_CHOOSER, { raise_exception: false, delay: 1000, navigation: false });
+
+        // Open login page
+        await driver.left_click(LeroyMerlinSelectors.BUTTON_LOGIN_PAGE);
 
         // Input email
         await driver.input_text(LeroyMerlinSelectors.INPUT_EMAIL, params.id);
@@ -66,7 +68,7 @@ export class LeroyMerlinCollector extends ScrapperCollector {
     }
 
     async collect(driver: Driver, params: any): Promise<Invoice[]> {    
-        const data = await driver.goto('https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html?auth-mode=login', 'https://www.leroymerlin.fr/order-followup/backend/v2/orders?');
+        const data = await driver.goto('https://www.leroymerlin.fr/espace-perso/suivi-de-commande.html', 'https://www.leroymerlin.fr/order-followup/backend/v2/orders?');
 
         return data.map(order => { 
             return {
