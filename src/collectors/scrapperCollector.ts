@@ -22,6 +22,7 @@ export type ScrapperConfig = {
     },
     entryUrl: string,
     useProxy?: boolean,
+    captcha?: "datadome" | "cloudflare"
 }
 
 export abstract class ScrapperCollector extends AbstractCollector {

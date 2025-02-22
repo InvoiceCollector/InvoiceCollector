@@ -5,8 +5,8 @@ import { Browser, DownloadPolicy, ElementHandle } from "rebrowser-puppeteer-core
 import { ElementNotFoundError } from './error';
 import { Proxy } from './proxy/abstractProxy';
 import * as utils from './utils';
-import { AbstractCollector } from './collectors/abstractCollector';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { ScrapperCollector } from './collectors/scrapperCollector';
 
 const stealth = StealthPlugin();
 stealth.enabledEvasions.delete('user-agent-override');
@@ -47,11 +47,11 @@ export class Driver {
         plugins: [/*stealth*/],
     };
 
-    collector: AbstractCollector;
+    collector: ScrapperCollector;
     browser: Browser | null;
     page: PageWithCursor | null;
 
-    constructor(collector: AbstractCollector) {
+    constructor(collector: ScrapperCollector) {
         this.collector = collector;
         this.browser = null;
         this.page = null;
@@ -75,8 +75,8 @@ export class Driver {
         this.browser = connectResult.browser;
         this.page = connectResult.page;
 
-        // Block images if not in debug
-        if (process.env.ENV != "debug") {
+        // Block images if collector does not implement cloudflare captcha
+        if (this.collector.config.captcha !== "cloudflare") {
             await this.page.setRequestInterception(true);
             this.page.on("request", (request) => {
                 if (!request.isInterceptResolutionHandled()) {

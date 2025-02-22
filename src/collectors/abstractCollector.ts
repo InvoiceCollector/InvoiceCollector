@@ -20,6 +20,7 @@ export type Config = {
     },
     entryUrl?: string,
     baseUrl?: string,
+    captcha?: "datadome" | "cloudflare"
 }
 
 export type Invoice = {

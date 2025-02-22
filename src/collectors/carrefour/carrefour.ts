@@ -23,7 +23,8 @@ export class CarrefourCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entryUrl: "https://www.carrefour.fr/mon-compte/mes-achats/en-ligne"
+        entryUrl: "https://www.carrefour.fr/mon-compte/mes-achats/en-ligne",
+        captcha: "cloudflare" as "cloudflare"
     }
 
     constructor() {

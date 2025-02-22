@@ -24,7 +24,8 @@ export class LeroyMerlinCollector extends ScrapperCollector {
                 mandatory: true,
             }
         },
-        entryUrl: "https://www.leroymerlin.fr"
+        entryUrl: "https://www.leroymerlin.fr",
+        captcha: "datadome" as "datadome"
     }
 
     constructor() {
