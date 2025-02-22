@@ -71,9 +71,7 @@ dotenv.config();
         }
     } catch (error) {
         console.error(error);
-
         if (error instanceof LoggableError) {
-            
             // Save screenshot if exists
             if (error.screenshot) {
                 fs.writeFileSync(`./media/${id}_screenshot.png`, Buffer.from(error.screenshot, 'base64'));
@@ -81,7 +79,7 @@ dotenv.config();
 
             // Save source code if exists
             if (error.source_code) {
-                fs.writeFileSync(`./media/${id}_source_code.html`, error.source_code);
+                fs.writeFileSync(`./media/${id}_source_code.html`, Buffer.from(error.source_code, 'base64'));
             }
         }
     }
