@@ -32,14 +32,14 @@ export class TotalEnergiesCollector extends ScrapperCollector {
 
     async login(driver: Driver, params: any): Promise<string | void> {
         // Refuse cookies
-        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, timeout: 5000});
 
         // Go to login page
         // Note: The login page is not the entryUrl to avoid datadom detection
         await driver.goto('https://www.coursesu.com/connexion');
 
         // Refuse cookies
-        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, timeout: 5000});
 
         // Input email & password
         await driver.input_text(USelectors.FIELD_EMAIL, params.id);
@@ -66,7 +66,7 @@ export class TotalEnergiesCollector extends ScrapperCollector {
         await driver.goto('https://www.coursesu.com/mon-compte/mes-commandes');
 
         // Refuse cookies
-        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(USelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, timeout: 5000});
 
         // TODO : Implement the rest of the collector
     }

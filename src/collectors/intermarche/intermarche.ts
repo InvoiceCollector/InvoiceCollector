@@ -56,7 +56,7 @@ export class IntermarcheCollector extends ScrapperCollector {
     }
 
     async collect(driver: Driver, params: any): Promise<void> {
-        await driver.left_click(IntermarcheSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(IntermarcheSelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, timeout: 5000});
         // TODO : Implement the rest of the collector
     }
 

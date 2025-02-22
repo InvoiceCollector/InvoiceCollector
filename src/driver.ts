@@ -164,7 +164,7 @@ export class Driver {
     ): Promise<any> {
         let startDate = Date.now()
         while ((Date.now() - startDate) < timeout) {
-            const result = await check_condition(this)
+            const result = await check_condition(this);
             if (result != null) {
                 return result;
             }
@@ -217,7 +217,12 @@ export class Driver {
         }, attributeName);
     }
 
-    async left_click(selector, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT, delay = Driver.DEFAULT_DELAY) {
+    async left_click(selector, {
+        raise_exception = true,
+        timeout = Driver.DEFAULT_TIMEOUT,
+        delay = Driver.DEFAULT_DELAY,
+        navigation = true
+    } = {}) {
         if (this.page === null) {
             throw new Error('Page is not initialized.');
         }
@@ -225,18 +230,20 @@ export class Driver {
         if(element != null) {
             await utils.delay(delay);
             await element.click();
-            try {
-                await this.page.waitForNavigation({timeout});
+            if(navigation === true) {
+                try {
+                    await this.page.waitForNavigation({timeout});
+                }
+                catch {}
             }
-            catch {}
         }
     }
 
     async input_text(selector, text, raise_exception = true, timeout = Driver.DEFAULT_TIMEOUT, delay = Driver.DEFAULT_DELAY) {
         let element = await this.wait_for_element(selector, raise_exception, timeout);
         if(element != null) {
-            await utils.delay(delay);
             await element.type(text);
+            await utils.delay(delay);
         }
     }
 
@@ -349,6 +356,17 @@ export class Driver {
             return token && token.length > 20 ? token : null;
         },
         "Cloudflare turnstile captcha did not succeed");
+    }
+
+    async waitForDatadomeCaptcha(): Promise<void> {
+        if (this.page === null) {
+            throw new Error('Page is not initialized.');
+        }
+        await this.waitFor(async (driver) => {
+            const iframe = await driver.page.$("iframe[title='DataDome Device Check']").catch(() => null);
+            return iframe ? null : "Navigation succeeded";
+        },
+        "Datadome captcha did not succeed");
     }
 }
 

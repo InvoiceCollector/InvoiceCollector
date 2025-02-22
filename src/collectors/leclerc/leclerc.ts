@@ -32,7 +32,7 @@ export class LeclercCollector extends ScrapperCollector {
 
     async login(driver: Driver, params: any): Promise<string | void> {
             // Accept cookies
-            await driver.left_click(LeclercSelectors.BUTTON_ACCEPT_COOKIES, false, 5000);
+            await driver.left_click(LeclercSelectors.BUTTON_ACCEPT_COOKIES, { raise_exception: false, timeout: 5000});
 
             // Input email
             await driver.input_text(LeclercSelectors.FIELD_EMAIL, params.id);

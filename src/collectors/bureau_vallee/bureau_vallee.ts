@@ -32,7 +32,7 @@ export class BureauValleeCollector extends ScrapperCollector {
 
     async login(driver: Driver, params: any): Promise<string | void> {
         // Refuse cookies
-        await driver.left_click(BureauValleeSelectors.BUTTON_REFUSE_COOKIES, false, 5000);
+        await driver.left_click(BureauValleeSelectors.BUTTON_REFUSE_COOKIES, { raise_exception: false, timeout: 5000});
 
         // Input email
         await driver.input_text(BureauValleeSelectors.FIELD_EMAIL, params.id);
