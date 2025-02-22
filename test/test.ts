@@ -2,7 +2,7 @@ import promptSync from 'prompt-sync';
 const prompt = promptSync({});
 import fs from 'fs';
 import { Server } from "../src/server";
-import { collectors } from '../src/collectors/collectors';
+import { CollectorLoader } from '../src/collectors/collectorLoader';
 import dotenv from 'dotenv';
 import { LoggableError } from '../src/error';
 dotenv.config();
@@ -19,17 +19,16 @@ dotenv.config();
             id = prompt('collector: ');
         }
 
-        // Get collectors
-        const matching_collectors = collectors.filter((collector) => collector.config.id == id.toLowerCase())
-        if(matching_collectors.length == 0) {
+        // Load collectors
+        CollectorLoader.load(id);
+
+        // Get collector
+        const collector = CollectorLoader.get(id);
+
+        // Check if collector not found
+        if(collector == null) {
             throw new Error(`No collector with id "${id}" found.`);
         }
-        if(matching_collectors.length > 1) {
-            throw new Error(`Found ${matching_collectors.length} collectors with id "${id}".`);
-        }
-
-        // Get collectors
-        const collector = matching_collectors[0];
 
         let params = {}
         let argv_index = 3;

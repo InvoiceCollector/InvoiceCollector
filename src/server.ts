@@ -4,7 +4,7 @@ import { AbstractSecretManager } from './secret_manager/abstractSecretManager';
 import { SecretManagerFactory } from './secret_manager/secretManagerFactory';
 import { AuthenticationBearerError, OauthError, MissingField, MissingParams, StatusError } from './error';
 import { generate_token } from './utils';
-import { collectors } from './collectors/collectors';
+import { CollectorLoader } from './collectors/collectorLoader';
 import { User } from './model/user';
 import { Customer } from './model/customer';
 import { IcCredential, State } from './model/credential';
@@ -39,6 +39,9 @@ export class Server {
 
         this.secret_manager = SecretManagerFactory.getSecretManager();
         this.tokens = {}
+
+        // Load collectors
+        CollectorLoader.load();
 
         this.collection_task = new CollectionTask(this.secret_manager);
 	}
@@ -352,7 +355,7 @@ export class Server {
 
     // ---------- NO OAUTH TOKEN NEEDED ----------
 
-    get_collectors(locale: any): Config[] {
+    public get_collectors(locale: any): Config[] {
         //Check if locale field is missing
         if(!locale || typeof locale !== 'string') {
             //Set default locale
@@ -365,7 +368,7 @@ export class Server {
         }
 
         console.log(`Listing all collectors`);
-        return collectors.map((collector): Config => {
+        return CollectorLoader.getAll().map((collector): Config => {
             const name: string = Server.i18n.__({ phrase: collector.config.name, locale });
             const description: string = Server.i18n.__({ phrase: collector.config.description, locale });
             const instructions: string = Server.i18n.__({ phrase: collector.config.instructions, locale });
@@ -387,14 +390,11 @@ export class Server {
         });
     }
 
-    get_collector(id: string): AbstractCollector {
-        const matching_collectors = collectors.filter((collector) => collector.config.id.toLowerCase() == id.toLowerCase())
-        if(matching_collectors.length == 0) {
+    private get_collector(id: string): AbstractCollector {
+        const collector = CollectorLoader.get(id);
+        if(collector == null) {
             throw new StatusError(`No collector with id "${id}" found.`, 400);
         }
-        if(matching_collectors.length > 1) {
-            throw new Error(`Found ${matching_collectors.length} collectors with id "${id}".`);
-        }
-        return matching_collectors[0]
+        return collector;
     }
 }

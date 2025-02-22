@@ -4,7 +4,7 @@ import { IcCredential, State } from '../model/credential';
 import { LoggableError, AuthenticationError, MaintenanceError, DesynchronizationError } from '../error';
 import { RegistryServer } from '../registryServer';
 import { AbstractSecretManager } from '../secret_manager/abstractSecretManager';
-import { collectors } from '../collectors/collectors';
+import { CollectorLoader } from '../collectors/collectorLoader';
 
 export class CollectionTask {
     private secret_manager: AbstractSecretManager;
@@ -81,7 +81,12 @@ export class CollectionTask {
             const secret = await this.secret_manager.getSecret(credential.secret_manager_id);
 
             // Get collector from collector_id
-            const collector = this.get_collector(credential.collector_id);
+            const collector = CollectorLoader.get(credential.collector_id);
+
+            // Check if collector not found
+            if(collector == null) {
+                throw new Error(`No collector with id "${credential.collector_id}" found.`);
+            }
 
             // Check if secret not found
             if (!secret) {
@@ -197,16 +202,5 @@ export class CollectionTask {
                 await credential.commit();
             }
         }
-    }
-    
-    get_collector(id: string) {
-        const collector_pointers = collectors.filter((collector) => collector.config.id.toLowerCase() == id.toLowerCase())
-        if(collector_pointers.length == 0) {
-            throw new Error(`No collector with id "${id}" found.`);
-        }
-        if(collector_pointers.length > 1) {
-            throw new Error(`Found ${collector_pointers.length} collectors with id "${id}".`);
-        }
-        return collector_pointers[0]
     }
 }
