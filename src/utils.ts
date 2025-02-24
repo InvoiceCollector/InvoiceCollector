@@ -1,6 +1,11 @@
 import * as crypto from 'crypto';
 import date_fns from 'date-fns';
+import os from 'os'
 import { enUS, fr } from 'date-fns/locale';
+
+export function generate_bearer(size=128): string {
+    return crypto.randomBytes(size).toString('base64');
+}
 
 export function generate_token(size=64): string {
     return crypto.randomBytes(size).toString('hex');
@@ -50,3 +55,14 @@ export function mimetypeFromBase64(base64: string | null): string {
 export function generateVerificationCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString().padStart(6, '0');
 }
+
+export function generateUserAgent()  {
+    const chromeVersion = Math.floor(Math.random() * 20) + 60
+    const webkitVersion = Math.floor(Math.random() * 700) + 500
+    const osPlatform =
+      os.platform() === 'win32'
+        ? 'Win64; x64'
+        : 'Macintosh; Intel Mac OS X 10_15_0'
+    const userAgent = `Mozilla/5.0 (${osPlatform}) AppleWebKit/${webkitVersion}.36 (KHTML, like Gecko) Chrome/${chromeVersion}.0.3163.100 Safari/${webkitVersion}.36`
+    return userAgent
+  }

@@ -2,84 +2,54 @@ import { Customer } from "../model/customer";
 import { User } from "../model/user";
 import { IcCredential } from "../model/credential";
 
-export class AbstractDatabase {
+export abstract class AbstractDatabase {
     constructor() {
         if (new.target === AbstractDatabase) {
             throw new TypeError("Cannot construct AbstractDatabase instances directly");
         }
     }
 
-    async connect(): Promise<void> {
-        throw new Error("Method 'connect()' must be implemented.");
-    }
+    abstract connect(): Promise<void>;
 
-    async disconnect(): Promise<void> {
-        throw new Error("Method 'disconnect()' must be implemented.");
-    }
+    abstract disconnect(): Promise<void>;
 
     // CUSTOMER
-    
-    async getCustomerFromBearer(bearer: string): Promise<Customer|null> {
-        throw new Error("Method 'getCustomerFromBearer()' must be implemented.");
-    }
-    
-    async getCustomer(customer_id: string): Promise<Customer|null> {
-        throw new Error("Method 'getCustomer()' must be implemented.");
-    }
 
-    async updateCustomer(customer: Customer): Promise<void> {
-        throw new Error("Method 'updateCustomer()' must be implemented.");
-    }
+    abstract countCustomers(): Promise<number>;
+
+    abstract createCustomer(customer: Customer): Promise<Customer>;
+    
+    abstract getCustomerFromBearer(bearer: string): Promise<Customer|null>;
+    
+    abstract getCustomer(customer_id: string): Promise<Customer|null>;
+
+    abstract updateCustomer(customer: Customer): Promise<void>;
 
     // USER
     
-    async getUser(user_id: string): Promise<User|null> {
-        throw new Error("Method 'getUser()' must be implemented.");
-    }
+    abstract getUser(user_id: string): Promise<User|null>;
 
-    async getUserFromCustomerIdAndRemoteId(customer_id: string, remote_id: string): Promise<User|null> {
-        throw new Error("Method 'getUserFromCustomerIdAndRemoteId()' must be implemented.");
-    }
+    abstract getUserFromCustomerIdAndRemoteId(customer_id: string, remote_id: string): Promise<User|null>;
     
-    async createUser(user: User): Promise<User> {
-        throw new Error("Method 'createUser()' must be implemented.");
-    }
+    abstract createUser(user: User): Promise<User>;
 
-    async updateUser(user: User): Promise<void> {
-        throw new Error("Method 'updateUser()' must be implemented.");
-    }
+    abstract updateUser(user: User): Promise<void>;
 
-    async deleteUser(user_id: string): Promise<void> {
-        throw new Error("Method 'deleteUser()' must be implemented.");
-    }
+    abstract deleteUser(user_id: string): Promise<void>;
 
     // CREDENTIAL
 
-    async getCredentialsIdToCollect(): Promise<string[]> {
-        throw new Error("Method 'getCredentialsToCollect()' must be implemented.");
-    }
+    abstract getCredentialsIdToCollect(): Promise<string[]>;
 
-    async getCredentials(user_id: string|null): Promise<IcCredential[]> {
-        throw new Error("Method 'getCredentials()' must be implemented.");
-    }
+    abstract getCredentials(user_id: string|null): Promise<IcCredential[]>;
 
-    async getCredential(credential_id: string): Promise<IcCredential|null> {
-        throw new Error("Method 'getCredential()' must be implemented.");
-    }
+    abstract getCredential(credential_id: string): Promise<IcCredential|null>;
 
-    async createCredential(credential: IcCredential): Promise<IcCredential> {
-        throw new Error("Method 'createCredential()' must be implemented.");
-    }
+    abstract createCredential(credential: IcCredential): Promise<IcCredential>;
 
-    async updateCredential(credential: IcCredential): Promise<void> {
-        throw new Error("Method 'updateCredential()' must be implemented.");
-    }
+    abstract updateCredential(credential: IcCredential): Promise<void>;
 
-    async deleteCredential(user_id: string, credential_id: string): Promise<void> {
-        throw new Error("Method 'deleteCredential()' must be implemented.");
-    }
+    abstract deleteCredential(user_id: string, credential_id: string): Promise<void>;
 
-    async deleteCredentials(user_id: string): Promise<void> {
-        throw new Error("Method 'deleteCredentials()' must be implemented.");
-    }
+    abstract deleteCredentials(user_id: string): Promise<void>;
 }

@@ -36,6 +36,15 @@ export class MongoDB extends AbstractDatabase {
             await this.db.createCollection(MongoDB.CUSTOMER_COLLECTION);
             await this.db.createCollection(MongoDB.USER_COLLECTION);
             await this.db.createCollection(MongoDB.CREDENTIAL_COLLECTION);
+
+            // Create default customer if no customer found
+            const nbCustomers = await this.countCustomers();
+            if (nbCustomers === 0) {
+                console.log("No customer found in database, creating default customer.");
+                const bearer = (await Customer.createDefault()).bearer;
+                console.log(`Default customer created. Bearer is "${bearer}". Keep it safe, it will not be displayed again.`);
+            }
+
         } catch (err) {
             console.error("Connection to MongoDB failed", err);
         }
@@ -51,6 +60,26 @@ export class MongoDB extends AbstractDatabase {
     }
 
     // CUSTOMER
+
+    async countCustomers(): Promise<number> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        return await this.db.collection(MongoDB.CUSTOMER_COLLECTION).countDocuments();
+    }
+
+    async createCustomer(customer: Customer): Promise<Customer> {
+        if (!this.db) {
+            throw new Error("Database is not connected");
+        }
+        const document = await this.db.collection(MongoDB.CUSTOMER_COLLECTION).insertOne({
+            name: customer.name,
+            callback: customer.callback,
+            bearer: customer.bearer
+        });
+        customer.id = document.insertedId.toString();
+        return customer;
+    }
 
     async getCustomerFromBearer(bearer: string): Promise<Customer|null> {
         if (!this.db) {
